@@ -14,7 +14,14 @@ The owner asked for the whole app in one go instead of phase-by-phase, so Phases
 | 7 | History, ratings, earnings and admin tools | DONE |
 | 8 | Testing and getting ready for a pilot | DONE in code — see `docs/LAUNCH_CHECKLIST.md` for what's left |
 
-## Not yet tried against a real Supabase project
+## Live Supabase project
+- Project **lift-me** (`sfvnchzihitdpblnjfvv`), Frankfurt (eu-central-1), free plan — created 2026-11-16.
+- All 6 migrations applied; RLS on all 18 tables; private `driver-documents` bucket; realtime on rides/offers/locations/payments; `no_driver_found` job runs every minute.
+- Edge Functions deployed: `places`, `get-quote`, `mpesa-stk-push` (login required) and `mpesa-callback` (no login; protected by its secret).
+- `.env` (git-ignored) points the app at this project.
+- Still needed from the owner: Edge Function secrets (Google server key, M-Pesa sandbox keys, callback secret), phone/SMS provider + test numbers, first admin.
+
+## Not yet tried end-to-end
 Everything was checked locally:
 - lint, typecheck and unit tests,
 - the database migrations and security tests on Postgres 16 + PostGIS,

@@ -293,3 +293,12 @@ create table public.admin_actions (
   details jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
+
+-- Lock tables down immediately; the security migration then grants exactly what is needed.
+do $$
+declare t record;
+begin
+  for t in select tablename from pg_tables where schemaname = 'public' loop
+    execute format('alter table public.%I enable row level security', t.tablename);
+  end loop;
+end $$;
