@@ -5,6 +5,7 @@ insert into public.settings (key, value, description) values
   ('currency',               '"KES"',              'Currency code for all prices'),
   ('timezone',               '"Africa/Nairobi"',   'Timezone used for "today" / "this week"'),
   ('country_code',           '"+254"',             'Default phone country code'),
+  ('country_iso',            '"ke"',               'Country used to focus address search'),
   ('commission_percent',     '15',                 'PLACEHOLDER — platform commission % per completed ride'),
   ('match_radius_km',        '5',                  'Offer requests to drivers within this many km of the pickup'),
   ('search_timeout_seconds', '120',                'If nobody accepts in this time → no_driver_found'),

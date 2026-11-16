@@ -1,0 +1,65 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@std/assert@1": "1.0.19",
+    "jsr:@std/internal@^1.0.12": "1.0.14"
+  },
+  "jsr": {
+    "@std/assert@1.0.19": {
+      "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/internal@1.0.14": {
+      "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@expo-google-fonts/inter@~0.4.2",
+        "npm:@expo/metro-runtime@~58.0.17",
+        "npm:@expo/vector-icons@^15.0.2",
+        "npm:@hookform/resolvers@^7.0.6",
+        "npm:@react-native-async-storage/async-storage@2.2.0",
+        "npm:@supabase/supabase-js@^2.119.0",
+        "npm:@tanstack/react-query@^5.107.1",
+        "npm:@types/jest@30",
+        "npm:@types/react@19.3",
+        "npm:eslint-config-expo@^58.0.4",
+        "npm:eslint@^9.39.5",
+        "npm:expo-constants@~58.0.16",
+        "npm:expo-document-picker@~58.0.5",
+        "npm:expo-font@~58.0.12",
+        "npm:expo-image-picker@~58.0.10",
+        "npm:expo-linking@~58.0.17",
+        "npm:expo-location@~58.0.22",
+        "npm:expo-router@~58.0.31",
+        "npm:expo-secure-store@~58.0.3",
+        "npm:expo-splash-screen@~58.0.14",
+        "npm:expo-status-bar@~58.0.5",
+        "npm:expo-task-manager@~58.0.14",
+        "npm:expo-web-browser@~58.0.8",
+        "npm:expo@~58.0.25",
+        "npm:jest-expo@^58.0.14",
+        "npm:jest@^30.5.2",
+        "npm:react-dom@19.3.0",
+        "npm:react-hook-form@^7.92.0",
+        "npm:react-native-gesture-handler@3.3",
+        "npm:react-native-maps@1.29.11",
+        "npm:react-native-reanimated@4.7.1",
+        "npm:react-native-safe-area-context@~5.11.1",
+        "npm:react-native-screens@~4.30.1",
+        "npm:react-native-url-polyfill@4",
+        "npm:react-native-web@~0.21.4",
+        "npm:react-native-worklets@0.13.0",
+        "npm:react-native@0.88.1",
+        "npm:react@19.3.0",
+        "npm:typescript@~6.0.3",
+        "npm:zod@^4.6.7",
+        "npm:zustand@^5.1.0"
+      ]
+    }
+  }
+}

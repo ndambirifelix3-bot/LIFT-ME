@@ -1,0 +1,2 @@
+-- No demo data on purpose (PROJECT_RULES: never fake data).
+-- Pilot configuration (prices, area, settings) lives in migrations/20261116000005_seed_config.sql.
