@@ -26,7 +26,8 @@ export default function AdminLayout() {
     const active = n.href === '/admin' ? path === '/admin' : path.startsWith(n.href);
     return (
       <Link key={n.href} href={n.href} asChild>
-        <Pressable style={[styles.link, active && styles.linkActive, !wide && styles.linkNarrow]} accessibilityRole="link">
+        {/* Link asChild hands this style to a browser <a> on web, which crashes on a style array — flatten it. */}
+        <Pressable style={StyleSheet.flatten([styles.link, active && styles.linkActive, !wide && styles.linkNarrow])} accessibilityRole="link">
           <Ionicons name={n.icon} size={18} color={active ? colors.black : colors.ivory} />
           <Text style={[styles.linkText, active && { color: colors.black }]}>{n.label}</Text>
         </Pressable>
@@ -62,9 +63,9 @@ const styles = StyleSheet.create({
   side: { backgroundColor: colors.black, padding: space.lg },
   sideWide: { width: 230 },
   sideNarrow: { gap: space.sm, paddingVertical: space.md },
-  brand: { fontFamily: fonts.bold, fontSize: 20, color: colors.gold },
+  brand: { fontFamily: fonts.bold, fontSize: 20, color: colors.brand },
   link: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10 },
   linkNarrow: { paddingVertical: 8 },
-  linkActive: { backgroundColor: colors.gold },
+  linkActive: { backgroundColor: colors.brand },
   linkText: { fontFamily: fonts.medium, fontSize: 14, color: colors.ivory },
 });

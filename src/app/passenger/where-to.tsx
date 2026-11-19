@@ -90,7 +90,7 @@ export default function WhereTo() {
       <View style={styles.box}>
         {fields.map((f) => (
           <View key={f.key} style={[styles.field, focus === f.key && styles.fieldActive]}>
-            <Ionicons name={f.icon} size={12} color={f.key === 'pickup' ? colors.black : colors.gold} />
+            <Ionicons name={f.icon} size={12} color={colors.black} />
             <TextInput
               ref={f.key === 'dropoff' ? dropRef : undefined}
               value={text[f.key]}
@@ -144,7 +144,7 @@ export default function WhereTo() {
         />
       ) : null}
 
-      {suggestions.isFetching || choosing ? <ActivityIndicator color={colors.gold} style={{ marginTop: space.lg }} /> : null}
+      {suggestions.isFetching || choosing ? <ActivityIndicator color={colors.black} style={{ marginTop: space.lg }} /> : null}
       <ErrorMessage error={error ?? suggestions.error} />
       {(suggestions.data ?? []).map((s) => (
         <ListItem key={s.placeId} icon="location-outline" title={s.title} subtitle={s.subtitle} onPress={() => choose(s.placeId)} />
@@ -159,6 +159,6 @@ export default function WhereTo() {
 const styles = StyleSheet.create({
   box: { backgroundColor: colors.white, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: space.sm, gap: space.xs, marginBottom: space.md },
   field: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.md, borderRadius: radius.md, backgroundColor: colors.ivory },
-  fieldActive: { borderWidth: 1, borderColor: colors.gold },
+  fieldActive: { borderWidth: 2, borderColor: colors.black },
   input: { flex: 1, minWidth: 0, outlineWidth: 0, minHeight: 48, fontFamily: fonts.medium, fontSize: 16, color: colors.text },
 });

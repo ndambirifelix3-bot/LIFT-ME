@@ -19,7 +19,7 @@ export function Row({ label, value, bold }: { label: string; value: ReactNode; b
 const PILL: Record<string, { bg: string; fg: string }> = {
   good: { bg: colors.successBg, fg: colors.success },
   bad: { bg: colors.errorBg, fg: colors.error },
-  wait: { bg: colors.goldBg, fg: colors.text },
+  wait: { bg: colors.brandBg, fg: colors.text },
   neutral: { bg: colors.ivory, fg: colors.secondary },
 };
 
@@ -43,7 +43,7 @@ export function Stars({ value, onChange, size = 30 }: { value: number; onChange?
     <View style={{ flexDirection: 'row', gap: 6 }}>
       {[1, 2, 3, 4, 5].map((n) => (
         <Pressable key={n} onPress={() => onChange?.(n)} disabled={!onChange} accessibilityLabel={`${n} star${n > 1 ? 's' : ''}`} hitSlop={4}>
-          <Ionicons name={n <= value ? 'star' : 'star-outline'} size={size} color={colors.gold} />
+          <Ionicons name={n <= value ? 'star' : 'star-outline'} size={size} color={colors.brand} />
         </Pressable>
       ))}
     </View>

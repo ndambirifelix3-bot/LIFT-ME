@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   avatar: { width: 56, height: 56, borderRadius: 28 },
   avatarEmpty: { backgroundColor: colors.ivory, alignItems: 'center', justifyContent: 'center' },
   plateRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space.md },
-  plate: { backgroundColor: colors.gold, borderRadius: radius.sm, paddingHorizontal: 10, paddingVertical: 4 },
+  plate: { backgroundColor: colors.brand, borderRadius: radius.sm, paddingHorizontal: 10, paddingVertical: 4 },
   plateText: { fontFamily: fonts.bold, fontSize: 15, color: colors.black, letterSpacing: 1 },
   divider: { height: 1, backgroundColor: colors.border, marginVertical: space.sm },
 });

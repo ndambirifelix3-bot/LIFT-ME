@@ -26,7 +26,7 @@ const config: ExpoConfig = {
   android: {
     package: 'com.liftme.app',
     adaptiveIcon: {
-      backgroundColor: '#101010',
+      backgroundColor: '#FFC107',
       foregroundImage: './assets/android-icon-foreground.png',
       backgroundImage: './assets/android-icon-background.png',
       monochromeImage: './assets/android-icon-monochrome.png',

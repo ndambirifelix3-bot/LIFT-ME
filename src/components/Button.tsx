@@ -28,7 +28,7 @@ export function Button({ title, onPress, variant = 'primary', loading, disabled,
         styles.base,
         small && styles.small,
         variantStyles[variant].box,
-        pressed && variant === 'primary' && { backgroundColor: colors.goldPressed },
+        pressed && variant === 'primary' && { backgroundColor: colors.brandPressed },
         pressed && variant !== 'primary' && { opacity: 0.8 },
         isDisabled && styles.disabled,
         style,
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
 });
 
 const variantStyles: Record<Variant, { box: ViewStyle; text: { color: string } }> = {
-  primary: { box: { backgroundColor: colors.gold }, text: { color: colors.black } },
+  primary: { box: { backgroundColor: colors.brand }, text: { color: colors.black } },
   dark: { box: { backgroundColor: colors.black }, text: { color: colors.white } },
   outline: { box: { borderWidth: 1, borderColor: colors.black, backgroundColor: 'transparent' }, text: { color: colors.black } },
   ghost: { box: { backgroundColor: 'transparent' }, text: { color: colors.text } },

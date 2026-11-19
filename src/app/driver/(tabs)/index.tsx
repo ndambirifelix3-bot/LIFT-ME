@@ -13,7 +13,7 @@ import type { Ride } from '@/features/rides/types';
 import { useSettings } from '@/features/settings';
 import { formatCountdown, formatDistance, formatDuration, formatMoney, RIDE_STATUS_LABEL, secondsUntil } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
-import { colors, fonts, space, type } from '@/theme';
+import { colors, fonts, space, switchColors, type } from '@/theme';
 
 function navigate(lat: number, lng: number) {
   // Opens Google Maps turn-by-turn (app if installed, otherwise browser).
@@ -136,8 +136,7 @@ function OnlineSwitch({ online, intervalSeconds, hasActiveRide }: { online: bool
           }
           toggle.mutate(v);
         }}
-        trackColor={{ true: colors.gold, false: colors.border }}
-        thumbColor={colors.white}
+        {...switchColors}
         accessibilityLabel={online ? 'Go offline' : 'Go online'}
       />
     </Card>
@@ -169,7 +168,7 @@ function Offers({ uid }: { uid: string }) {
       {list.map((o) => {
         const r = o.ride as Ride;
         return (
-          <Card key={o.ride_id} style={{ borderColor: colors.gold, borderWidth: 2 }}>
+          <Card key={o.ride_id} style={{ borderColor: colors.brand, borderWidth: 2 }}>
             <View style={styles.offerHead}>
               <Text style={type.h2}>{formatMoney(r.fare, r.currency)}</Text>
               <Pill text={formatCountdown(secondsUntil(o.expires_at))} tone="wait" />

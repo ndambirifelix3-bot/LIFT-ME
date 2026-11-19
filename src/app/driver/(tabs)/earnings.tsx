@@ -55,6 +55,6 @@ export default function DriverEarnings() {
 }
 
 const styles = StyleSheet.create({
-  big: { fontFamily: fonts.bold, fontSize: 34, color: colors.gold, marginVertical: 4 },
+  big: { fontFamily: fonts.bold, fontSize: 34, color: colors.brand, marginVertical: 4 },
   mid: { fontFamily: fonts.bold, fontSize: 20, color: colors.text, marginVertical: 4 },
 });

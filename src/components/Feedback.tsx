@@ -7,7 +7,7 @@ import { Button } from './Button';
 export function Loading({ label }: { label?: string }) {
   return (
     <View style={styles.center} accessibilityLabel={label ?? 'Loading'}>
-      <ActivityIndicator size="large" color={colors.gold} />
+      <ActivityIndicator size="large" color={colors.black} />
       {label ? <Text style={styles.muted}>{label}</Text> : null}
     </View>
   );
@@ -18,7 +18,9 @@ export function EmptyState({ icon = 'car-outline', title, message, action, onAct
 }) {
   return (
     <View style={styles.center}>
-      <Ionicons name={icon} size={40} color={colors.gold} />
+      <View style={styles.iconCircle}>
+        <Ionicons name={icon} size={32} color={colors.black} />
+      </View>
       <Text style={styles.title}>{title}</Text>
       {message ? <Text style={[styles.muted, { textAlign: 'center' }]}>{message}</Text> : null}
       {action && onAction ? <Button title={action} onPress={onAction} style={{ marginTop: space.lg, alignSelf: 'stretch' }} /> : null}
@@ -37,9 +39,9 @@ export function ErrorMessage({ error, onRetry }: { error: unknown; onRetry?: () 
   );
 }
 
-export function Notice({ text, tone = 'gold' }: { text: string; tone?: 'gold' | 'success' | 'error' }) {
-  const bg = tone === 'gold' ? colors.goldBg : tone === 'success' ? colors.successBg : colors.errorBg;
-  const fg = tone === 'gold' ? colors.text : tone === 'success' ? colors.success : colors.error;
+export function Notice({ text, tone = 'brand' }: { text: string; tone?: 'brand' | 'success' | 'error' }) {
+  const bg = tone === 'brand' ? colors.brandBg : tone === 'success' ? colors.successBg : colors.errorBg;
+  const fg = tone === 'brand' ? colors.text : tone === 'success' ? colors.success : colors.error;
   return (
     <View style={[styles.notice, { backgroundColor: bg }]}>
       <Text style={[styles.noticeText, { color: fg }]}>{text}</Text>
@@ -49,6 +51,7 @@ export function Notice({ text, tone = 'gold' }: { text: string; tone?: 'gold' | 
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, gap: space.sm, minHeight: 200 },
+  iconCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: fonts.semibold, fontSize: 17, color: colors.text, marginTop: space.sm },
   muted: { fontFamily: fonts.regular, fontSize: 14, color: colors.secondary },
   error: {

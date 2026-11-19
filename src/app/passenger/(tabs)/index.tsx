@@ -43,7 +43,7 @@ export default function PassengerHome() {
         <View style={{ flex: 1 }} pointerEvents="none" />
         <View style={styles.sheet}>
           {loc.permission !== 'granted' ? (
-            <Card style={{ backgroundColor: colors.goldBg, borderColor: colors.goldBg }}>
+            <Card style={{ backgroundColor: colors.brandBg, borderColor: colors.brandBg }}>
               <Text style={type.h3}>Use your location for pickup?</Text>
               <Text style={[type.small, { marginVertical: space.sm }]}>
                 Lift Me uses your location only to set your pickup point and show nearby drivers. You can also type your pickup instead.

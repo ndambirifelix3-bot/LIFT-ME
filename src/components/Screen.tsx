@@ -23,7 +23,7 @@ export function Screen({ children, scroll = true, footer, onRefresh, refreshing 
           <ScrollView
             contentContainerStyle={styles.scroll}
             keyboardShouldPersistTaps="handled"
-            refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.gold} /> : undefined}
+            refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.black} /> : undefined}
           >
             {content}
           </ScrollView>

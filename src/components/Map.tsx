@@ -8,9 +8,9 @@ import type { MapMarkerKind, MapProps } from './Map.types';
 
 const PIN_COLOR: Record<MapMarkerKind, string> = {
   pickup: colors.black,
-  dropoff: colors.gold,
+  dropoff: colors.brand,
   driver: colors.black,
-  me: colors.gold,
+  me: colors.brand,
 };
 
 /** Native map (react-native-maps). Google Maps on Android; Apple Maps on iOS in Expo Go. */

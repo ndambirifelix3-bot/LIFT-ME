@@ -35,6 +35,6 @@ export default function Splash() {
 
 const styles = StyleSheet.create({
   wrap: { flex: 1, backgroundColor: colors.black, alignItems: 'center', justifyContent: 'center' },
-  logo: { fontFamily: fonts.bold, fontSize: 40, color: colors.gold, letterSpacing: -1 },
+  logo: { fontFamily: fonts.bold, fontSize: 40, color: colors.brand, letterSpacing: -1 },
   tag: { fontFamily: fonts.regular, fontSize: 15, color: colors.ivory, marginTop: 8 },
 });

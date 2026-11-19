@@ -9,7 +9,7 @@ import { AdminPage } from '@/features/admin/AdminPage';
 import { formatMoney } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import type { Tables } from '@/types/database';
-import { colors, space, type } from '@/theme';
+import { space, switchColors, type } from '@/theme';
 
 const money = z.string().regex(/^\d{1,6}$/, 'Whole KES only (no decimals)');
 const schema = z.object({ base_fare: money, per_km: money, per_minute: money, minimum_fare: money, display_name: z.string().trim().min(2), description: z.string().trim().max(120) });
@@ -60,7 +60,7 @@ function PriceCard({ row }: { row: Tables<'pricing'> }) {
         <Text style={type.h2}>{row.display_name} <Text style={type.small}>({row.ride_type})</Text></Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
           <Text style={type.small}>{row.is_active ? 'Available' : 'Hidden'}</Text>
-          <Switch value={row.is_active} onValueChange={(x) => active.mutate(x)} trackColor={{ true: colors.gold, false: colors.border }} />
+          <Switch value={row.is_active} onValueChange={(x) => active.mutate(x)} {...switchColors} />
         </View>
       </View>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
@@ -122,7 +122,7 @@ function SettingsCard({ rows }: { rows: Tables<'settings'>[] }) {
           <View key={s.key} style={{ flexGrow: 1, flexBasis: 240 }}>
             {s.kind === 'bool' ? (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, marginBottom: space.lg }}>
-                <Switch value={values[s.key] === 'true'} onValueChange={(x) => setValues((v) => ({ ...v, [s.key]: String(x) }))} trackColor={{ true: colors.gold, false: colors.border }} />
+                <Switch value={values[s.key] === 'true'} onValueChange={(x) => setValues((v) => ({ ...v, [s.key]: String(x) }))} {...switchColors} />
                 <Text style={type.body}>{s.label}</Text>
               </View>
             ) : (

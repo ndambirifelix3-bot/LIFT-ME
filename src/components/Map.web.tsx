@@ -10,7 +10,7 @@ import type { MapProps } from './Map.types';
 export function Map({ markers = [], height = 220 }: MapProps) {
   return (
     <View style={[styles.box, { height: typeof height === 'number' ? Math.min(height, 260) : 220 }]}>
-      <Ionicons name="map-outline" size={32} color={colors.gold} />
+      <Ionicons name="map-outline" size={32} color={colors.black} />
       <Text style={styles.text}>The live map is available in the Lift Me phone app.</Text>
       {markers.map((m) => (
         <Text key={m.id} style={styles.small}>

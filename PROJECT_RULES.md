@@ -52,10 +52,14 @@ ONE app, ONE codebase, THREE dashboards:
   12. Don't delete or overwrite working code without explaining why.
 
  Brand
-Midnight Black #101010 · Champagne Gold #D6B45B · Gold Pressed #B9953F · White #FFFFFF ·
-Warm Ivory #F4F4F1 · Text #171717 · Secondary #666666 · Border #E5E5E0 · Success #237A50 ·
-Error #B3261E. Font: Inter. Gold is an accent for main buttons and highlights. Premium, minimal,
-clean. Don't copy Uber or Bolt designs.
+Taxi yellow + black + white (changed from champagne gold on 2026-11-19 at the owner's request).
+Midnight Black #101010 · Lift Yellow #FFC107 · Yellow Pressed #E0A800 · Pale Yellow #FFF4CC ·
+White #FFFFFF · Light Grey #F5F5F5 · Text #171717 · Secondary #666666 · Border #E5E5E5 ·
+Success #237A50 · Error #B3261E. Font: Inter. Colours live in src/theme (colors.brand = yellow).
+Yellow is for fills (main buttons, badges, plates) with BLACK text on top, and for accents on black.
+Never use yellow for text, thin borders or small icons on white — use black there.
+Logo: placeholder pin + up-arrow (scripts/make-icons.mjs) until the client supplies a real one.
+Bold, clean, friendly. Don't copy Uber, Bolt or any other company's design or logo.
 
  End-of-phase report (always use this)
    1. What was built (in plain English)

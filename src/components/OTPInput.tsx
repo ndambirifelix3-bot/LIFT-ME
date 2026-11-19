@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     flex: 1, aspectRatio: 0.85, maxWidth: 56, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md,
     alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white,
   },
-  active: { borderColor: colors.gold, borderWidth: 2 },
+  active: { borderColor: colors.black, borderWidth: 2 },
   error: { borderColor: colors.error },
   digit: { fontFamily: fonts.semibold, fontSize: 22, color: colors.text },
   hidden: { position: 'absolute', opacity: 0, height: 1, width: 1 },

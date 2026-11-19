@@ -36,7 +36,7 @@ export default function ChooseRole() {
       accessibilityState={{ checked: choice === value }}
       style={[styles.option, choice === value && styles.selected]}
     >
-      <Ionicons name={icon} size={28} color={choice === value ? colors.gold : colors.text} />
+      <Ionicons name={icon} size={28} color={choice === value ? colors.brand : colors.text} />
       <View style={{ flex: 1 }}>
         <Text style={[styles.optTitle, choice === value && { color: colors.white }]}>{title}</Text>
         <Text style={[styles.optText, choice === value && { color: colors.ivory }]}>{text}</Text>

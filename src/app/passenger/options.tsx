@@ -71,12 +71,12 @@ export default function RideOptions() {
             accessibilityState={{ checked: selected }}
             style={[styles.option, selected && styles.optionSelected]}
           >
-            <Ionicons name={o.ride_type.includes('premium') ? 'car-sport' : 'car'} size={30} color={selected ? colors.gold : colors.text} />
+            <Ionicons name={o.ride_type.includes('premium') ? 'car-sport' : 'car'} size={30} color={selected ? colors.brand : colors.text} />
             <View style={{ flex: 1 }}>
               <Text style={[styles.optTitle, selected && { color: colors.white }]}>{o.display_name}</Text>
               <Text style={[styles.optSub, selected && { color: colors.ivory }]}>{o.description} · {o.seats} seats</Text>
             </View>
-            <Text style={[styles.price, selected && { color: colors.gold }]}>{formatMoney(o.fare, o.currency)}</Text>
+            <Text style={[styles.price, selected && { color: colors.brand }]}>{formatMoney(o.fare, o.currency)}</Text>
           </Pressable>
         );
       })}
@@ -120,6 +120,6 @@ const styles = StyleSheet.create({
     flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.sm, padding: space.md, borderRadius: radius.md,
     backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border,
   },
-  paySelected: { borderColor: colors.gold, borderWidth: 2, backgroundColor: colors.goldBg },
+  paySelected: { borderColor: colors.brand, borderWidth: 2, backgroundColor: colors.brandBg },
   payText: { fontFamily: fonts.semibold, fontSize: 15, color: colors.text },
 });

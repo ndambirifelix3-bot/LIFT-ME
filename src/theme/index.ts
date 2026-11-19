@@ -1,18 +1,21 @@
-// Lift Me brand. Gold is an accent for main buttons and highlights only.
+// Lift Me brand: taxi yellow + black + white.
+// Yellow is for fills (buttons, badges, plates) with BLACK text on top, and for accents on black.
+// Never use yellow for text, thin borders or small icons on white: it is too hard to read there.
+// Use `colors.black` for those instead.
 export const colors = {
   black: '#101010', // Midnight Black
-  gold: '#D6B45B', // Champagne Gold
-  goldPressed: '#B9953F',
+  brand: '#FFC107', // Lift Yellow
+  brandPressed: '#E0A800',
+  brandBg: '#FFF4CC', // pale yellow tint for highlighted cards / notices
   white: '#FFFFFF',
-  ivory: '#F4F4F1', // Warm Ivory (backgrounds)
+  ivory: '#F5F5F5', // light grey page background
   text: '#171717',
   secondary: '#666666',
-  border: '#E5E5E0',
+  border: '#E5E5E5',
   success: '#237A50',
   error: '#B3261E',
   successBg: '#E8F3EC',
   errorBg: '#F9E9E8',
-  goldBg: '#F8F1DE',
 } as const;
 
 export const fonts = {
@@ -32,4 +35,12 @@ export const type = {
   body: { fontFamily: fonts.regular, fontSize: 15, color: colors.text, lineHeight: 21 },
   small: { fontFamily: fonts.regular, fontSize: 13, color: colors.secondary, lineHeight: 18 },
   label: { fontFamily: fonts.medium, fontSize: 13, color: colors.secondary },
+} as const;
+
+// Spread onto every <Switch>. `activeThumbColor` is the web's name for the "on" knob colour
+// (without it the browser shows a teal knob).
+export const switchColors = {
+  trackColor: { true: colors.brand, false: colors.border },
+  thumbColor: colors.white,
+  activeThumbColor: colors.white,
 } as const;
