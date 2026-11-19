@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Link, Slot, usePathname } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Logo } from '@/components';
 import { RoleGate } from '@/features/auth/RoleGate';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { colors, fonts, space } from '@/theme';
@@ -39,7 +40,10 @@ export default function AdminLayout() {
     <RoleGate role="admin">
       <SafeAreaView style={[styles.wrap, { flexDirection: wide ? 'row' : 'column' }]} edges={['top', 'left', 'right']}>
         <View style={[styles.side, wide ? styles.sideWide : styles.sideNarrow]}>
-          <Text style={styles.brand}>Lift Me <Text style={{ color: colors.ivory, fontFamily: fonts.regular }}>Admin</Text></Text>
+          <View style={styles.brandRow}>
+            <Logo variant="mark" width={34} />
+            <Text style={styles.brand}>Lift Me <Text style={{ color: colors.ivory, fontFamily: fonts.regular }}>Admin</Text></Text>
+          </View>
           {wide ? (
             <View style={{ gap: 4, marginTop: space.xl, flex: 1 }}>{links}</View>
           ) : (
@@ -63,6 +67,7 @@ const styles = StyleSheet.create({
   side: { backgroundColor: colors.black, padding: space.lg },
   sideWide: { width: 230 },
   sideNarrow: { gap: space.sm, paddingVertical: space.md },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   brand: { fontFamily: fonts.bold, fontSize: 20, color: colors.brand },
   link: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10 },
   linkNarrow: { paddingVertical: 8 },

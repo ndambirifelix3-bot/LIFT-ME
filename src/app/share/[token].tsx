@@ -30,7 +30,7 @@ export default function SharedTrip() {
   const t = q.data;
   return (
     <Screen>
-      <Header title="Lift Me trip" subtitle="Move with confidence." />
+      <Header title="Lift Me trip" subtitle="Move smarter." />
       {!t ? (
         <EmptyState icon="checkmark-done-outline" title="This trip has ended" message="Live sharing stops when the trip is finished or cancelled." />
       ) : (

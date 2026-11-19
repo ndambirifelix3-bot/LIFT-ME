@@ -7,3 +7,4 @@ export { Header } from './Header';
 export { Loading, EmptyState, ErrorMessage, Notice } from './Feedback';
 export { Screen } from './Screen';
 export { Row, Pill, toneForStatus, Stars, Chip, ListItem, SectionTitle } from './Bits';
+export { Logo } from './Logo';

@@ -26,7 +26,7 @@ const config: ExpoConfig = {
   android: {
     package: 'com.liftme.app',
     adaptiveIcon: {
-      backgroundColor: '#FFC107',
+      backgroundColor: '#01061A', // logo navy
       foregroundImage: './assets/android-icon-foreground.png',
       backgroundImage: './assets/android-icon-background.png',
       monochromeImage: './assets/android-icon-monochrome.png',
@@ -43,7 +43,7 @@ const config: ExpoConfig = {
   web: { favicon: './assets/favicon.png', bundler: 'metro', output: 'single' },
   plugins: [
     'expo-router',
-    ['expo-splash-screen', { image: './assets/splash-icon.png', backgroundColor: '#101010', imageWidth: 160 }],
+    ['expo-splash-screen', { image: './assets/splash-icon.png', backgroundColor: '#101010', imageWidth: 240 }],
     'expo-font',
     'expo-secure-store',
     'expo-web-browser',

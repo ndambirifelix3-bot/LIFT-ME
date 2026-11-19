@@ -58,7 +58,9 @@ White #FFFFFF · Light Grey #F5F5F5 · Text #171717 · Secondary #666666 · Bord
 Success #237A50 · Error #B3261E. Font: Inter. Colours live in src/theme (colors.brand = yellow).
 Yellow is for fills (main buttons, badges, plates) with BLACK text on top, and for accents on black.
 Never use yellow for text, thin borders or small icons on white — use black there.
-Logo: placeholder pin + up-arrow (scripts/make-icons.mjs) until the client supplies a real one.
+Logo: the client's LIFTME logo (assets/brand/logo-source.png). All icons and the in-app <Logo />
+are generated from it by scripts/make-brand-assets.py — only place it on dark backgrounds.
+Tagline: "Move smarter." (from the logo; replaced "Move with confidence.").
 Bold, clean, friendly. Don't copy Uber, Bolt or any other company's design or logo.
 
  End-of-phase report (always use this)

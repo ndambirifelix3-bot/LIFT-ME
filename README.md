@@ -1,4 +1,4 @@
-# Lift Me — *Move with confidence.*
+# Lift Me — *Move smarter.*
 
 A simple ride-hailing app for a small Nairobi pilot. **One app, one codebase, three dashboards**:
 

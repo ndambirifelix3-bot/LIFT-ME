@@ -1,7 +1,7 @@
 import { Redirect, router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button } from '@/components';
+import { Button, Logo } from '@/components';
 import { homeForProfile, useAuth } from '@/features/auth/AuthProvider';
 import { colors, fonts, space } from '@/theme';
 
@@ -12,9 +12,7 @@ export default function Welcome() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.top}>
-        <Text style={styles.logo}>Lift Me</Text>
-        <View style={styles.rule} />
-        <Text style={styles.tag}>Move with confidence.</Text>
+        <Logo width={280} />
         <Text style={styles.copy}>Safe, reliable rides across Nairobi. Pay with M-Pesa or cash.</Text>
       </View>
       <View style={styles.bottom}>
@@ -27,11 +25,8 @@ export default function Welcome() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.black, padding: space.xl, justifyContent: 'space-between' },
-  top: { flex: 1, justifyContent: 'center', maxWidth: 480, width: '100%', alignSelf: 'center' },
-  logo: { fontFamily: fonts.bold, fontSize: 48, color: colors.white, letterSpacing: -1.5 },
-  rule: { width: 48, height: 3, backgroundColor: colors.brand, marginVertical: space.lg },
-  tag: { fontFamily: fonts.semibold, fontSize: 22, color: colors.brand },
-  copy: { fontFamily: fonts.regular, fontSize: 16, color: colors.ivory, marginTop: space.md, lineHeight: 23, opacity: 0.85 },
+  top: { flex: 1, justifyContent: 'center', alignItems: 'center', maxWidth: 480, width: '100%', alignSelf: 'center' },
+  copy: { fontFamily: fonts.regular, fontSize: 16, color: colors.ivory, marginTop: space.xl, lineHeight: 23, opacity: 0.85, textAlign: 'center' },
   bottom: { gap: space.md, maxWidth: 480, width: '100%', alignSelf: 'center' },
   legal: { fontFamily: fonts.regular, fontSize: 12, color: colors.ivory, opacity: 0.6, textAlign: 'center' },
 });
