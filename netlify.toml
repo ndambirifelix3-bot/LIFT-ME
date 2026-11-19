@@ -1,0 +1,53 @@
+# Netlify hosting for the Lift Me website / installable web app (PWA).
+# Netlify reads this file automatically when the site is connected to the GitHub repo.
+#
+# Set these in Netlify → Site configuration → Environment variables (public values only):
+#   EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY
+# Never add the Supabase service role key, Google server key or M-Pesa keys here.
+
+[build]
+  command = "npx expo export -p web"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Single-page app: any address that isn't a real file (e.g. /passenger/ride/123) loads the app,
+# which then shows the right screen.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# The service worker must never be cached by the browser, or phones would miss app updates.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# The main page is small; always check for a newer version.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# App code and fonts have a content hash in their file names, so they can be cached for a year.
+[[headers]]
+  for = "/_expo/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Stops other sites from showing Lift Me inside a frame (click-jacking).
+    X-Frame-Options = "DENY"
+    # Location is used (pickup point, driver tracking); camera for driver document photos.
+    Permissions-Policy = "geolocation=(self), camera=(self), microphone=()"

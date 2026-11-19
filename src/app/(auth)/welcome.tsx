@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Logo } from '@/components';
 import { homeForProfile, useAuth } from '@/features/auth/AuthProvider';
+import { InstallApp } from '@/features/pwa/InstallApp';
 import { colors, fonts, space } from '@/theme';
 
 export default function Welcome() {
@@ -17,6 +18,7 @@ export default function Welcome() {
       </View>
       <View style={styles.bottom}>
         <Button title="Get started" onPress={() => router.push('/phone')} />
+        <InstallApp tone="dark" />
         <Text style={styles.legal}>By continuing you agree to the Lift Me Terms and Privacy Policy.</Text>
       </View>
     </SafeAreaView>

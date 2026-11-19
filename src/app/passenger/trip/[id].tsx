@@ -71,10 +71,16 @@ export default function PassengerTrip() {
   };
 
   const shareTrip = async () => {
-    const base = process.env.EXPO_PUBLIC_WEB_URL ?? '';
+    // On the website, the site's own address is always right; the phone apps need EXPO_PUBLIC_WEB_URL.
+    const base = Platform.OS === 'web' ? window.location.origin : (process.env.EXPO_PUBLIC_WEB_URL ?? '');
     const url = `${base}/share/${ride.share_token}`;
     const message = `I'm on a Lift Me ride${d.driver?.vehicle ? ` in a ${d.driver.vehicle.colour} ${d.driver.vehicle.make} ${d.driver.vehicle.plate}` : ''}. Follow my trip: ${url}`;
     if (Platform.OS === 'web') {
+      // Phone browsers: open the normal Share sheet (WhatsApp, SMS…). Otherwise copy the link.
+      if (navigator.share) {
+        await navigator.share({ text: message }).catch(() => undefined); // closing the sheet is not an error
+        return;
+      }
       await navigator.clipboard?.writeText(message);
       window.alert('Trip link copied.');
     } else {

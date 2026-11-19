@@ -14,6 +14,13 @@ The owner asked for the whole app in one go instead of phase-by-phase, so Phases
 | 7 | History, ratings, earnings and admin tools | DONE |
 | 8 | Testing and getting ready for a pilot | DONE in code — see `docs/LAUNCH_CHECKLIST.md` for what's left |
 
+## Web app (PWA) — branch `pwa`
+- Brand changed to taxi yellow + black and the client's LIFTME logo ("Move smarter."); icons generated from it.
+- Installable web app: manifest, icons, service worker (app files only, offline page), install button (Android/desktop)
+  and Add-to-Home-Screen steps (iPhone). Netlify config in `netlify.toml`. See docs/SETUP.md §9.
+- Fixed: admin dashboard crashed (blank page) on the web.
+- Phone login works with Supabase test numbers (no SMS provider yet). Test admin: 0700 000 099.
+
 ## Live Supabase project
 - Project **lift-me** (`sfvnchzihitdpblnjfvv`), Frankfurt (eu-central-1), free plan — created 2026-11-16.
 - All 6 migrations applied; RLS on all 18 tables; private `driver-documents` bucket; realtime on rides/offers/locations/payments; `no_driver_found` job runs every minute.

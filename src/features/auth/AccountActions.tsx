@@ -5,6 +5,7 @@ import { Button, Card, ErrorMessage, Input, Notice, Row } from '@/components';
 import { formatPhoneForDisplay } from '@/lib/phone';
 import { supabase } from '@/lib/supabase';
 import { space, type } from '@/theme';
+import { InstallApp } from '@/features/pwa/InstallApp';
 import { useAuth } from './AuthProvider';
 
 function confirm(title: string, message: string, onYes: () => void) {
@@ -46,6 +47,7 @@ export function AccountBasics() {
         {save.isSuccess ? <Notice tone="success" text="Saved." /> : null}
         <Button title="Save" variant="dark" small disabled={name.trim().length < 3 || name.trim() === profile.full_name} loading={save.isPending} onPress={() => save.mutate()} />
       </Card>
+      <InstallApp />
       <Button title="Log out" variant="outline" onPress={() => confirm('Log out?', 'You will need a new SMS code to log in again.', signOut)} />
       <ErrorMessage error={del.error} />
       {profile.delete_requested_at ? (

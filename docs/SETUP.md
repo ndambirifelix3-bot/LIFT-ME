@@ -199,6 +199,31 @@ Set the same `EXPO_PUBLIC_*` and `GOOGLE_MAPS_*` values as EAS environment varia
 
 ---
 
+## 9. Installable web app (PWA) on Netlify
+
+The same code runs as a website that people can **install on their phone's home screen** (no app store).
+
+- PWA files live in `public/`: `manifest.webmanifest` (name, colours, icons), `index.html` (page template with
+  the install tags), `sw.js` (service worker: caches only the app's own files and shows an offline page — never
+  Supabase data) and `icons/` (made from the logo by `python3 scripts/make-brand-assets.py`).
+- `netlify.toml` tells Netlify how to build and serve it.
+
+Put it online:
+
+1. netlify.com → sign up with GitHub → **Add new site → Import an existing project → GitHub** → pick `LIFT-ME`.
+2. Branch to deploy: `pwa` (later `main`). Build settings are read from `netlify.toml` — leave them.
+3. **Environment variables** → add `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` (public values).
+4. **Deploy**. Open the `https://….netlify.app` link on your phone:
+   - Android (Chrome): tap **Install the Lift Me app** on the welcome screen.
+   - iPhone (Safari): **Share → Add to Home Screen** (the welcome screen shows these steps).
+
+Limits of the web app (why drivers will later need the real Android app): it cannot send the driver's location
+while the screen is off or the app is in the background, and iPhones only allow notifications once the app is
+added to the home screen.
+
+
+---
+
 ## Where every key goes (summary)
 
 | Value | Where | Secret? |

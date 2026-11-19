@@ -74,10 +74,21 @@ def main() -> None:
         # Splash screen (background colour is set in app.config.ts).
         "splash-icon.png": place(full, 1024, 0.95),
         "favicon.png": place(mark, 48, 0.9, ICON_BG),
+        # PWA (installable web app) icons, copied to the website from public/.
+        "../public/icons/icon-192.png": place(mark, 192, 0.72, ICON_BG),
+        "../public/icons/icon-512.png": place(mark, 512, 0.72, ICON_BG),
+        # "maskable": Android may crop it to a circle, so keep the logo inside the middle 80%.
+        "../public/icons/maskable-512.png": place(mark, 512, 0.56, ICON_BG),
+        "../public/icons/apple-touch-icon.png": place(mark, 180, 0.72, ICON_BG),
     }
     for name, image in outputs.items():
-        image.save(OUT / name, optimize=True)
-        print("wrote", OUT / name, image.size)
+        path = OUT / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # iOS shows transparency as black, so home-screen icons are saved without it.
+        if name.endswith(("apple-touch-icon.png", "icon.png")):
+            image = image.convert("RGB")
+        image.save(path, optimize=True)
+        print("wrote", path.resolve().relative_to(ROOT), image.size)
 
 
 if __name__ == "__main__":

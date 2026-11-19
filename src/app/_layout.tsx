@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '@/features/auth/AuthProvider';
 import '@/features/driver/tracking'; // registers the background location task at startup
+import '@/features/pwa/pwa'; // web only: service worker + install prompt, must start early
 import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
