@@ -62,7 +62,7 @@ export default function RideOptions() {
         expired ? (
           <Button title="Price expired — get a new price" variant="dark" onPress={() => goBack('/passenger/where-to')} />
         ) : (
-          <Button title="Request Lift" onPress={() => request.mutate()} loading={request.isPending} disabled={!rideType} />
+          <Button title={`Request ${quote.options.find((o) => o.ride_type === rideType)?.display_name ?? "ride"}`} onPress={() => request.mutate()} loading={request.isPending} disabled={!rideType} />
         )
       }
     >
