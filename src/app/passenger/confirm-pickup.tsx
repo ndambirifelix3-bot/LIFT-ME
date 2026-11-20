@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, ErrorMessage, Header, Input } from '@/components';
 import { Map } from '@/components/Map';
@@ -61,30 +61,24 @@ export default function ConfirmPickup() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.ivory }}>
-      {Platform.OS !== 'web' ? (
-        <View style={{ flex: 1 }}>
-          <Map
-            center={start}
-            centerPin
-            showsUserLocation={loc.permission === 'granted'}
-            onCenterChange={(c) => {
-              if (Math.abs(c.lat - center.lat) > 1e-6 || Math.abs(c.lng - center.lng) > 1e-6) {
-                moved.current = true;
-                setCenter(c);
-              }
-            }}
-          />
-          <SafeAreaView style={styles.top} edges={['top']}>
-            <View style={styles.headerCard}>
-              <Header title="Confirm pickup" subtitle="Move the map to put the pin on your exact spot." back />
-            </View>
-          </SafeAreaView>
-        </View>
-      ) : (
-        <SafeAreaView edges={['top']} style={{ padding: space.lg }}>
-          <Header title="Confirm pickup" back />
+      <View style={{ flex: 1 }}>
+        <Map
+          center={start}
+          centerPin
+          showsUserLocation={loc.permission === 'granted'}
+          onCenterChange={(c) => {
+            if (Math.abs(c.lat - center.lat) > 1e-6 || Math.abs(c.lng - center.lng) > 1e-6) {
+              moved.current = true;
+              setCenter(c);
+            }
+          }}
+        />
+        <SafeAreaView style={styles.top} edges={['top']}>
+          <View style={styles.headerCard}>
+            <Header title="Confirm pickup" subtitle="Move the map to put the pin on your exact spot." back />
+          </View>
         </SafeAreaView>
-      )}
+      </View>
       <SafeAreaView edges={['bottom']} style={styles.sheet}>
         <Text style={type.label}>Pickup</Text>
         <Text style={[type.h3, { marginBottom: space.md }]} numberOfLines={2}>

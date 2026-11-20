@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, router } from 'expo-router';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Card, ErrorMessage, Loading } from '@/components';
 import { Map } from '@/components/Map';
@@ -31,11 +31,9 @@ export default function PassengerHome() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.ivory }}>
-      {Platform.OS !== 'web' ? (
-        <View style={StyleSheet.absoluteFill}>
-          <Map center={loc.position ?? NAIROBI} showsUserLocation={loc.permission === 'granted'} followKey={loc.position ? 'me' : 'nbo'} />
-        </View>
-      ) : null}
+      <View style={StyleSheet.absoluteFill}>
+        <Map center={loc.position ?? NAIROBI} showsUserLocation={loc.permission === 'granted'} followKey={loc.position ? 'me' : 'nbo'} />
+      </View>
       <SafeAreaView style={styles.overlay} edges={['top']} pointerEvents="box-none">
         <View style={styles.greeting}>
           <Text style={styles.hello}>Hello{firstName ? `, ${firstName}` : ''}</Text>
