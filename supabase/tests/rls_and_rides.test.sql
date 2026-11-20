@@ -64,8 +64,10 @@ select t.ok((select count(*) from public.profiles) = 1, 'passenger sees only own
 select t.ok((select count(*) from public.admin_actions) = 0, 'passenger cannot read admin log');
 select t.expect_error($$select public.admin_overview()$$, '%admin_only%');
 select t.expect_error($$select public.admin_set_role('00000000-0000-0000-0000-0000000000a1', 'admin')$$, '%admin_only%');
-update public.pricing set base_fare = 1;  -- RLS filters this to 0 rows
-select t.ok((select base_fare from public.pricing where ride_type = 'lift') = 100, 'passenger cannot change prices');
+update public.market_prices set base_fare = 1;  -- RLS filters this to 0 rows
+select t.ok((select base_fare from public.market_prices where market_code = 'nairobi' and ride_type = 'lift') = 100, 'passenger cannot change prices');
+update public.markets set commission_percent = 0;  -- RLS filters this to 0 rows
+select t.ok((select commission_percent from public.markets where code = 'nairobi') = 15, 'passenger cannot change the market');
 select t.expect_error($$insert into public.settings (key, value) values ('x', '1')$$, '%permission denied%');
 
 select t.as_user('00000000-0000-0000-0000-0000000000a2');
@@ -135,14 +137,14 @@ set role authenticated;
 -- ===================== QUOTES (server only) =====================
 select t.as_user('00000000-0000-0000-0000-0000000000a1');
 select t.expect_error($$select public.create_quote(auth.uid(), -1.2864, 36.8172, 'CBD', null, -1.3, 36.78, 'Westlands', 5000, 900, null)$$, '%permission denied%');
-select t.expect_error($$select public.calculate_fare('lift', 1000, 60)$$, '%permission denied%');
+select t.expect_error($$select public.calculate_fare('nairobi', 'lift', 1000, 60)$$, '%permission denied%');
 select t.expect_error($$insert into public.quotes (passenger_id, pickup, pickup_address, dropoff, dropoff_address, distance_m, duration_s, options, currency, expires_at) values (auth.uid(), public.make_point(0,0), 'a', public.make_point(0,0), 'b', 1, 1, '[{"ride_type":"lift","fare":1}]', 'KES', now() + interval '1 hour')$$, '%permission denied%');
 reset role;
 
 -- what the get-quote Edge Function does (service role):
-select t.ok(public.calculate_fare('lift', 5000, 900) = 360, 'fare = 100 + 40*5km + 4*15min = 360');
-select t.ok(public.calculate_fare('lift', 500, 60) = 200, 'minimum fare applies');
-select t.ok(pg_typeof(public.calculate_fare('lift_premium', 12345, 1234))::text = 'integer', 'fares are integers');
+select t.ok(public.calculate_fare('nairobi', 'lift', 5000, 900) = 360, 'fare = 100 + 40*5km + 4*15min = 360');
+select t.ok(public.calculate_fare('nairobi', 'lift', 500, 60) = 200, 'minimum fare applies');
+select t.ok(pg_typeof(public.calculate_fare('nairobi', 'lift_premium', 12345, 1234))::text = 'integer', 'fares are integers');
 select t.expect_error($$select public.create_quote('00000000-0000-0000-0000-0000000000a1', 0.5, 36.0, 'Far away', null, -1.3, 36.78, 'X', 1, 1, null)$$, '%pickup_outside_service_area%');
 create temp table q as
   select * from public.create_quote('00000000-0000-0000-0000-0000000000a1', -1.2864, 36.8172, 'Kenyatta Ave, CBD', 'Near the Shell station',
@@ -280,7 +282,7 @@ select t.ok((select status from public.rides where id = (select id from r3)) = '
 select t.as_user('00000000-0000-0000-0000-0000000000ad');
 select t.ok((select count(*) from public.rides) = 3, 'admin sees all rides');
 select t.ok((public.admin_overview() ->> 'collected_total')::int = 360, 'admin overview uses real payments');
-update public.pricing set base_fare = 150 where ride_type = 'lift';
+update public.market_prices set base_fare = 150 where market_code = 'nairobi' and ride_type = 'lift';
 select t.ok((select count(*) from public.admin_actions where action = 'config_updated') = 1, 'price change is audited');
 select public.admin_set_user_suspended('00000000-0000-0000-0000-0000000000a2', true, 'test');
 select t.expect_error($$select public.admin_set_role(auth.uid(), 'passenger')$$, '%cannot_change_own_role%');
