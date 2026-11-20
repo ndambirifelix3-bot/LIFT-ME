@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
     <title>%WEB_TITLE%</title>
     <meta name="description" content="Book a ride, track your driver and pay with M-Pesa or cash. Move smarter." />
 
@@ -23,6 +23,8 @@
       html,
       body {
         height: 100%;
+        /* Only the part of the screen you can actually see (not behind the phone browser's toolbar). */
+        height: 100dvh;
         /* Black while the app loads, so there is no white flash when opened from the home screen. */
         background-color: #101010;
       }
