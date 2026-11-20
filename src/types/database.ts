@@ -485,6 +485,121 @@ export type Database = {
         }
         Relationships: []
       }
+      push_config: {
+        Row: {
+          function_url: string | null
+          id: boolean
+          trigger_secret: string
+          updated_at: string
+          vapid_private_key: string | null
+          vapid_public_key: string | null
+        }
+        Insert: {
+          function_url?: string | null
+          id?: boolean
+          trigger_secret?: string
+          updated_at?: string
+          vapid_private_key?: string | null
+          vapid_public_key?: string | null
+        }
+        Update: {
+          function_url?: string | null
+          id?: boolean
+          trigger_secret?: string
+          updated_at?: string
+          vapid_private_key?: string | null
+          vapid_public_key?: string | null
+        }
+        Relationships: []
+      }
+      push_outbox: {
+        Row: {
+          body: string
+          created_at: string
+          devices: number | null
+          error: string | null
+          id: number
+          sent_at: string | null
+          tag: string | null
+          title: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          devices?: number | null
+          error?: string | null
+          id?: never
+          sent_at?: string | null
+          tag?: string | null
+          title: string
+          url?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          devices?: number | null
+          error?: string | null
+          id?: never
+          sent_at?: string | null
+          tag?: string | null
+          title?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_outbox_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          last_used_at: string | null
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          last_used_at?: string | null
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          last_used_at?: string | null
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quotes: {
         Row: {
           created_at: string
@@ -1552,6 +1667,10 @@ export type Database = {
         }
       }
       expire_searching_rides: { Args: never; Returns: number }
+      format_money: {
+        Args: { p_amount: number; p_currency: string; p_decimals: number }
+        Returns: string
+      }
       get_driver_earnings: { Args: never; Returns: Json }
       get_ride_details: { Args: { p_ride_id: string }; Returns: Json }
       get_shared_trip: { Args: { p_token: string }; Returns: Json }
@@ -1585,6 +1704,16 @@ export type Database = {
         Args: { p_lat: number; p_lng: number }
         Returns: boolean
       }
+      push_notify: {
+        Args: {
+          p_body: string
+          p_tag?: string
+          p_title: string
+          p_url?: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       rate_ride: {
         Args: { p_comment?: string; p_ride_id: string; p_stars: number }
         Returns: {
@@ -1602,6 +1731,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      remove_push_subscription: {
+        Args: { p_endpoint: string }
+        Returns: undefined
       }
       request_account_deletion: { Args: never; Returns: undefined }
       request_ride: {
@@ -1672,6 +1805,10 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      ride_money: {
+        Args: { r: Database["public"]["Tables"]["rides"]["Row"] }
+        Returns: string
+      }
       ride_transition_allowed: {
         Args: {
           p_from: Database["public"]["Enums"]["ride_status"]
@@ -1680,6 +1817,15 @@ export type Database = {
         Returns: boolean
       }
       ride_type_tier: { Args: { p_ride_type: string }; Returns: number }
+      save_push_subscription: {
+        Args: {
+          p_auth: string
+          p_endpoint: string
+          p_p256dh: string
+          p_user_agent?: string
+        }
+        Returns: undefined
+      }
       set_driver_online: {
         Args: { p_online: boolean }
         Returns: {

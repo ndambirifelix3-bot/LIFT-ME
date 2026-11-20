@@ -2,6 +2,7 @@ import type { Session } from '@supabase/supabase-js';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
+import { forgetThisDeviceForPush } from '@/features/pwa/push';
 import type { Tables } from '@/types/database';
 
 export type Profile = Tables<'profiles'>;
@@ -55,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // the SMS code is verified, before the new session has reached this component.
       refreshProfile: () => queryClient.invalidateQueries({ queryKey: ['profile'] }),
       signOut: async () => {
+        await forgetThisDeviceForPush(); // the next person on this phone must not get your alerts
         await supabase.auth.signOut();
         queryClient.clear();
       },

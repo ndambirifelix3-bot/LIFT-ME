@@ -127,3 +127,44 @@ async function trim(cache) {
   // Oldest entries come first; drop them until we're under the limit.
   for (let i = 0; i < keys.length - MAX_HASHED_FILES; i++) await cache.delete(keys[i]);
 }
+
+// ---------------------------------------------------------------------------
+// Push notifications (sent by the push-send Edge Function).
+// Payload: { title, body, url, tag }. Same tag = replaces the older alert for that ride.
+// ---------------------------------------------------------------------------
+self.addEventListener('push', (event) => {
+  let msg = {};
+  try {
+    msg = event.data ? event.data.json() : {};
+  } catch {
+    msg = { body: event.data ? event.data.text() : '' };
+  }
+  const title = msg.title || 'Lift Me';
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: msg.body || '',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      tag: msg.tag || undefined,
+      renotify: !!msg.tag,
+      data: { url: msg.url || '/' },
+      vibrate: [200, 100, 200],
+    }),
+  );
+});
+
+// Tapping a notification opens Lift Me on the right screen (reusing an open tab if there is one).
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = new URL((event.notification.data && event.notification.data.url) || '/', self.location.origin).href;
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+      for (const w of windows) {
+        if (new URL(w.url).origin === self.location.origin && 'focus' in w) {
+          return w.focus().then((focused) => (focused && 'navigate' in focused ? focused.navigate(target) : focused));
+        }
+      }
+      return self.clients.openWindow(target);
+    }),
+  );
+});

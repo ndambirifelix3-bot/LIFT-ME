@@ -7,6 +7,7 @@ import { Map } from '@/components/Map';
 import type { MapProps } from '@/components/Map.types';
 import { DriverCard, PassengerPayment, RatePanel, Receipt } from '@/features/rides/components';
 import { useRideAction, useRideDetails, useRideRealtime } from '@/features/rides/hooks';
+import { NotificationsCard } from '@/features/pwa/NotificationsCard';
 import { formatCountdown, formatMoney, RIDE_STATUS_LABEL, secondsUntil } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import { colors, space, type } from '@/theme';
@@ -111,6 +112,8 @@ export default function PassengerTrip() {
           <Map center={center} markers={markers} polyline={status === 'in_progress' || status === 'searching' ? ride.polyline : undefined} height={280} followKey={`${status}-${driverLoc?.updated_at ?? ''}`} />
         </View>
       ) : null}
+
+      {['searching', 'accepted', 'arrived'].includes(status) ? <NotificationsCard role="passenger" compact /> : null}
 
       {status === 'searching' ? (
         <Card>

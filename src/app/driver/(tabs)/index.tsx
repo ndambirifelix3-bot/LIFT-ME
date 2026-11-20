@@ -11,6 +11,7 @@ import { startDriverTracking, stopDriverTracking, type TrackingMode } from '@/fe
 import { useActiveRide, useRideAction, useRideDetails, useRideRealtime } from '@/features/rides/hooks';
 import type { Ride } from '@/features/rides/types';
 import { useMarkets } from '@/features/markets';
+import { NotificationsCard } from '@/features/pwa/NotificationsCard';
 import { useSettings } from '@/features/settings';
 import { formatCountdown, formatDistance, formatDuration, formatMoney, RIDE_STATUS_LABEL, secondsUntil } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
@@ -50,6 +51,7 @@ export default function DriverHome() {
       {approved && driver ? (
         <>
           <OnlineSwitch online={driver.is_online} intervalSeconds={settings.data?.location_interval_seconds ?? 5} hasActiveRide={!!active.data} />
+          <NotificationsCard role="driver" compact />
           {active.data ? <ActiveRide ride={active.data} /> : driver.is_online ? <Offers uid={uid!} /> : (
             <EmptyState icon="moon-outline" title="You're offline" message="Go online to start receiving ride requests near you." />
           )}
