@@ -2,7 +2,7 @@
  * Ride types (Boda Electric, Boda, Lift Mini, Lift, Lift XL, Lift Premium) come from the `pricing`
  * catalogue in the database, so names and icons stay in one place and admins can rename them.
  */
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import type { Tables } from '@/types/database';

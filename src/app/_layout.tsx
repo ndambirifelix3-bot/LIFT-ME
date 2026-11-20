@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '@/features/auth/AuthProvider';
 import '@/features/driver/tracking'; // registers the background location task at startup
@@ -28,7 +29,8 @@ export default function RootLayout() {
     if (fontsLoaded || fontError) SplashScreen.hideAsync().catch(() => undefined);
   }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded && !fontError) return null;
+  // On the web, show the app straight away; text switches to Inter as soon as it arrives.
+  if (!fontsLoaded && !fontError && Platform.OS !== 'web') return null;
 
   return (
     <SafeAreaProvider>
