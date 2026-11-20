@@ -15,11 +15,17 @@ serve(async (req) => {
   const db = adminClient();
   const { data: ride } = await db
     .from('rides')
-    .select('id, passenger_id, status, fare, currency')
+    .select('id, passenger_id, status, fare, currency, market_code')
     .eq('id', rideId)
     .maybeSingle();
   if (!ride || ride.passenger_id !== user.id) return errorResponse('not_your_ride', 403);
   if (ride.status !== 'completed') return errorResponse('ride_not_completed', 409, 'You can pay once the trip is complete.');
+
+  // M-Pesa only takes whole Kenyan shillings, and only where the market offers it.
+  const { data: market } = await db.from('markets').select('payment_methods').eq('code', ride.market_code).maybeSingle();
+  if (ride.currency !== 'KES' || !market?.payment_methods?.includes('mpesa')) {
+    return errorResponse('payment_method_not_available', 409, 'M-Pesa is not available for this trip.');
+  }
 
   const { data: payment } = await db.from('payments').select('*').eq('ride_id', ride.id).maybeSingle();
   if (!payment) return errorResponse('payment_not_found', 404);
@@ -43,7 +49,7 @@ serve(async (req) => {
       Password: stkPassword(timestamp),
       Timestamp: timestamp,
       TransactionType: 'CustomerPayBillOnline',
-      Amount: payment.amount, // whole KES
+      Amount: payment.amount, // whole KES (checked above)
       PartyA: msisdn,
       PartyB: shortcode,
       PhoneNumber: msisdn,

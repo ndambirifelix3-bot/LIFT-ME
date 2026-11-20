@@ -1,9 +1,9 @@
 // get-quote — the ONLY way a fare is produced.
 // 1. checks the caller is a signed-in passenger
-// 2. checks pickup + drop-off are inside the active service area
+// 2. checks pickup + drop-off are inside the same active market's service area
 // 3. gets real driving distance/time from Google Routes
 // 4. calls the database function create_quote, which prices every ride type
-//    from the pricing table and saves the quote (valid ~10 minutes)
+//    with the market's prices and currency, and saves the quote (valid ~10 minutes)
 import { adminClient, errorResponse, getUser, isLatLng, json, requireEnv, serve } from '../_shared/common.ts';
 
 type Stop = { lat: number; lng: number; address: string; note?: string };
@@ -30,13 +30,13 @@ serve(async (req) => {
   const dropoff = readStop(body.dropoff);
   if (!pickup || !dropoff) return errorResponse('bad_request', 400, 'Pickup and destination are required.');
 
-  // Check the service area before paying for a Google call.
-  const [{ data: pickupOk }, { data: dropoffOk }] = await Promise.all([
-    db.rpc('point_in_service_area', { p_lat: pickup.lat, p_lng: pickup.lng }),
-    db.rpc('point_in_service_area', { p_lat: dropoff.lat, p_lng: dropoff.lng }),
+  // Check the service area before paying for a Google call. A trip must stay within one market.
+  const [{ data: pickupMarket }, { data: dropoffMarket }] = await Promise.all([
+    db.rpc('market_at_point', { p_lat: pickup.lat, p_lng: pickup.lng }),
+    db.rpc('market_at_point', { p_lat: dropoff.lat, p_lng: dropoff.lng }),
   ]);
-  if (!pickupOk) return errorResponse('pickup_outside_service_area', 422, 'Sorry, Lift Me is not available at this pickup point yet.');
-  if (!dropoffOk) return errorResponse('dropoff_outside_service_area', 422, 'Sorry, this destination is outside our service area.');
+  if (!pickupMarket) return errorResponse('pickup_outside_service_area', 422, 'Sorry, Lift Me is not available at this pickup point yet.');
+  if (dropoffMarket !== pickupMarket) return errorResponse('dropoff_outside_service_area', 422, 'Sorry, this destination is outside our service area.');
 
   const routeRes = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
     method: 'POST',
@@ -84,6 +84,7 @@ serve(async (req) => {
   return json({
     quote: {
       id: quote.id,
+      market_code: quote.market_code,
       options: quote.options,
       currency: quote.currency,
       distance_m: quote.distance_m,

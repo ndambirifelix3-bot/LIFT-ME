@@ -1,11 +1,29 @@
 // places — address search for the app, keeping the Google server key secret.
 // Actions:
-//   { action: 'autocomplete', input, sessionToken, near?: {lat,lng} }
+//   { action: 'autocomplete', input, sessionToken, near?: {lat,lng}, market?: code }
 //   { action: 'details', placeId, sessionToken }
 //   { action: 'reverse', lat, lng }            (address for a dragged pin)
-import { adminClient, errorResponse, getSetting, getUser, isLatLng, json, requireEnv, serve } from '../_shared/common.ts';
+import { adminClient, errorResponse, getUser, isLatLng, json, requireEnv, serve } from '../_shared/common.ts';
+import type { SupabaseClient } from 'npm:@supabase/supabase-js@2';
 
 const PLACES = 'https://places.googleapis.com/v1';
+
+/**
+ * Countries to search in: the market at the user's position (or the market the app says it's in);
+ * otherwise every country where Lift Me operates.
+ */
+async function searchCountries(db: SupabaseClient, near: unknown, market: unknown): Promise<string[]> {
+  let code: string | null = null;
+  if (isLatLng(near)) {
+    const { data } = await db.rpc('market_at_point', { p_lat: near.lat, p_lng: near.lng });
+    code = (data as string | null) ?? null;
+  }
+  if (!code && typeof market === 'string' && /^[a-z0-9_]{1,40}$/.test(market)) code = market;
+  const query = db.from('markets').select('country_iso').eq('is_active', true);
+  const { data } = code ? await query.eq('code', code) : await query;
+  const countries = [...new Set((data ?? []).map((m: { country_iso: string }) => m.country_iso))];
+  return countries.length ? countries.slice(0, 15) : ['ke'];
+}
 
 serve(async (req) => {
   const user = await getUser(req);
@@ -17,11 +35,10 @@ serve(async (req) => {
   if (body.action === 'autocomplete') {
     const input = String(body.input ?? '').trim().slice(0, 120);
     if (input.length < 2) return json({ suggestions: [] });
-    const region = await getSetting<string>(adminClient(), 'country_iso', 'ke');
     const payload: Record<string, unknown> = {
       input,
       sessionToken: String(body.sessionToken ?? ''),
-      includedRegionCodes: [region],
+      includedRegionCodes: await searchCountries(adminClient(), body.near, body.market),
     };
     if (isLatLng(body.near)) {
       payload.locationBias = {
