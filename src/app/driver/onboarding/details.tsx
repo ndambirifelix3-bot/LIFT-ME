@@ -10,7 +10,8 @@ import { supabase } from '@/lib/supabase';
 
 const schema = z.object({
   full_name: z.string().trim().min(3, 'Enter your full name as on your ID').max(100),
-  id_number: z.string().trim().regex(/^\d{6,10}$/, 'Enter your National ID number (digits only)'),
+  // Kenya: National ID (digits). Elsewhere: passport or state/national ID, which can include letters.
+  id_number: z.string().trim().regex(/^[A-Za-z0-9-]{5,20}$/, 'Enter your ID number (letters and digits only)'),
   licence_number: z.string().trim().min(4, 'Enter your driving licence number').max(30),
   email: z.union([z.literal(''), z.string().trim().email('Enter a valid email or leave empty')]),
 });
@@ -54,7 +55,7 @@ export default function DriverDetails() {
     <Screen footer={<Button title="Save" onPress={handleSubmit((v) => save.mutate(v))} loading={save.isPending} />}>
       <Header title="Personal details" back />
       {field('full_name', 'Full name (as on your ID)', { autoCapitalize: 'words' })}
-      {field('id_number', 'National ID number', { keyboardType: 'number-pad', maxLength: 10 })}
+      {field('id_number', 'ID number (National ID, passport or state ID)', { autoCapitalize: 'characters', maxLength: 20 })}
       {field('licence_number', 'Driving licence number', { autoCapitalize: 'characters', maxLength: 30 })}
       {field('email', 'Email (optional)', { keyboardType: 'email-address', autoCapitalize: 'none' })}
       <ErrorMessage error={save.error} />

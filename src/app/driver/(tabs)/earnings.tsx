@@ -22,18 +22,18 @@ export default function DriverEarnings() {
         <>
           <Card style={{ backgroundColor: colors.black, borderColor: colors.black }}>
             <Text style={[type.label, { color: colors.ivory }]}>Today</Text>
-            <Text style={styles.big}>{formatMoney(e.today, e.currency)}</Text>
+            <Text style={styles.big}>{formatMoney(e.today, e.currency, e.currency_decimals)}</Text>
             <Text style={[type.small, { color: colors.ivory }]}>{e.today_trips} trips</Text>
           </Card>
           <View style={{ flexDirection: 'row', gap: space.md }}>
             <Card style={{ flex: 1 }}>
               <Text style={type.label}>This week</Text>
-              <Text style={styles.mid}>{formatMoney(e.week, e.currency)}</Text>
+              <Text style={styles.mid}>{formatMoney(e.week, e.currency, e.currency_decimals)}</Text>
               <Text style={type.small}>{e.week_trips} trips</Text>
             </Card>
             <Card style={{ flex: 1 }}>
               <Text style={type.label}>All time</Text>
-              <Text style={styles.mid}>{formatMoney(e.total, e.currency)}</Text>
+              <Text style={styles.mid}>{formatMoney(e.total, e.currency, e.currency_decimals)}</Text>
               <Text style={type.small}>{e.total_trips} trips · {e.rating ? `★ ${e.rating}` : 'No ratings yet'}</Text>
             </Card>
           </View>

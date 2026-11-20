@@ -1,44 +1,60 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import { Controller, useForm } from 'react-hook-form';
+import { useMemo, useState } from 'react';
 import { Text } from 'react-native';
-import { z } from 'zod';
 import { Button, ErrorMessage, Header, PhoneInput, Screen } from '@/components';
+import type { PhoneCountry } from '@/components/PhoneInput';
 import { useMutation } from '@tanstack/react-query';
-import { normalizeKenyanPhone } from '@/lib/phone';
+import { phoneCountries, useMarkets } from '@/features/markets';
+import { normalizePhone, phonePlaceholder } from '@/lib/phone';
 import { supabase } from '@/lib/supabase';
 import { type } from '@/theme';
 
-const schema = z.object({
-  phone: z.string().refine((v) => normalizeKenyanPhone(v) !== null, 'Enter a valid Kenyan mobile number, e.g. 712 345 678'),
-});
+// Used only until the list of markets has loaded (or if it can't load).
+const FALLBACK: PhoneCountry = { dialCode: '+254', countryIso: 'ke' };
 
 export default function PhoneLogin() {
-  const { control, handleSubmit, formState } = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
-    defaultValues: { phone: '' },
-  });
+  const markets = useMarkets();
+  const countries = useMemo(() => phoneCountries(markets.data ?? []), [markets.data]);
+  const [picked, setPicked] = useState<PhoneCountry | null>(null);
+  const country = picked ?? countries[0] ?? FALLBACK;
+  const [phone, setPhone] = useState('');
+  const [error, setError] = useState<string | undefined>();
 
   const send = useMutation({
-    mutationFn: async (phone: string) => {
-      const { error } = await supabase.auth.signInWithOtp({ phone });
-      if (error) throw error;
-      return phone;
+    mutationFn: async (e164: string) => {
+      const { error: e } = await supabase.auth.signInWithOtp({ phone: e164 });
+      if (e) throw e;
+      return e164;
     },
-    onSuccess: (phone) => router.push({ pathname: '/otp', params: { phone } }),
+    onSuccess: (e164) => router.push({ pathname: '/otp', params: { phone: e164 } }),
   });
 
-  const onSubmit = handleSubmit(({ phone }) => send.mutate(normalizeKenyanPhone(phone)!));
+  const onSubmit = () => {
+    const e164 = normalizePhone(phone, country.dialCode);
+    if (!e164) {
+      setError(`Enter a valid mobile number, e.g. ${phonePlaceholder(country.dialCode)}`);
+      return;
+    }
+    setError(undefined);
+    send.mutate(e164);
+  };
 
   return (
     <Screen footer={<Button title="Send code" onPress={onSubmit} loading={send.isPending} />}>
       <Header title="Your phone number" subtitle="We'll text you a 6-digit code to log in." back />
-      <Controller
-        control={control}
-        name="phone"
-        render={({ field }) => (
-          <PhoneInput value={field.value} onChangeText={field.onChange} error={formState.errors.phone?.message} />
-        )}
+      <PhoneInput
+        value={phone}
+        onChangeText={(v) => {
+          setPhone(v);
+          if (error) setError(undefined);
+        }}
+        error={error}
+        country={country}
+        countries={countries}
+        onChangeCountry={(c) => {
+          setPicked(c);
+          setError(undefined);
+        }}
       />
       <ErrorMessage error={send.error} />
       <Text style={type.small}>Standard SMS rates may apply.</Text>

@@ -5,17 +5,27 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, ErrorMessage, Header, Notice, Row, Screen, SectionTitle } from '@/components';
 import { useBooking } from '@/features/booking/store';
+import { useMarket } from '@/features/markets';
 import type { Ride } from '@/features/rides/types';
 import { formatCountdown, formatDistance, formatDuration, formatMoney, secondsUntil } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import { colors, fonts, radius, space, type } from '@/theme';
 
-type Method = 'cash' | 'mpesa';
+type Method = Ride['payment_method'];
+
+const METHOD_LABEL: Record<Method, { label: string; icon: 'cash-outline' | 'phone-portrait-outline'; hint: string }> = {
+  mpesa: { label: 'M-Pesa', icon: 'phone-portrait-outline', hint: 'You will get an M-Pesa prompt on your phone at the end of the trip.' },
+  cash: { label: 'Cash', icon: 'cash-outline', hint: 'Pay your driver in cash at the end of the trip.' },
+};
 
 export default function RideOptions() {
   const { quote, pickup, dropoff, pickupNote, reset } = useBooking();
   const [rideType, setRideType] = useState<string | null>(quote?.options[0]?.ride_type ?? null);
-  const [method, setMethod] = useState<Method>('mpesa');
+  const market = useMarket(quote?.market_code);
+  // Only the payment methods this city offers, in the order the market lists them.
+  const methods = (market?.payment_methods ?? ['cash']) as Method[];
+  const [picked, setPicked] = useState<Method | null>(null);
+  const method: Method = picked && methods.includes(picked) ? picked : methods[0];
   const [left, setLeft] = useState(secondsUntil(quote?.expires_at));
 
   useEffect(() => {
@@ -54,7 +64,7 @@ export default function RideOptions() {
         )
       }
     >
-      <Header title="Choose your ride" subtitle={`${formatDistance(quote.distance_m)} · about ${formatDuration(quote.duration_s)}`} back />
+      <Header title="Choose your ride" subtitle={`${formatDistance(quote.distance_m, market?.distance_unit)} · about ${formatDuration(quote.duration_s)}`} back />
       <Card>
         <Row label="From" value={pickup.address} />
         {pickupNote ? <Row label="Note" value={pickupNote} /> : null}
@@ -76,28 +86,28 @@ export default function RideOptions() {
               <Text style={[styles.optTitle, selected && { color: colors.white }]}>{o.display_name}</Text>
               <Text style={[styles.optSub, selected && { color: colors.ivory }]}>{o.description} · {o.seats} seats</Text>
             </View>
-            <Text style={[styles.price, selected && { color: colors.brand }]}>{formatMoney(o.fare, o.currency)}</Text>
+            <Text style={[styles.price, selected && { color: colors.brand }]}>{formatMoney(o.fare, o.currency, market?.currency_decimals)}</Text>
           </Pressable>
         );
       })}
 
       <SectionTitle>Payment</SectionTitle>
       <View style={{ flexDirection: 'row', gap: space.md }}>
-        {(['mpesa', 'cash'] as const).map((m) => (
+        {methods.map((m) => (
           <Pressable
             key={m}
-            onPress={() => setMethod(m)}
+            onPress={() => setPicked(m)}
             accessibilityRole="radio"
             accessibilityState={{ checked: method === m }}
             style={[styles.pay, method === m && styles.paySelected]}
           >
-            <Ionicons name={m === 'cash' ? 'cash-outline' : 'phone-portrait-outline'} size={22} color={colors.text} />
-            <Text style={styles.payText}>{m === 'cash' ? 'Cash' : 'M-Pesa'}</Text>
+            <Ionicons name={METHOD_LABEL[m].icon} size={22} color={colors.text} />
+            <Text style={styles.payText}>{METHOD_LABEL[m].label}</Text>
           </Pressable>
         ))}
       </View>
       <Text style={[type.small, { marginTop: space.sm }]}>
-        {method === 'mpesa' ? 'You will get an M-Pesa prompt on your phone at the end of the trip.' : 'Pay your driver in cash at the end of the trip.'}
+        {METHOD_LABEL[method].hint}
       </Text>
 
       <View style={{ height: space.lg }} />

@@ -12,6 +12,7 @@ const NAV = [
   { href: '/admin/drivers', label: 'Drivers', icon: 'car-outline' },
   { href: '/admin/rides', label: 'Rides', icon: 'navigate-outline' },
   { href: '/admin/pricing', label: 'Pricing', icon: 'pricetag-outline' },
+  { href: '/admin/markets', label: 'Markets', icon: 'globe-outline' },
   { href: '/admin/users', label: 'Users', icon: 'people-outline' },
   { href: '/admin/reports', label: 'Reports', icon: 'chatbubbles-outline' },
 ] as const;

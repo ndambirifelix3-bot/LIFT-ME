@@ -17,7 +17,15 @@ export function useMyDriver(userId: string | undefined) {
         supabase.from('document_types').select('*').eq('is_active', true).order('sort_order'),
       ]);
       for (const r of [driver, vehicle, docs, types]) if (r.error) throw r.error;
-      return { driver: driver.data, vehicle: vehicle.data, documents: docs.data ?? [], documentTypes: types.data ?? [] };
+      // Only ask for documents that apply everywhere or in the driver's own country.
+      let country: string | null = null;
+      if (driver.data?.market_code) {
+        const m = await supabase.from('markets').select('country_iso').eq('code', driver.data.market_code).maybeSingle();
+        if (m.error) throw m.error;
+        country = m.data?.country_iso ?? null;
+      }
+      const documentTypes = (types.data ?? []).filter((t) => !t.country_iso || t.country_iso === country);
+      return { driver: driver.data, vehicle: vehicle.data, documents: docs.data ?? [], documentTypes };
     },
   });
 }
@@ -57,7 +65,9 @@ export function useOffers(userId: string | undefined, enabled: boolean) {
 }
 
 export type Earnings = {
+  market_code: string | null;
   currency: string;
+  currency_decimals: number | null;
   today: number; today_trips: number;
   week: number; week_trips: number;
   total: number; total_trips: number;

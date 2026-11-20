@@ -10,6 +10,7 @@ import { useMyDriver, useOffers } from '@/features/driver/hooks';
 import { startDriverTracking, stopDriverTracking, type TrackingMode } from '@/features/driver/tracking';
 import { useActiveRide, useRideAction, useRideDetails, useRideRealtime } from '@/features/rides/hooks';
 import type { Ride } from '@/features/rides/types';
+import { useMarkets } from '@/features/markets';
 import { useSettings } from '@/features/settings';
 import { formatCountdown, formatDistance, formatDuration, formatMoney, RIDE_STATUS_LABEL, secondsUntil } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
@@ -145,6 +146,8 @@ function OnlineSwitch({ online, intervalSeconds, hasActiveRide }: { online: bool
 
 function Offers({ uid }: { uid: string }) {
   const offers = useOffers(uid, true);
+  const markets = useMarkets().data;
+  const unitFor = (code: string) => markets?.find((m) => m.code === code)?.distance_unit;
   const [, force] = useState(0);
   useEffect(() => {
     const t = setInterval(() => force((n) => n + 1), 1000);
@@ -173,7 +176,7 @@ function Offers({ uid }: { uid: string }) {
               <Text style={type.h2}>{formatMoney(r.fare, r.currency)}</Text>
               <Pill text={formatCountdown(secondsUntil(o.expires_at))} tone="wait" />
             </View>
-            <Text style={type.small}>{r.ride_type === 'lift_premium' ? 'Lift Premium' : 'Lift'} · {formatDistance(r.distance_m)} · {formatDuration(r.duration_s)} · {r.payment_method === 'mpesa' ? 'M-Pesa' : 'Cash'}</Text>
+            <Text style={type.small}>{r.ride_type === 'lift_premium' ? 'Lift Premium' : 'Lift'} · {formatDistance(r.distance_m, unitFor(r.market_code))} · {formatDuration(r.duration_s)} · {r.payment_method === 'mpesa' ? 'M-Pesa' : 'Cash'}</Text>
             <View style={{ marginVertical: space.md, gap: 6 }}>
               <Text style={type.body}><Text style={{ fontFamily: fonts.semibold }}>Pickup: </Text>{r.pickup_address}</Text>
               {r.pickup_note ? <Text style={type.small}>Note: {r.pickup_note}</Text> : null}

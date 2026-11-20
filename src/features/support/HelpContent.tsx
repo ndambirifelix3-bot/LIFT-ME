@@ -5,7 +5,7 @@ import { Linking, Text, View } from 'react-native';
 import { z } from 'zod';
 import { Button, Card, Chip, ErrorMessage, Input, ListItem, Notice, Pill, SectionTitle, toneForStatus } from '@/components';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { useSettings } from '@/features/settings';
+import { useMarket, useMyMarket } from '@/features/markets';
 import { formatDateTime } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import { colors, space, type } from '@/theme';
@@ -28,7 +28,19 @@ const schema = z.object({
 /** Emergency numbers + "report a problem" form, shared by passengers and drivers. */
 export function HelpContent({ rideId }: { rideId?: string }) {
   const { session } = useAuth();
-  const settings = useSettings();
+  const myMarket = useMyMarket();
+  // On a trip, use the trip's market (a visitor from Kenya riding in the US needs 911, not 999).
+  const rideMarketCode = useQuery({
+    queryKey: ['ride-market', rideId],
+    enabled: !!rideId,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('rides').select('market_code').eq('id', rideId!).maybeSingle();
+      if (error) throw error;
+      return data?.market_code ?? null;
+    },
+  }).data;
+  const rideMarket = useMarket(rideMarketCode);
+  const market = rideMarket ?? myMarket;
   const { control, handleSubmit, formState, reset, setValue } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { category: 'safety', message: '' },
@@ -57,8 +69,9 @@ export function HelpContent({ rideId }: { rideId?: string }) {
     },
   });
 
-  const numbers = settings.data?.emergency_numbers ?? ['999', '112'];
-  const supportPhone = settings.data?.support_phone;
+  const listed = Array.isArray(market?.emergency_numbers) ? (market.emergency_numbers as unknown[]).map(String) : [];
+  const numbers = listed.length ? listed : ['112']; // 112 works on most mobile networks worldwide
+  const supportPhone = market?.support_phone;
   const category = useWatch({ control, name: 'category' });
 
   return (

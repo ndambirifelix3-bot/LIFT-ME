@@ -155,17 +155,23 @@ npm start
 
 ---
 
-## 7. Edit the Nairobi pilot area
+## 7. Markets (cities / countries) and service areas
 
-The sample polygon is a rough outline of Nairobi. To use your exact zone, draw it on geojson.io, then in the SQL Editor:
+Each city Lift Me runs in is a **market** with its own service area, currency, km/miles, phone code, emergency
+numbers, payment methods, commission and prices. Nairobi is the first market.
 
-```sql
-update public.service_area
-   set area = st_geogfromtext('SRID=4326;MULTIPOLYGON(((lng lat, lng lat, ..., first point again)))')
- where name = 'Nairobi pilot (sample)';
-```
+- **Admin → Markets**: add a city (it starts switched off), switch it on/off, set its time zone and units, and
+  add service areas: draw the area on geojson.io, copy the GeoJSON from the right-hand panel and paste it in.
+- **Admin → Pricing**: pick the market at the top, then set prices per ride type (typed as money, e.g. 2.50 for
+  $2.50; per km or per mile follows the market), commission, payment methods, emergency numbers, support phone.
+  Settings shared by all markets (match radius, search timeout…) are at the bottom.
+- Rides belong to the market of the pickup point and can't cross into another market. Drivers are placed in a
+  market from their phone's country code; an admin can move them (Admin → Drivers → driver → Market).
+- Money is stored in the smallest unit: KES as whole shillings, USD as cents.
+- **Before a US city goes live** you still need: card payments (Stripe — not built yet; until then only cash),
+  US SMS sender registration, background checks/insurance documents (add them as document types for country `us`).
 
-Prices, commission, match radius (5 km), search timeout (2 min) are edited in **Admin → Pricing**.
+To replace the sample Nairobi polygon, add the new area in Admin → Markets and switch the old one off.
 
 ---
 

@@ -1,15 +1,32 @@
 import { describe, expect, it } from '@jest/globals';
-import { decodePolyline, formatCountdown, formatDistance, formatDuration, formatMoney } from '../format';
+import { decodePolyline, formatCountdown, formatDistance, formatDuration, formatMoney, fromMoneyInput, toMoneyInput } from '../format';
 import { friendlyError } from '../errors';
 
 describe('format', () => {
-  it('money is whole currency units', () => {
+  it('money uses each currency\'s smallest unit', () => {
     expect(formatMoney(1234, 'KES')).toBe('KES 1,234');
+    expect(formatMoney(1250, 'USD')).toBe('$12.50');
+    expect(formatMoney(123456789, 'USD')).toBe('$1,234,567.89');
+    expect(formatMoney(5, 'USD')).toBe('$0.05');
+    expect(formatMoney(1050, 'KES', 0)).toBe('KES 1,050');
+    expect(formatMoney(-190, 'USD')).toBe('-$1.90');
     expect(formatMoney(null)).toBe('—');
+  });
+  it('converts money to and from what people type', () => {
+    expect(toMoneyInput(250, 2)).toBe('2.50');
+    expect(toMoneyInput(100, 0)).toBe('100');
+    expect(fromMoneyInput('2.5', 2)).toBe(250);
+    expect(fromMoneyInput('8', 2)).toBe(800);
+    expect(fromMoneyInput('1.755', 2)).toBeNull();
+    expect(fromMoneyInput('100', 0)).toBe(100);
+    expect(fromMoneyInput('10.5', 0)).toBeNull();
+    expect(fromMoneyInput('abc', 2)).toBeNull();
   });
   it('distance and duration', () => {
     expect(formatDistance(850)).toBe('850 m');
     expect(formatDistance(12345)).toBe('12.3 km');
+    expect(formatDistance(3219, 'mi')).toBe('2.0 mi');
+    expect(formatDistance(100, 'mi')).toBe('328 ft');
     expect(formatDuration(30)).toBe('1 min');
     expect(formatDuration(3900)).toBe('1 h 5 min');
     expect(formatCountdown(125)).toBe('2:05');

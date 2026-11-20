@@ -5,8 +5,9 @@ import { useState } from 'react';
 import { Platform, Text, View } from 'react-native';
 import { Button, Card, Chip, ErrorMessage, Input, Loading, Notice, Pill, Row, SectionTitle, toneForStatus } from '@/components';
 import { AdminPage } from '@/features/admin/AdminPage';
+import { useMarkets } from '@/features/markets';
 import { formatDateTime } from '@/lib/format';
-import { formatPhoneForDisplay } from '@/lib/phone';
+import { flagEmoji, formatPhoneForDisplay } from '@/lib/phone';
 import { supabase } from '@/lib/supabase';
 import { space, type } from '@/theme';
 
@@ -24,6 +25,7 @@ export default function AdminDriverDetail() {
   const [reason, setReason] = useState('');
   const [rideType, setRideType] = useState<string | null>(null);
   const [openError, setOpenError] = useState<unknown>(null);
+  const markets = useMarkets();
 
   const q = useQuery({
     queryKey: ['admin-driver', id],
@@ -56,6 +58,13 @@ export default function AdminDriverDetail() {
     },
     onSuccess: done,
   });
+  const moveMarket = useMutation({
+    mutationFn: async (code: string) => {
+      const { error } = await supabase.rpc('admin_set_driver_market', { p_driver_id: id!, p_market_code: code });
+      if (error) throw error;
+    },
+    onSuccess: done,
+  });
   const suspend = useMutation({
     mutationFn: async (on: boolean) => {
       const { error } = await supabase.rpc('admin_set_driver_suspended', { p_driver_id: id!, p_suspended: on, p_reason: on ? reason || undefined : undefined });
@@ -64,7 +73,7 @@ export default function AdminDriverDetail() {
     onSuccess: done,
   });
 
-  if (q.isLoading) return <Loading />;
+  if (q.isLoading || markets.isLoading) return <Loading />;
   if (q.error || !q.data) return <AdminPage title="Driver"><ErrorMessage error={q.error} onRetry={() => q.refetch()} /></AdminPage>;
   const { profile, driver, vehicle, docs, types, pricing, history } = q.data;
   const chosenType = rideType ?? vehicle?.ride_type ?? 'lift';
@@ -80,11 +89,30 @@ export default function AdminDriverDetail() {
       <Card>
         <Row label="Status" value={<Pill text={driver.status} tone={toneForStatus(driver.status)} />} />
         <Row label="Submitted" value={driver.submitted_at ? formatDateTime(driver.submitted_at) : 'Not submitted yet'} />
-        <Row label="National ID no." value={driver.id_number ?? '—'} />
+        <Row label="ID no." value={driver.id_number ?? '—'} />
         <Row label="Licence no." value={driver.licence_number ?? '—'} />
         <Row label="Email" value={driver.email ?? '—'} />
         {driver.reviewed_at ? <Row label="Last reviewed" value={formatDateTime(driver.reviewed_at)} /> : null}
         {driver.reject_reason ? <Row label="Reason" value={driver.reject_reason} /> : null}
+      </Card>
+
+      <SectionTitle>Market</SectionTitle>
+      <Card>
+        {!driver.market_code ? (
+          <Notice tone="error" text="This driver's phone number doesn't match any market. Pick one before approving." />
+        ) : null}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+          {(markets.data ?? []).map((m) => (
+            <Chip
+              key={m.code}
+              label={`${flagEmoji(m.country_iso)} ${m.name}`}
+              selected={driver.market_code === m.code}
+              onPress={() => m.code !== driver.market_code && moveMarket.mutate(m.code)}
+            />
+          ))}
+        </View>
+        <Text style={[type.small, { marginTop: space.sm }]}>The driver only gets ride requests in this market. Moving them takes them offline.</Text>
+        <ErrorMessage error={moveMarket.error} />
       </Card>
 
       <SectionTitle>Vehicle</SectionTitle>

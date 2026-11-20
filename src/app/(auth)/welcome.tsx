@@ -14,7 +14,7 @@ export default function Welcome() {
     <SafeAreaView style={styles.safe}>
       <View style={styles.top}>
         <Logo width={280} />
-        <Text style={styles.copy}>Safe, reliable rides across Nairobi. Pay with M-Pesa or cash.</Text>
+        <Text style={styles.copy}>Safe, reliable rides in your city. Book in seconds and track your driver live.</Text>
       </View>
       <View style={styles.bottom}>
         <Button title="Get started" onPress={() => router.push('/phone')} />

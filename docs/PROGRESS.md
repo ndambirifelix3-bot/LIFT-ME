@@ -21,6 +21,15 @@ The owner asked for the whole app in one go instead of phase-by-phase, so Phases
 - Fixed: admin dashboard crashed (blank page) on the web.
 - Phone login works with Supabase test numbers (no SMS provider yet). Test admin: 0700 000 099.
 
+## Multi-country ("markets") — Part A, applied to the live project 2026-11-20
+- Database migration `20261120000001_markets.sql` (markets, market_prices, market on areas/quotes/rides/drivers,
+  per-country documents, per-market fares/commission/earnings/admin totals). Tests: `supabase/tests/markets.test.sql`.
+- Edge Functions places / get-quote / mpesa-stk-push redeployed (search per country, no cross-market trips,
+  M-Pesa only for KES).
+- App: phone country picker (+254 / +1), money per currency (KES whole, USD cents), km/mi, payment methods and
+  emergency numbers per market. Admin: market switcher, per-market Pricing, new Markets page, move driver market.
+- Not done (needs the client): Stripe card payments, US SMS registration, US driver checks/insurance.
+
 ## Live Supabase project
 - Project **lift-me** (`sfvnchzihitdpblnjfvv`), Frankfurt (eu-central-1), free plan — created 2026-11-16.
 - All 6 migrations applied; RLS on all 18 tables; private `driver-documents` bucket; realtime on rides/offers/locations/payments; `no_driver_found` job runs every minute.

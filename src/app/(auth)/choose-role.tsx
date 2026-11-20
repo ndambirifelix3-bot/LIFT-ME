@@ -49,7 +49,7 @@ export default function ChooseRole() {
       footer={<Button title="Continue" disabled={!choice} loading={save.isPending} onPress={() => choice && save.mutate(choice)} />}
     >
       <Header title="How will you use Lift Me?" />
-      {option('passenger', 'person-outline', 'I need rides', 'Book rides, track your driver and pay with M-Pesa or cash.')}
+      {option('passenger', 'person-outline', 'I need rides', 'Book rides, track your driver live and pay easily.')}
       {option('driver', 'car-sport-outline', 'I want to drive', 'Apply to drive with Lift Me and earn on your schedule.')}
       <Notice text="You can only choose once. Contact support if you need to change it later." />
       <ErrorMessage error={save.error} />

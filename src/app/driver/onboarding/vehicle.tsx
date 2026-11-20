@@ -14,7 +14,7 @@ const schema = z.object({
   model: z.string().trim().min(1, 'Required').max(40),
   year: z.string().regex(/^\d{4}$/, 'Enter a year like 2016').refine((y) => +y >= 1980 && +y <= thisYear + 1, 'Enter a valid year'),
   colour: z.string().trim().min(1, 'Required').max(30),
-  plate: z.string().trim().toUpperCase().regex(/^[A-Z0-9 ]{3,12}$/, 'Enter the number plate, e.g. KDA 123A'),
+  plate: z.string().trim().toUpperCase().regex(/^[A-Z0-9 ]{3,12}$/, 'Enter the number plate, e.g. KDA 123A or 7ABC123'),
 });
 type Form = z.infer<typeof schema>;
 

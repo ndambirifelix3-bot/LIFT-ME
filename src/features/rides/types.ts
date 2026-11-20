@@ -15,6 +15,8 @@ export type QuoteOption = {
 
 export type Quote = {
   id: string;
+  /** The market of the pickup point: decides currency, km/mi and payment methods. */
+  market_code: string;
   options: QuoteOption[];
   currency: string;
   distance_m: number;
@@ -35,6 +37,8 @@ export type RideDetails = {
     location: { lat: number; lng: number; heading: number | null; updated_at: string } | null;
   };
   passenger: { id: string; full_name: string; phone: string | null; rating: number | null } | null;
+  /** The ride's market (currency decimals, km/mi, emergency numbers). */
+  market: Omit<Tables<'markets'>, 'created_at' | 'updated_at'> | null;
   payment: Payment | null;
   my_rating: Tables<'ratings'> | null;
   events: Tables<'ride_events'>[] | null;

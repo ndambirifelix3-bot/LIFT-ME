@@ -4,7 +4,8 @@ choice adds complexity that a small Nairobi pilot doesn't need, don't do it — 
 instead.
 
  What we are building
-Lift Me — a simple ride-hailing app (like Uber/Bolt) for a small pilot in Nairobi, Kenya. Tagline:
+Lift Me — a simple ride-hailing app (like Uber/Bolt), piloting in Nairobi, Kenya first, built to add more
+cities/countries (e.g. the USA) as "markets" without code changes. Tagline:
 "Move with confidence."
 ONE app, ONE codebase, THREE dashboards:
       Passenger dashboard — book a ride, track the driver, pay, see history.
@@ -40,13 +41,15 @@ ONE app, ONE codebase, THREE dashboards:
    4. Ride status changes go through database functions (RPC) that check the move is allowed.
       The app never writes status directly.
    5. Accepting a ride must be atomic — two drivers can never get the same ride.
-   6. Money is stored as whole numbers (integers, KES). Never floats.
+   6. Money is stored as whole numbers (integers) in each market's smallest unit: KES whole shillings
+      (currency_decimals 0), USD cents (currency_decimals 2). Never floats. Never add amounts in different currencies.
    7. M-Pesa payment success only comes from the M-Pesa callback, never from the app.
    8. Driver documents are in a PRIVATE storage bucket. Only the driver and admins can view
       them.
    9. Secrets (service role key, M-Pesa keys, Maps server key) live only in Edge Function secrets
       or .env — never in app code, never committed.
-  10. Don't hard-code prices, currency or the service area; keep them in a settings / pricing
+  10. Don't hard-code prices, currency, units, phone codes, emergency numbers or service areas; they live on the
+      market (markets / market_prices / service_area tables) or in settings. Keep them in the database
       table so they can change later.
   11. Never fake data: no fake drivers, fake ETAs or fake payment success outside tests.
   12. Don't delete or overwrite working code without explaining why.

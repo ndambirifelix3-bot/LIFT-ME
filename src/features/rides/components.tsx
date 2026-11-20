@@ -51,11 +51,11 @@ export function Receipt({ details }: { details: RideDetails }) {
       <Row label="Date" value={formatDateTime(r.completed_at ?? r.requested_at)} />
       <Row label="From" value={r.pickup_address} />
       <Row label="To" value={r.dropoff_address} />
-      <Row label="Distance" value={`${formatDistance(r.distance_m)} · ${formatDuration(r.duration_s)}`} />
+      <Row label="Distance" value={`${formatDistance(r.distance_m, details.market?.distance_unit)} · ${formatDuration(r.duration_s)}`} />
       <Row label="Ride type" value={r.ride_type === 'lift_premium' ? 'Lift Premium' : 'Lift'} />
       {details.driver ? <Row label="Driver" value={details.driver.full_name} /> : null}
       <View style={styles.divider} />
-      <Row label="Total" value={formatMoney(r.fare, r.currency)} bold />
+      <Row label="Total" value={formatMoney(r.fare, r.currency, details.market?.currency_decimals)} bold />
       <Row label="Payment" value={p ? `${p.method === 'mpesa' ? 'M-Pesa' : 'Cash'} · ${p.status}` : r.payment_method === 'mpesa' ? 'M-Pesa' : 'Cash'} />
       {p?.mpesa_receipt ? <Row label="M-Pesa receipt" value={p.mpesa_receipt} /> : null}
     </Card>
@@ -82,6 +82,7 @@ export function PassengerPayment({ details }: { details: RideDetails }) {
   });
 
   if (!p) return null;
+  const cashAllowed = details.market?.payment_methods?.includes('cash') ?? true;
   if (p.status === 'paid') return <Notice tone="success" text={`Paid ${formatMoney(p.amount, p.currency)}${p.mpesa_receipt ? ` · ${p.mpesa_receipt}` : ''}. Thank you!`} />;
   if (p.method === 'cash') return <Notice text={`Please pay your driver ${formatMoney(p.amount, p.currency)} in cash.`} />;
 
@@ -101,7 +102,9 @@ export function PassengerPayment({ details }: { details: RideDetails }) {
       />
       <ErrorMessage error={push.error ?? toCash.error} />
       <Button title={push.isSuccess ? 'Send the prompt again' : 'Pay with M-Pesa'} onPress={() => push.mutate()} loading={push.isPending} />
-      <Button title="I'll pay cash instead" variant="ghost" onPress={() => toCash.mutate()} loading={toCash.isPending} style={{ marginTop: space.sm }} />
+      {cashAllowed ? (
+        <Button title="I'll pay cash instead" variant="ghost" onPress={() => toCash.mutate()} loading={toCash.isPending} style={{ marginTop: space.sm }} />
+      ) : null}
     </Card>
   );
 }

@@ -1,29 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 
+/** App-wide settings. Anything that differs by city/country (currency, emergency numbers, commission,
+ *  support phone…) lives on the market instead — see features/markets.ts. */
 export type AppSettings = {
-  currency: string;
-  country_code: string;
-  commission_percent: number;
   match_radius_km: number;
   search_timeout_seconds: number;
+  location_fresh_seconds: number;
   location_interval_seconds: number;
-  emergency_numbers: string[];
-  support_phone: string;
-  pricing_is_placeholder: boolean;
+  quote_valid_minutes: number;
   [key: string]: unknown;
 };
 
 const DEFAULTS: AppSettings = {
-  currency: 'KES',
-  country_code: '+254',
-  commission_percent: 0,
   match_radius_km: 5,
   search_timeout_seconds: 120,
+  location_fresh_seconds: 120,
   location_interval_seconds: 5,
-  emergency_numbers: ['999', '112'],
-  support_phone: '',
-  pricing_is_placeholder: false,
+  quote_valid_minutes: 10,
 };
 
 /** Settings live in the database so they can change without a new app release. */
