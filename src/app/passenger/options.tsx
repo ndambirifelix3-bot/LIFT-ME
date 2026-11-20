@@ -9,6 +9,7 @@ import { useMarket } from '@/features/markets';
 import type { Ride } from '@/features/rides/types';
 import { formatCountdown, formatDistance, formatDuration, formatMoney, secondsUntil } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
+import { goBack } from '@/lib/nav';
 import { colors, fonts, radius, space, type } from '@/theme';
 
 type Method = Ride['payment_method'];
@@ -58,7 +59,7 @@ export default function RideOptions() {
     <Screen
       footer={
         expired ? (
-          <Button title="Price expired — get a new price" variant="dark" onPress={() => router.back()} />
+          <Button title="Price expired — get a new price" variant="dark" onPress={() => goBack('/passenger/where-to')} />
         ) : (
           <Button title="Request Lift" onPress={() => request.mutate()} loading={request.isPending} disabled={!rideType} />
         )

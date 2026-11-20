@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { Image, View } from 'react-native';
 import { Button, ErrorMessage, Header, Notice, Screen } from '@/components';
@@ -9,6 +8,7 @@ import { useMyDriver } from '@/features/driver/hooks';
 import { uploadDriverFile, type PickedFile } from '@/features/driver/upload';
 import { useSignedPhoto } from '@/features/rides/hooks';
 import { supabase } from '@/lib/supabase';
+import { goBack } from '@/lib/nav';
 import { colors, space } from '@/theme';
 
 export default function DriverPhoto() {
@@ -30,7 +30,7 @@ export default function DriverPhoto() {
     },
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ['my-driver'] });
-      router.back();
+      goBack('/driver/onboarding');
     },
   });
 

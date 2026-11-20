@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { router } from 'expo-router';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button, ErrorMessage, Header, Input, Loading, Screen } from '@/components';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useMyDriver } from '@/features/driver/hooks';
 import { supabase } from '@/lib/supabase';
+import { goBack } from '@/lib/nav';
 
 const schema = z.object({
   full_name: z.string().trim().min(3, 'Enter your full name as on your ID').max(100),
@@ -38,7 +38,7 @@ export default function DriverDetails() {
     onSuccess: async () => {
       await refreshProfile();
       await qc.invalidateQueries({ queryKey: ['my-driver'] });
-      router.back();
+      goBack('/driver/onboarding');
     },
   });
 

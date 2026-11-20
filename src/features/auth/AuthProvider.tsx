@@ -51,7 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       initializing,
       profile: userId ? profileQuery.data : null,
       profileLoading: !!userId && profileQuery.isLoading,
-      refreshProfile: () => profileQuery.refetch(),
+      // invalidate (not refetch): it skips the request while nobody is signed in yet — e.g. just after
+      // the SMS code is verified, before the new session has reached this component.
+      refreshProfile: () => queryClient.invalidateQueries({ queryKey: ['profile'] }),
       signOut: async () => {
         await supabase.auth.signOut();
         queryClient.clear();

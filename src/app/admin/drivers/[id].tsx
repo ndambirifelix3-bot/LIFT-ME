@@ -12,11 +12,22 @@ import { supabase } from '@/lib/supabase';
 import { space, type } from '@/theme';
 
 async function openSigned(path: string) {
-  // Short-lived signed link (60 s) to the PRIVATE bucket. Only admins and the driver can create one (RLS).
-  const { data, error } = await supabase.storage.from('driver-documents').createSignedUrl(path, 60);
-  if (error) throw error;
-  if (Platform.OS === 'web') window.open(data.signedUrl, '_blank', 'noopener');
-  else await WebBrowser.openBrowserAsync(data.signedUrl);
+  // Open the tab straight away, while the click still counts: browsers (Safari especially) block
+  // tabs opened after waiting for the network.
+  const tab = Platform.OS === 'web' ? window.open('', '_blank') : null;
+  try {
+    // Short-lived signed link (60 s) to the PRIVATE bucket. Only admins and the driver can create one (RLS).
+    const { data, error } = await supabase.storage.from('driver-documents').createSignedUrl(path, 60);
+    if (error) throw error;
+    if (Platform.OS !== 'web') await WebBrowser.openBrowserAsync(data.signedUrl);
+    else if (tab) {
+      tab.opener = null;
+      tab.location.href = data.signedUrl;
+    } else window.open(data.signedUrl, '_blank', 'noopener');
+  } catch (e) {
+    tab?.close();
+    throw e;
+  }
 }
 
 export default function AdminDriverDetail() {
@@ -77,6 +88,9 @@ export default function AdminDriverDetail() {
   if (q.error || !q.data) return <AdminPage title="Driver"><ErrorMessage error={q.error} onRetry={() => q.refetch()} /></AdminPage>;
   const { profile, driver, vehicle, docs, types, pricing, history } = q.data;
   const chosenType = rideType ?? vehicle?.ride_type ?? 'lift';
+  // Only this driver's country's documents (plus anything they uploaded anyway).
+  const country = markets.data?.find((m) => m.code === driver.market_code)?.country_iso;
+  const shownTypes = types.filter((t) => !t.country_iso || t.country_iso === country || docs.some((d) => d.doc_type === t.code));
 
   return (
     <AdminPage
@@ -132,7 +146,7 @@ export default function AdminDriverDetail() {
       <Card>
         <ErrorMessage error={openError} />
         <Row label="Profile photo" value={driver.photo_path ? <Button small variant="outline" title="View" onPress={() => openSigned(driver.photo_path!).catch(setOpenError)} /> : 'Missing'} />
-        {types.map((t) => {
+        {shownTypes.map((t) => {
           const doc = docs.find((d) => d.doc_type === t.code);
           return (
             <Row

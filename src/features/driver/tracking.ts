@@ -30,6 +30,32 @@ if (Platform.OS !== 'web') {
 
 let foregroundSub: Location.LocationSubscription | null = null;
 
+/**
+ * Web only: keep the screen on while the driver is online. A browser can't send location with the
+ * screen off, so without this the phone would go to sleep and the driver would silently stop
+ * getting requests. Browsers drop the lock when the tab is hidden, so take it again on return.
+ */
+type WakeLock = { release: () => Promise<void> };
+let wakeLock: WakeLock | null = null;
+let wantWakeLock = false;
+
+async function takeWakeLock() {
+  const nav = navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<WakeLock> } };
+  if (!wantWakeLock || wakeLock || !nav.wakeLock || document.visibilityState !== 'visible') return;
+  try {
+    wakeLock = await nav.wakeLock.request('screen');
+    (wakeLock as unknown as EventTarget).addEventListener?.('release', () => {
+      wakeLock = null;
+    });
+  } catch {
+    // Not allowed right now (e.g. battery saver). Tracking still works while the screen is on.
+  }
+}
+
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => void takeWakeLock());
+}
+
 export type TrackingMode = 'background' | 'foreground';
 
 export async function startDriverTracking(intervalSeconds: number): Promise<TrackingMode> {
@@ -55,7 +81,7 @@ export async function startDriverTracking(intervalSeconds: number): Promise<Trac
           foregroundService: {
             notificationTitle: 'Lift Me — you are online',
             notificationBody: 'Sharing your location so passengers nearby can book you.',
-            notificationColor: '#D6B45B',
+            notificationColor: '#FFC107',
           },
         });
         return 'background';
@@ -63,6 +89,11 @@ export async function startDriverTracking(intervalSeconds: number): Promise<Trac
     } catch (err) {
       console.warn('background location unavailable, using foreground', err);
     }
+  }
+
+  if (Platform.OS === 'web') {
+    wantWakeLock = true;
+    await takeWakeLock();
   }
 
   foregroundSub?.remove();
@@ -76,6 +107,9 @@ export async function startDriverTracking(intervalSeconds: number): Promise<Trac
 export async function stopDriverTracking() {
   foregroundSub?.remove();
   foregroundSub = null;
+  wantWakeLock = false;
+  await wakeLock?.release().catch(() => undefined);
+  wakeLock = null;
   if (Platform.OS !== 'web') {
     try {
       if (await Location.hasStartedLocationUpdatesAsync(DRIVER_LOCATION_TASK)) {

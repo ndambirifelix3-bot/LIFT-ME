@@ -8,6 +8,7 @@ import type { LatLng } from '@/components/Map.types';
 import { useBooking } from '@/features/booking/store';
 import { useMyLocation } from '@/features/location';
 import { getQuote, reverseGeocode } from '@/features/places/api';
+import { goBack } from '@/lib/nav';
 import { colors, space, type } from '@/theme';
 
 const NAIROBI = { lat: -1.2864, lng: 36.8172 };
@@ -42,7 +43,7 @@ export default function ConfirmPickup() {
     const chosen = { ...center, address: address || pickup?.address || 'Pinned location' };
     setPickup(chosen);
     if (pickOnMap || !dropoff) {
-      router.back();
+      goBack('/passenger/where-to');
       return;
     }
     setLoading(true);

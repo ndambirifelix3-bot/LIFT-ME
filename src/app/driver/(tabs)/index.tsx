@@ -117,7 +117,9 @@ function OnlineSwitch({ online, intervalSeconds, hasActiveRide }: { online: bool
         <Text style={[type.small, online && { color: colors.ivory }]}>
           {online
             ? mode === 'foreground'
-              ? 'Keep Lift Me open to receive requests.'
+              ? Platform.OS === 'web'
+                ? 'Keep Lift Me open and your phone plugged in. Requests stop if you switch apps.'
+                : 'Keep Lift Me open to receive requests.'
               : 'Receiving requests nearby.'
             : 'Go online to receive requests.'}
         </Text>
