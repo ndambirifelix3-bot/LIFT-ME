@@ -65,7 +65,15 @@ async function turnOn(): Promise<void> {
   const { publicKey } = await callFunction<{ publicKey: string }>('push-send', { action: 'public-key' });
   const reg = await navigator.serviceWorker.ready;
   const existing = await reg.pushManager.getSubscription();
-  const sub = existing ?? (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(publicKey) as BufferSource }));
+  let sub = existing;
+  if (!sub) {
+    try {
+      sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(publicKey) as BufferSource });
+    } catch {
+      // e.g. browsers without a push service, or privacy settings that block it.
+      throw new Error('This browser could not set up notifications. On Android use Chrome; on iPhone open Lift Me from the Home Screen.');
+    }
+  }
   await saveSubscription(sub);
 }
 

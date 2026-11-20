@@ -230,6 +230,22 @@ added to the home screen.
 
 ---
 
+## 10. Push notifications (web app)
+
+Nothing to configure: the `push-send` Edge Function creates its own key pair on first use and keeps the
+private key in the server-only `push_config` table. People tap **Turn on notifications** (Account tab, driver
+home, passenger trip screen).
+
+- Android: Chrome (browser or installed app). iPhone/iPad: only after **Add to Home Screen** (iOS 16.4+).
+- Sent for: new ride request, driver on the way / arrived, trip complete, no driver found, cancellations,
+  M-Pesa payment received, driver application approved / rejected / suspended.
+- Every notification is logged in `push_outbox` (14 days): `sent_at`, `devices` reached, `error`.
+  `error = 'no_device'` means that person hasn't turned notifications on.
+- If the project URL ever changes: `update push_config set function_url = 'https://<ref>.supabase.co/functions/v1/push-send';`
+- The Android/iPhone store apps will need Expo push notifications later (separate setup).
+
+---
+
 ## Where every key goes (summary)
 
 | Value | Where | Secret? |

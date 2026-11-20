@@ -61,3 +61,8 @@ Still to try once the owner has created the Supabase project and keys:
 
 ## Suggested later (not needed for the pilot)
 Push notifications, in-app chat, scheduled rides, promo codes, driver payouts via M-Pesa B2C, Swahili translation, a web map for admins, and a cheaper SMS route (Africa's Talking).
+
+## Push notifications (web) — live 2026-11-20
+- Migration `20261120000003_push_notifications.sql`, Edge Function `push-send`, service worker push handlers,
+  "Turn on notifications" card. Server pipeline verified live (trigger → pg_net → function → web push; dead
+  devices removed). Still to verify on a real Android phone and an iPhone added to the Home Screen.
