@@ -30,6 +30,12 @@ The owner asked for the whole app in one go instead of phase-by-phase, so Phases
   emergency numbers per market. Admin: market switcher, per-market Pricing, new Markets page, move driver market.
 - Not done (needs the client): Stripe card payments, US SMS registration, US driver checks/insurance.
 
+## Indianapolis test market (client is based in Indiana) — live since 2026-11-20
+- Migration `20261120000002_indianapolis_test_market.sql`: market `indianapolis` (USD cents, miles, +1, 911,
+  America/Indiana/Indianapolis, cash only, 15% commission), service area ≈ Marion County (downtown, airport,
+  Speedway, Broad Ripple; not Carmel), PLACEHOLDER prices, US driver documents (licence, registration, insurance).
+- To log in with a US number before a US SMS sender exists, add a Supabase test number, e.g. 13175550100=123456.
+
 ## Live Supabase project
 - Project **lift-me** (`sfvnchzihitdpblnjfvv`), Frankfurt (eu-central-1), free plan — created 2026-11-16.
 - All 6 migrations applied; RLS on all 18 tables; private `driver-documents` bucket; realtime on rides/offers/locations/payments; `no_driver_found` job runs every minute.

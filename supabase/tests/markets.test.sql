@@ -12,7 +12,7 @@ insert into auth.users (id, phone) values
 -- ===================== READING MARKETS =====================
 set role anon;
 select t.as_user(null);
-select t.ok((select count(*) from public.markets) = 1, 'anyone (even logged out) can read markets for the phone screen');
+select t.ok((select count(*) from public.markets) = 2, 'anyone (even logged out) can read markets for the phone screen');
 select t.expect_error($$select count(*) from public.market_prices$$, '%permission denied%');
 
 -- ===================== ADMIN CREATES A US MARKET =====================
@@ -25,6 +25,8 @@ select t.expect_error($$insert into public.markets (code, name, country_iso, cur
 insert into public.markets (code, name, country_iso, currency, currency_decimals, timezone, distance_unit, phone_country_code,
                             emergency_numbers, payment_methods, commission_percent, prices_are_placeholder, is_active, sort_order)
 values ('nyc', 'New York City', 'us', 'USD', 2, 'America/New_York', 'mi', '+1', '["911"]', '{cash}', 20, false, true, 2);
+-- Indianapolis (also +1) exists from the migrations; switch it off so +1 test users land in NYC here.
+update public.markets set is_active = false where code = 'indianapolis';
 -- Prices in cents, per MILE: $2.50 base, $1.75/mi, $0.35/min, $8.00 minimum.
 insert into public.market_prices (market_code, ride_type, base_fare, per_distance, per_minute, minimum_fare)
 values ('nyc', 'lift', 250, 175, 35, 800);
@@ -32,10 +34,10 @@ values ('nyc', 'lift', 250, 175, 35, 800);
 insert into public.service_area (name, market_code, area)
 values ('Manhattan (test)', 'nyc', extensions.st_geogfromtext(
   'SRID=4326;MULTIPOLYGON(((-74.03 40.68, -73.90 40.68, -73.90 40.88, -74.03 40.88, -74.03 40.68)))'));
-insert into public.document_types (code, name, description, required, country_iso, sort_order)
-values ('us_drivers_license', 'Driver''s License', 'US state driver''s license', true, 'us', 10);
+-- US document types come from the Indianapolis migration; this test needs only the licence.
+update public.document_types set required = false where country_iso = 'us' and code <> 'us_drivers_license';
 update public.markets set commission_percent = 20 where code = 'nyc';
-select t.ok((select count(*) from public.admin_actions where action = 'config_updated' and target_type = 'markets') = 1, 'market edit is audited');
+select t.ok((select count(*) from public.admin_actions where action = 'config_updated' and target_type = 'markets') = 2, 'market edits are audited');
 select t.ok(public.market_at_point(40.758, -73.9855) = 'nyc', 'Times Square is in the NYC market');
 select t.ok(public.market_at_point(-1.2864, 36.8172) = 'nairobi', 'Nairobi CBD is in the Nairobi market');
 select t.ok(public.market_at_point(51.5, -0.12) is null, 'London is not served');

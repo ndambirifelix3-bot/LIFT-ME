@@ -82,7 +82,7 @@ select t.expect_error($$select public.submit_driver_application()$$, '%missing_p
 update public.drivers set id_number = '12345678', licence_number = 'DL123', photo_path = '00000000-0000-0000-0000-0000000000d1/photo-1.jpg' where id = auth.uid();
 insert into public.vehicles (driver_id, make, model, year, colour, plate) values (auth.uid(), 'Toyota', 'Axio', 2016, 'Silver', 'KDA 123A');
 insert into public.driver_documents (driver_id, doc_type, file_path, mime_type)
-select auth.uid(), code, auth.uid() || '/' || code || '-1.jpg', 'image/jpeg' from public.document_types where code <> 'insurance';
+select auth.uid(), code, auth.uid() || '/' || code || '-1.jpg', 'image/jpeg' from public.document_types where country_iso = 'ke' and code <> 'insurance';
 select t.expect_error($$select public.submit_driver_application()$$, '%missing_documents: Insurance%');
 insert into public.driver_documents (driver_id, doc_type, file_path, mime_type)
 values (auth.uid(), 'insurance', auth.uid() || '/insurance-1.pdf', 'application/pdf');
@@ -101,7 +101,7 @@ update public.profiles set full_name = 'Dora Driver' where id = auth.uid();
 update public.drivers set id_number = '87654321', licence_number = 'DL999', photo_path = '00000000-0000-0000-0000-0000000000d2/photo-1.jpg' where id = auth.uid();
 insert into public.vehicles (driver_id, make, model, year, colour, plate) values (auth.uid(), 'Mazda', 'Demio', 2017, 'Blue', 'KDB 456B');
 insert into public.driver_documents (driver_id, doc_type, file_path, mime_type)
-select auth.uid(), code, auth.uid() || '/' || code || '-1.jpg', 'image/jpeg' from public.document_types;
+select auth.uid(), code, auth.uid() || '/' || code || '-1.jpg', 'image/jpeg' from public.document_types where country_iso = 'ke';
 select public.submit_driver_application();
 select t.ok((select count(*) from public.driver_documents) = 5, 'driver 2 sees only own 5 documents');
 select t.ok((select count(*) from public.drivers) = 1, 'driver 2 sees only own driver row');
