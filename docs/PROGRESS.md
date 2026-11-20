@@ -73,3 +73,12 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   Routes: OSRM in get-quote with a ~20 km/h city floor; straight-line estimate if OSRM is down.
 - Booking tested end to end through the screens on the live project (CBD → Sarit Centre, 3.7 km, real prices).
 
+
+## Ride types: bodas + car sizes — live 2026-11-21
+- Migration `20261121000002_vehicle_types.sql`: Boda Electric, Boda, Lift Mini, Lift, Lift XL, Lift Premium
+  (`pricing.vehicle_kind`, `is_electric`, `can_take`). Bodas Nairobi only; PLACEHOLDER prices.
+- Matching uses `can_take` (electric boda also takes fuel boda trips; XL takes Lift + Mini; cars never get bodas).
+- Drivers pick their type in onboarding; admins can change it ("Save category"). Tests: `vehicle_types.test.sql`.
+- Verified live on a real iPhone: Boda Electric request → "New boda request 🏍️" in ~1 s → accept → cancel alert;
+  a Lift Mini request was not offered to the boda rider.
+- Fixed: bottom tab labels were cut off on phones.
