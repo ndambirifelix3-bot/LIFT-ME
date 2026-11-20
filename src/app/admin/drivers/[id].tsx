@@ -163,9 +163,12 @@ export default function AdminDriverDetail() {
         {driver.status !== 'suspended' ? (
           <>
             <Text style={[type.label, { marginBottom: space.sm }]}>Approve for category</Text>
-            <View style={{ flexDirection: 'row', gap: space.sm, marginBottom: space.md }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginBottom: space.md }}>
               {pricing.map((p) => <Chip key={p.ride_type} label={p.display_name} selected={chosenType === p.ride_type} onPress={() => setRideType(p.ride_type)} />)}
             </View>
+            {driver.status === 'approved' && vehicle && chosenType !== vehicle.ride_type ? (
+              <Button title="Save category" variant="dark" onPress={() => review.mutate(true)} loading={review.isPending && review.variables} style={{ marginBottom: space.md }} />
+            ) : null}
           </>
         ) : null}
         <Input label="Reason (required to reject or suspend; shown to the driver)" value={reason} onChangeText={setReason} multiline maxLength={300} />
