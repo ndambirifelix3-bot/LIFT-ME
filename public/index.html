@@ -36,6 +36,12 @@
         height: 100%;
         flex: 1;
       }
+      /* Netlify's free plan adds a "Powered by Netlify" badge (64px tall) at the bottom right, on top of
+         the page. When it is there, end the app above it so it never covers a button.
+         On any other host there is no badge and nothing changes. */
+      body:has(#nl-badge-frame) #root {
+        height: calc(100% - 64px);
+      }
     </style>
   </head>
 
