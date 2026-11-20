@@ -65,4 +65,5 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 ## Push notifications (web) — live 2026-11-20
 - Migration `20261120000003_push_notifications.sql`, Edge Function `push-send`, service worker push handlers,
   "Turn on notifications" card. Server pipeline verified live (trigger → pg_net → function → web push; dead
-  devices removed). Still to verify on a real Android phone and an iPhone added to the Home Screen.
+  devices removed). Verified on a real iPhone (Home Screen app): test alert, "New ride request", accept from
+  the alert, "Ride cancelled". Android Chrome still to try.
