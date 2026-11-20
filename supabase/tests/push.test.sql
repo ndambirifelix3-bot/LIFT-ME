@@ -13,8 +13,8 @@ select t.ok(public.format_money(123456, 'USD', 2) = '$1,234.56', 'USD thousands'
 
 -- ===================== QUEUED BY THE EARLIER RIDES =====================
 select t.ok((select count(*) from public.push_outbox where user_id = '00000000-0000-0000-0000-0000000000d1'
-             and title = 'New ride request 🚗' and body like 'KES 360 · Pickup: Kenyatta Ave, CBD%') >= 1,
-            'driver 1 was told about the new request, with fare and pickup');
+             and title = 'New ride request 🚗' and body like 'Lift · KES 360 · Pickup: Kenyatta Ave, CBD%') >= 1,
+            'driver 1 was told about the new request: ride type, fare and pickup');
 select t.ok((select count(*) from public.push_outbox where user_id = '00000000-0000-0000-0000-0000000000d2' and title = 'New ride request 🚗') >= 1,
             'driver 2 was told too');
 select t.ok((select body from public.push_outbox where user_id = '00000000-0000-0000-0000-0000000000a1'

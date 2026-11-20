@@ -421,34 +421,43 @@ export type Database = {
       }
       pricing: {
         Row: {
+          can_take: string[]
           description: string
           display_name: string
           is_active: boolean
+          is_electric: boolean
           ride_type: string
           seats: number
           sort_order: number
           tier: number
           updated_at: string
+          vehicle_kind: string
         }
         Insert: {
+          can_take?: string[]
           description?: string
           display_name: string
           is_active?: boolean
+          is_electric?: boolean
           ride_type: string
           seats?: number
           sort_order?: number
           tier?: number
           updated_at?: string
+          vehicle_kind?: string
         }
         Update: {
+          can_take?: string[]
           description?: string
           display_name?: string
           is_active?: boolean
+          is_electric?: boolean
           ride_type?: string
           seats?: number
           sort_order?: number
           tier?: number
           updated_at?: string
+          vehicle_kind?: string
         }
         Relationships: []
       }
@@ -1699,6 +1708,15 @@ export type Database = {
         Args: { p_lat: number; p_lng: number }
         Returns: string
       }
+      market_centers: {
+        Args: never
+        Returns: {
+          code: string
+          country_iso: string
+          lat: number
+          lng: number
+        }[]
+      }
       market_for_phone: { Args: { p_phone: string }; Returns: string }
       point_in_service_area: {
         Args: { p_lat: number; p_lng: number }
@@ -1927,6 +1945,10 @@ export type Database = {
       update_driver_location: {
         Args: { p_heading?: number; p_lat: number; p_lng: number }
         Returns: number
+      }
+      vehicle_can_take: {
+        Args: { p_ride_type: string; p_vehicle_type: string }
+        Returns: boolean
       }
     }
     Enums: {

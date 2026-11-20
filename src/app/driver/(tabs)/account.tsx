@@ -3,11 +3,13 @@ import { Card, Header, ListItem, Loading, Pill, Row, Screen, SectionTitle, toneF
 import { AccountBasics } from '@/features/auth/AccountActions';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useMyDriver } from '@/features/driver/hooks';
+import { useRideTypeName } from '@/features/rides/rideTypes';
 
 export default function DriverAccount() {
   const { session } = useAuth();
   const me = useMyDriver(session?.user.id);
   const d = me.data;
+  const category = useRideTypeName(d?.vehicle?.ride_type);
 
   return (
     <Screen onRefresh={() => me.refetch()} refreshing={me.isRefetching}>
@@ -23,7 +25,7 @@ export default function DriverAccount() {
               <>
                 <Row label="Vehicle" value={`${d.vehicle.colour} ${d.vehicle.make} ${d.vehicle.model} (${d.vehicle.year})`} />
                 <Row label="Plate" value={d.vehicle.plate} />
-                <Row label="Category" value={d.vehicle.ride_type === 'lift_premium' ? 'Lift Premium' : 'Lift'} />
+                <Row label="Category" value={category} />
               </>
             ) : (
               <Row label="Vehicle" value="Not added" />

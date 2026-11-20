@@ -9,6 +9,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useMyDriver, useOffers } from '@/features/driver/hooks';
 import { startDriverTracking, stopDriverTracking, type TrackingMode } from '@/features/driver/tracking';
 import { useActiveRide, useRideAction, useRideDetails, useRideRealtime } from '@/features/rides/hooks';
+import { fallbackName, RideTypeIcon, useRideTypes } from '@/features/rides/rideTypes';
 import type { Ride } from '@/features/rides/types';
 import { useMarkets } from '@/features/markets';
 import { NotificationsCard } from '@/features/pwa/NotificationsCard';
@@ -149,6 +150,7 @@ function OnlineSwitch({ online, intervalSeconds, hasActiveRide }: { online: bool
 }
 
 function Offers({ uid }: { uid: string }) {
+  const rideTypes = useRideTypes();
   const offers = useOffers(uid, true);
   const markets = useMarkets().data;
   const unitFor = (code: string) => markets?.find((m) => m.code === code)?.distance_unit;
@@ -174,13 +176,17 @@ function Offers({ uid }: { uid: string }) {
       <ErrorMessage error={accept.error ?? decline.error} />
       {list.map((o) => {
         const r = o.ride as Ride;
+        const t = rideTypes.data?.find((x) => x.ride_type === r.ride_type);
         return (
           <Card key={o.ride_id} style={{ borderColor: colors.brand, borderWidth: 2 }}>
             <View style={styles.offerHead}>
-              <Text style={type.h2}>{formatMoney(r.fare, r.currency)}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+                <RideTypeIcon type={t ?? { ride_type: r.ride_type }} size={26} color={colors.text} />
+                <Text style={type.h2}>{formatMoney(r.fare, r.currency)}</Text>
+              </View>
               <Pill text={formatCountdown(secondsUntil(o.expires_at))} tone="wait" />
             </View>
-            <Text style={type.small}>{r.ride_type === 'lift_premium' ? 'Lift Premium' : 'Lift'} · {formatDistance(r.distance_m, unitFor(r.market_code))} · {formatDuration(r.duration_s)} · {r.payment_method === 'mpesa' ? 'M-Pesa' : 'Cash'}</Text>
+            <Text style={type.small}>{t?.display_name ?? fallbackName(r.ride_type)} · {formatDistance(r.distance_m, unitFor(r.market_code))} · {formatDuration(r.duration_s)} · {r.payment_method === 'mpesa' ? 'M-Pesa' : 'Cash'}</Text>
             <View style={{ marginVertical: space.md, gap: 6 }}>
               <Text style={type.body}><Text style={{ fontFamily: fonts.semibold }}>Pickup: </Text>{r.pickup_address}</Text>
               {r.pickup_note ? <Text style={type.small}>Note: {r.pickup_note}</Text> : null}

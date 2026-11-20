@@ -11,8 +11,8 @@ ROUNDS=10
 
 # Clean slate for passenger 1 and both drivers.
 "${PSQL[@]}" -c "update public.profiles set is_suspended = false;
-  update public.vehicles set ride_type = 'lift';
-  update public.drivers set is_online = true where id in ('$D1','$D2');
+  update public.vehicles set ride_type = 'lift' where driver_id in ('$D1','$D2');
+  update public.drivers set is_online = (id in ('$D1','$D2'));
   update public.driver_locations set updated_at = now();" >/dev/null
 
 accept() { # $1 driver, $2 ride, $3 start-at epoch

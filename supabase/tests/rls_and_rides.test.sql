@@ -283,7 +283,7 @@ select t.as_user('00000000-0000-0000-0000-0000000000ad');
 select t.ok((select count(*) from public.rides) = 3, 'admin sees all rides');
 select t.ok((public.admin_overview() ->> 'collected_total')::int = 360, 'admin overview uses real payments');
 update public.market_prices set base_fare = 150 where market_code = 'nairobi' and ride_type = 'lift';
-select t.ok((select count(*) from public.admin_actions where action = 'config_updated') = 1, 'price change is audited');
+select t.ok((select count(*) from public.admin_actions where action = 'config_updated' and admin_id = auth.uid()) = 1, 'price change is audited (with who made it)');
 select public.admin_set_user_suspended('00000000-0000-0000-0000-0000000000a2', true, 'test');
 select t.expect_error($$select public.admin_set_role(auth.uid(), 'passenger')$$, '%cannot_change_own_role%');
 select t.as_user('00000000-0000-0000-0000-0000000000a2');

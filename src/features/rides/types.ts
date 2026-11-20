@@ -9,6 +9,9 @@ export type QuoteOption = {
   display_name: string;
   description: string;
   seats: number;
+  /** 'car' or 'motorcycle' (boda). */
+  vehicle_kind?: string;
+  is_electric?: boolean;
   fare: number;
   currency: string;
 };

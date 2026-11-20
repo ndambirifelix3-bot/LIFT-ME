@@ -22,5 +22,6 @@ done
 "${PSQL[@]}" -f "$HERE/rls_and_rides.test.sql" >/dev/null
 "${PSQL[@]}" -f "$HERE/markets.test.sql" >/dev/null
 "${PSQL[@]}" -f "$HERE/push.test.sql" >/dev/null
+"${PSQL[@]}" -f "$HERE/vehicle_types.test.sql" >/dev/null
 bash "$HERE/concurrent_accept.test.sh" "$PORT"
 echo "ALL DATABASE TESTS PASSED"

@@ -8,6 +8,7 @@ import { callFunction, supabase } from '@/lib/supabase';
 import { colors, fonts, radius, space, type } from '@/theme';
 import { useSignedPhoto } from './hooks';
 import type { RideDetails } from './types';
+import { useRideTypeName } from './rideTypes';
 
 export function DriverCard({ details }: { details: RideDetails }) {
   const d = details.driver;
@@ -42,6 +43,7 @@ export function DriverCard({ details }: { details: RideDetails }) {
 export function Receipt({ details }: { details: RideDetails }) {
   const r = details.ride;
   const p = details.payment;
+  const rideTypeName = useRideTypeName(r.ride_type);
   return (
     <Card>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: space.sm }}>
@@ -52,7 +54,7 @@ export function Receipt({ details }: { details: RideDetails }) {
       <Row label="From" value={r.pickup_address} />
       <Row label="To" value={r.dropoff_address} />
       <Row label="Distance" value={`${formatDistance(r.distance_m, details.market?.distance_unit)} · ${formatDuration(r.duration_s)}`} />
-      <Row label="Ride type" value={r.ride_type === 'lift_premium' ? 'Lift Premium' : 'Lift'} />
+      <Row label="Ride type" value={rideTypeName} />
       {details.driver ? <Row label="Driver" value={details.driver.full_name} /> : null}
       <View style={styles.divider} />
       <Row label="Total" value={formatMoney(r.fare, r.currency, details.market?.currency_decimals)} bold />

@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, ErrorMessage, Header, Notice, Row, Screen, SectionTitle } from '@/components';
 import { useBooking } from '@/features/booking/store';
 import { useMarket } from '@/features/markets';
+import { RideTypeIcon } from '@/features/rides/rideTypes';
 import type { Ride } from '@/features/rides/types';
 import { formatCountdown, formatDistance, formatDuration, formatMoney, secondsUntil } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
@@ -82,15 +83,24 @@ export default function RideOptions() {
             accessibilityState={{ checked: selected }}
             style={[styles.option, selected && styles.optionSelected]}
           >
-            <Ionicons name={o.ride_type.includes('premium') ? 'car-sport' : 'car'} size={30} color={selected ? colors.brand : colors.text} />
+            <RideTypeIcon type={o} color={selected ? colors.brand : colors.text} />
             <View style={{ flex: 1 }}>
-              <Text style={[styles.optTitle, selected && { color: colors.white }]}>{o.display_name}</Text>
-              <Text style={[styles.optSub, selected && { color: colors.ivory }]}>{o.description} · {o.seats} seats</Text>
+              <View style={styles.titleRow}>
+                <Text style={[styles.optTitle, selected && { color: colors.white }]}>{o.display_name}</Text>
+                {o.is_electric ? <Text style={styles.electric}>⚡ Electric</Text> : null}
+              </View>
+              <Text style={[styles.optSub, selected && { color: colors.ivory }]}>
+                {o.description} · {o.seats === 1 ? '1 passenger' : `${o.seats} seats`}
+              </Text>
             </View>
             <Text style={[styles.price, selected && { color: colors.brand }]}>{formatMoney(o.fare, o.currency, market?.currency_decimals)}</Text>
           </Pressable>
         );
       })}
+
+      {quote.options.find((o) => o.ride_type === rideType)?.vehicle_kind === 'motorcycle' ? (
+        <Notice text="Boda: one passenger, light luggage only. Your rider will give you a helmet — please wear it." />
+      ) : null}
 
       <SectionTitle>Payment</SectionTitle>
       <View style={{ flexDirection: 'row', gap: space.md }}>
@@ -119,6 +129,8 @@ export default function RideOptions() {
 }
 
 const styles = StyleSheet.create({
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm, flexWrap: 'wrap' },
+  electric: { fontFamily: fonts.bold, fontSize: 11, color: colors.success, backgroundColor: colors.successBg, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, overflow: 'hidden' },
   option: {
     flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg, borderRadius: radius.lg,
     backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border, marginBottom: space.sm,
