@@ -62,6 +62,19 @@ export function Receipt({ details }: { details: RideDetails }) {
   );
 }
 
+/** Plain-English reason for a failed M-Pesa payment (Daraja result codes). */
+export function mpesaFailureReason(code: string | null | undefined, desc: string | null | undefined): string {
+  switch (code) {
+    case '1': return 'There isn\'t enough money in your M-Pesa account.';
+    case '1032': return 'The M-Pesa prompt was cancelled.';
+    case '1037': return 'Your phone couldn\'t be reached. Make sure it\'s on, unlocked and has signal, then try again.';
+    case '2001': return 'The M-Pesa PIN was wrong.';
+    case '1025':
+    case '9999': return 'M-Pesa had a problem sending the prompt. Please try again.';
+    default: return desc ? `M-Pesa said: ${desc}` : 'Please try again.';
+  }
+}
+
 /** Passenger: pay with M-Pesa (STK push) or switch to cash. Success only ever comes from the server. */
 export function PassengerPayment({ details }: { details: RideDetails }) {
   const qc = useQueryClient();
@@ -89,7 +102,7 @@ export function PassengerPayment({ details }: { details: RideDetails }) {
   return (
     <Card>
       <Text style={type.h3}>Pay {formatMoney(p.amount, p.currency)} with M-Pesa</Text>
-      {p.status === 'failed' ? <Notice tone="error" text={`Payment did not go through${p.result_desc ? `: ${p.result_desc}` : ''}. You can try again.`} /> : null}
+      {p.status === 'failed' ? <Notice tone="error" text={`Payment did not go through. ${mpesaFailureReason(p.result_code, p.result_desc)}`} /> : null}
       {push.isSuccess && p.status === 'pending' ? (
         <Notice text="Check your phone and enter your M-Pesa PIN. This screen updates when M-Pesa confirms." />
       ) : null}

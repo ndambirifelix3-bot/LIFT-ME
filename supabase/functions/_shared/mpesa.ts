@@ -59,8 +59,29 @@ export async function stkQuery(checkoutRequestId: string): Promise<StkQueryResul
     }),
   });
   const data = await res.json().catch(() => ({}));
-  // While the customer hasn't answered yet Daraja returns an errorCode such as 500.001.1001.
-  if (data.errorCode) return { ok: false, resultCode: null, resultDesc: data.errorMessage ?? null, pending: true };
-  const resultCode = data.ResultCode != null ? String(data.ResultCode) : null;
-  return { ok: resultCode === '0', resultCode, resultDesc: data.ResultDesc ?? null, pending: false };
+  return interpretStkQuery(data);
+}
+
+/**
+ * Reads M-Pesa's status-query answer. "Not finished yet" comes back in two forms:
+ * an errorCode (e.g. 500.001.1001) or ResultCode 4999 "The transaction is still under processing".
+ * Neither is a failure — the caller should ask again a little later.
+ */
+// deno-lint-ignore no-explicit-any
+export function interpretStkQuery(data: any): StkQueryResult {
+  if (data?.errorCode) return { ok: false, resultCode: null, resultDesc: data.errorMessage ?? null, pending: true };
+  const resultCode = data?.ResultCode != null ? String(data.ResultCode) : null;
+  if (resultCode === null || resultCode === '4999') return { ok: false, resultCode, resultDesc: data?.ResultDesc ?? null, pending: true };
+  return { ok: resultCode === '0', resultCode, resultDesc: data?.ResultDesc ?? null, pending: false };
+}
+
+/** Asks M-Pesa a few times, a few seconds apart, until it has a final answer. */
+export async function stkQueryUntilFinal(checkoutRequestId: string, attempts = 5, waitMs = 4000): Promise<StkQueryResult> {
+  let last: StkQueryResult = { ok: false, resultCode: null, resultDesc: null, pending: true };
+  for (let i = 0; i < attempts; i++) {
+    if (i > 0) await new Promise((r) => setTimeout(r, waitMs));
+    last = await stkQuery(checkoutRequestId);
+    if (!last.pending) return last;
+  }
+  return last;
 }
