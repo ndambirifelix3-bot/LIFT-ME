@@ -246,6 +246,22 @@ home, passenger trip screen).
 
 ---
 
+## 11. Maps without Google (free mode)
+
+Until `GOOGLE_MAPS_SERVER_KEY` is set as an Edge Function secret, the app runs on free OpenStreetMap services:
+
+| What | Free service | Where it runs |
+|---|---|---|
+| Map pictures | OpenFreeMap tiles (MapLibre) | phone / browser |
+| Address search + "address of this pin" | Photon (photon.komoot.io) | phone / browser (it refuses cloud servers) |
+| Road distance + time for the fare | OSRM (router.project-osrm.org), times floored at ~20 km/h for city traffic | `get-quote` Edge Function |
+
+Prices are always calculated on the server. All three are shared "fair use" services: fine for testing and a
+small pilot. Setting the Google key switches search and routes to Google automatically (live traffic, better
+Kenyan addresses); the map pictures stay free.
+
+---
+
 ## Where every key goes (summary)
 
 | Value | Where | Secret? |

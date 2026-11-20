@@ -78,4 +78,13 @@ set role authenticated;
 select t.as_user('00000000-0000-0000-0000-0000000000ad');
 select t.ok((select count(*) from public.push_outbox) > 5, 'admin can read the notification log');
 reset role;
+
+-- ===================== MARKET CENTRES (address search bias) =====================
+reset role;
+select t.ok((select round(lat::numeric, 1) from public.market_centers() where code = 'nairobi') = -1.3
+            and (select round(lng::numeric, 1) from public.market_centers() where code = 'nairobi') = 36.9, 'Nairobi centre is in Nairobi');
+set role authenticated;
+select t.as_user('00000000-0000-0000-0000-0000000000a1');
+select t.expect_error($$select * from public.market_centers()$$, '%permission denied%');
+reset role;
 \warn 'push.test.sql: ALL PASSED'

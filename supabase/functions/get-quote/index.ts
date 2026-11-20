@@ -1,10 +1,12 @@
 // get-quote — the ONLY way a fare is produced.
 // 1. checks the caller is a signed-in passenger
 // 2. checks pickup + drop-off are inside the same active market's service area
-// 3. gets real driving distance/time from Google Routes
+// 3. gets the driving distance/time: Google Routes when GOOGLE_MAPS_SERVER_KEY is set, otherwise the
+//    free OSRM route service (or an estimate if that is down) — see _shared/maps.ts
 // 4. calls the database function create_quote, which prices every ride type
 //    with the market's prices and currency, and saves the quote (valid ~10 minutes)
-import { adminClient, errorResponse, getUser, isLatLng, json, requireEnv, serve } from '../_shared/common.ts';
+import { adminClient, errorResponse, getUser, isLatLng, json, serve } from '../_shared/common.ts';
+import { freeRoute, googleKey, googleRoute, type Route } from '../_shared/maps.ts';
 
 type Stop = { lat: number; lng: number; address: string; note?: string };
 
@@ -38,30 +40,17 @@ serve(async (req) => {
   if (!pickupMarket) return errorResponse('pickup_outside_service_area', 422, 'Sorry, Lift Me is not available at this pickup point yet.');
   if (dropoffMarket !== pickupMarket) return errorResponse('dropoff_outside_service_area', 422, 'Sorry, this destination is outside our service area.');
 
-  const routeRes = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Goog-Api-Key': requireEnv('GOOGLE_MAPS_SERVER_KEY'),
-      'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline',
-    },
-    body: JSON.stringify({
-      origin: { location: { latLng: { latitude: pickup.lat, longitude: pickup.lng } } },
-      destination: { location: { latLng: { latitude: dropoff.lat, longitude: dropoff.lng } } },
-      travelMode: 'DRIVE',
-      routingPreference: 'TRAFFIC_AWARE',
-    }),
-  });
-  if (!routeRes.ok) {
-    console.error('routes', routeRes.status, await routeRes.text());
+  let route: Route | null;
+  const key = googleKey();
+  try {
+    route = key ? await googleRoute(key, pickup, dropoff) : await freeRoute(pickup, dropoff);
+  } catch (err) {
+    console.error('route', err);
     return errorResponse('maps_unavailable', 502, 'We could not calculate the route. Please try again.');
   }
-  const routeData = await routeRes.json();
-  const route = routeData.routes?.[0];
   if (!route) return errorResponse('no_route', 422, 'No driving route found between these points.');
-
-  const distanceM = Math.max(0, Math.round(Number(route.distanceMeters ?? 0)));
-  const durationS = Math.max(0, Math.round(parseFloat(String(route.duration ?? '0s'))));
+  const distanceM = route.distanceM;
+  const durationS = route.durationS;
 
   const { data: quote, error } = await db.rpc('create_quote', {
     p_passenger_id: user.id,
@@ -74,7 +63,7 @@ serve(async (req) => {
     p_dropoff_address: dropoff.address,
     p_distance_m: distanceM,
     p_duration_s: durationS,
-    p_polyline: route.polyline?.encodedPolyline ?? null,
+    p_polyline: route.polyline,
   });
   if (error || !quote) {
     console.error('create_quote', error);

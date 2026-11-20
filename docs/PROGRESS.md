@@ -67,3 +67,9 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   "Turn on notifications" card. Server pipeline verified live (trigger → pg_net → function → web push; dead
   devices removed). Verified on a real iPhone (Home Screen app): test alert, "New ride request", accept from
   the alert, "Ride cancelled". Android Chrome still to try.
+
+## Free maps (no Google needed yet) — live 2026-11-21
+- Web map: MapLibre + OpenFreeMap. Address search: Photon on the device (server hands over countries + centre).
+  Routes: OSRM in get-quote with a ~20 km/h city floor; straight-line estimate if OSRM is down.
+- Booking tested end to end through the screens on the live project (CBD → Sarit Centre, 3.7 km, real prices).
+
