@@ -1,0 +1,12 @@
+// Cloudflare Workers settings for the Lift Me web app (PWA).
+// Cloudflare runs `npm run build:web` and then `npx wrangler deploy`, which uploads the `dist` folder.
+// No server code: Cloudflare just serves the files (free and unlimited for static files).
+{
+  "name": "lift-me",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    // Any address that isn't a real file (e.g. /passenger/ride/123) gets index.html; the app then shows the right screen.
+    "not_found_handling": "single-page-application"
+  }
+}

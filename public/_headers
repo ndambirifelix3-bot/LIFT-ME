@@ -1,5 +1,5 @@
-# Response headers for Cloudflare Pages (same rules as netlify.toml).
-# Pages serves index.html for any address that isn't a real file, so no redirect rule is needed.
+# Response headers for Cloudflare (same rules as netlify.toml).
+# wrangler.jsonc serves index.html for any address that isn't a real file.
 
 /*
   X-Content-Type-Options: nosniff
