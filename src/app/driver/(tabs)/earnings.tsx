@@ -3,6 +3,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Card, EmptyState, ErrorMessage, Header, ListItem, Loading, Pill, Screen, SectionTitle, toneForStatus } from '@/components';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useEarnings } from '@/features/driver/hooks';
+import { useWallet } from '@/features/driver/wallet';
+import { LedgerRow, WalletCard } from '@/features/driver/WalletCard';
 import { useRideHistory } from '@/features/rides/hooks';
 import { formatDateTime, formatMoney, RIDE_STATUS_LABEL } from '@/lib/format';
 import { colors, fonts, space, type } from '@/theme';
@@ -11,11 +13,15 @@ export default function DriverEarnings() {
   const { session } = useAuth();
   const earnings = useEarnings();
   const trips = useRideHistory(session?.user.id, 'driver');
+  const wallet = useWallet();
   const e = earnings.data;
+  const w = wallet.data;
 
   return (
-    <Screen onRefresh={() => { earnings.refetch(); trips.refetch(); }} refreshing={earnings.isRefetching}>
+    <Screen onRefresh={() => { earnings.refetch(); trips.refetch(); wallet.refetch(); }} refreshing={earnings.isRefetching}>
       <Header title="Earnings" subtitle="Your share after Lift Me commission" />
+      {w ? <WalletCard wallet={w} /> : null}
+      <ErrorMessage error={wallet.error} onRetry={() => wallet.refetch()} />
       {earnings.isLoading ? <Loading /> : null}
       <ErrorMessage error={earnings.error} onRetry={() => earnings.refetch()} />
       {e ? (
@@ -37,6 +43,14 @@ export default function DriverEarnings() {
               <Text style={type.small}>{e.total_trips} trips · {e.rating ? `★ ${e.rating}` : 'No ratings yet'}</Text>
             </Card>
           </View>
+        </>
+      ) : null}
+      {w && w.entries.length ? (
+        <>
+          <SectionTitle>Money history</SectionTitle>
+          <Card>
+            {w.entries.map((x) => <LedgerRow key={x.id} entry={x} decimals={w.currency_decimals} />)}
+          </Card>
         </>
       ) : null}
       <SectionTitle>Trip history</SectionTitle>

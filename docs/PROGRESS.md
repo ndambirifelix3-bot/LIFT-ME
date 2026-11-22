@@ -93,3 +93,13 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - Verified on real phones: iPhone (driver) + Android Chrome (passenger) notifications; boda request -> accept ->
   "driver on the way". Drivers must keep the app open on screen (web apps can't send location in the background).
 - Netlify site (liftmerides.netlify.app) is retired: its free credits ran out and deploys are paused.
+
+## Driver money (wallet) — live 2026-11-22
+- Migration `20261122000001_driver_wallet.sql`: `driver_ledger` (permanent entries) + `drivers.wallet_balance`.
+  Cash trip completed -> driver owes the commission (charged at completion, not only on "cash received");
+  M-Pesa paid -> Lift Me owes the driver their share. Admin records payouts / driver payments / corrections.
+- Per-city debt limit (Nairobi KES 1,000, Indianapolis $50) and "how to pay" text, in Admin -> Markets.
+  Over the limit: taken offline, alerted, can't go online, no ride offers until they pay.
+- App: wallet card + money history in driver Earnings, warning on driver Home, Admin -> Driver money (list +
+  per-driver page with record form). Tests: `supabase/tests/driver_wallet.test.sql`.
+- Not yet automatic: drivers paying by M-Pesa from the app (STK push) and payouts by M-Pesa B2C — need the live Paybill.

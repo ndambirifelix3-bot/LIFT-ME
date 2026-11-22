@@ -7,6 +7,8 @@ import { Button, Card, EmptyState, ErrorMessage, Header, Loading, Notice, Pill, 
 import { Map } from '@/components/Map';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useMyDriver, useOffers } from '@/features/driver/hooks';
+import { useWallet } from '@/features/driver/wallet';
+import { BalanceDueCard } from '@/features/driver/WalletCard';
 import { startDriverTracking, stopDriverTracking, type TrackingMode } from '@/features/driver/tracking';
 import { useActiveRide, useRideAction, useRideDetails, useRideRealtime } from '@/features/rides/hooks';
 import { fallbackName, RideTypeIcon, useRideTypes } from '@/features/rides/rideTypes';
@@ -41,16 +43,18 @@ export default function DriverHome() {
   const driver = me.data?.driver;
   const approved = driver?.status === 'approved';
   const active = useActiveRide(uid, 'driver');
+  const wallet = useWallet(approved);
 
   if (me.isLoading || active.isLoading) return <Loading />;
   if (me.error) return <Screen><ErrorMessage error={me.error} onRetry={() => me.refetch()} /></Screen>;
 
   return (
-    <Screen onRefresh={() => { me.refetch(); active.refetch(); }} refreshing={me.isRefetching}>
+    <Screen onRefresh={() => { me.refetch(); active.refetch(); wallet.refetch(); }} refreshing={me.isRefetching}>
       <Header title={`Hi ${profile?.full_name.split(' ')[0] ?? ''}`} subtitle="Lift Me Driver" />
       {!approved ? <ApplicationStatus status={driver?.status} submitted={!!driver?.submitted_at} reason={driver?.reject_reason} /> : null}
       {approved && driver ? (
         <>
+          {wallet.data ? <BalanceDueCard wallet={wallet.data} /> : null}
           <OnlineSwitch online={driver.is_online} intervalSeconds={settings.data?.location_interval_seconds ?? 5} hasActiveRide={!!active.data} />
           <NotificationsCard role="driver" compact />
           {active.data ? <ActiveRide ride={active.data} /> : driver.is_online ? <Offers uid={uid!} /> : (

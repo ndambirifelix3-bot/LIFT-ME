@@ -30,6 +30,12 @@ const MESSAGES: Record<string, string> = {
   already_paid: 'This trip is already paid.',
   maps_unavailable: 'Maps are unavailable right now. Please try again.',
   duplicate_key: 'This already exists.',
+  balance_due: 'You owe Lift Me more than the limit. Pay your balance to go online (see Earnings).',
+  payout_more_than_owed: 'That is more than Lift Me owes this driver.',
+  payment_more_than_owed: 'That is more than this driver owes.',
+  amount_required: 'Enter an amount.',
+  driver_market_required: 'Set the driver\'s city first.',
+  not_a_driver: 'This is only for drivers.',
 };
 
 export function friendlyError(err: unknown): string {

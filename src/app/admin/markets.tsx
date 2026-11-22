@@ -5,7 +5,7 @@ import { Linking, Switch, Text, View } from 'react-native';
 import { Button, Card, Chip, ErrorMessage, Input, ListItem, Loading, Notice, SectionTitle } from '@/components';
 import { AdminPage } from '@/features/admin/AdminPage';
 import { type Market, useMarkets } from '@/features/markets';
-import { currencyDecimals } from '@/lib/format';
+import { currencyDecimals, fromMoneyInput, toMoneyInput } from '@/lib/format';
 import { geoJsonToMultiPolygon } from '@/lib/geo';
 import { flagEmoji } from '@/lib/phone';
 import { supabase } from '@/lib/supabase';
@@ -93,10 +93,17 @@ function MarketCard({ market }: { market: Market }) {
     distance_unit: market.distance_unit,
     is_active: market.is_active,
   });
+  const d = market.currency_decimals;
+  const [debtLimit, setDebtLimit] = useState(market.driver_debt_limit == null ? '' : toMoneyInput(market.driver_debt_limit, d));
+  const [payInfo, setPayInfo] = useState(market.driver_payment_instructions);
   const save = useMutation({
     mutationFn: async () => {
       if (!/^\+\d{1,4}$/.test(form.phone_country_code)) throw new Error('Phone code looks like +1 or +254.');
-      const { error } = await supabase.from('markets').update({ ...form, name: form.name.trim() }).eq('code', market.code);
+      const limit = debtLimit.trim() === '' ? null : fromMoneyInput(debtLimit, d);
+      if (debtLimit.trim() !== '' && limit == null) throw new Error(d ? 'Driver limit: enter an amount like 50.00.' : 'Driver limit: enter a whole amount, e.g. 1000.');
+      const { error } = await supabase.from('markets').update({
+        ...form, name: form.name.trim(), driver_debt_limit: limit, driver_payment_instructions: payInfo.trim(),
+      }).eq('code', market.code);
       if (error) throw error;
     },
     onSuccess: () => refresh(qc),
@@ -130,6 +137,15 @@ function MarketCard({ market }: { market: Market }) {
         {(['km', 'mi'] as const).map((u) => (
           <Chip key={u} label={u === 'km' ? 'Kilometres' : 'Miles'} selected={form.distance_unit === u} onPress={() => setForm((f) => ({ ...f, distance_unit: u }))} />
         ))}
+      </View>
+      <Text style={[type.label, { marginBottom: space.sm }]}>Driver money</Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
+        <View style={{ flexGrow: 1, flexBasis: 200 }}>
+          <Input label={`Most a driver may owe (${market.currency}); empty = no limit`} value={debtLimit} onChangeText={setDebtLimit} keyboardType="decimal-pad" />
+        </View>
+        <View style={{ flexGrow: 2, flexBasis: 300 }}>
+          <Input label="How drivers pay what they owe (shown to drivers)" value={payInfo} onChangeText={setPayInfo} multiline maxLength={400} />
+        </View>
       </View>
       <ErrorMessage error={save.error} />
       {save.isSuccess ? <Notice tone="success" text="Saved." /> : null}

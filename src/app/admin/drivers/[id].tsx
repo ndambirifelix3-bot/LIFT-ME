@@ -6,7 +6,7 @@ import { Platform, Text, View } from 'react-native';
 import { Button, Card, Chip, ErrorMessage, Input, Loading, Notice, Pill, Row, SectionTitle, toneForStatus } from '@/components';
 import { AdminPage } from '@/features/admin/AdminPage';
 import { useMarkets } from '@/features/markets';
-import { formatDateTime } from '@/lib/format';
+import { formatDateTime, formatMoney } from '@/lib/format';
 import { flagEmoji, formatPhoneForDisplay } from '@/lib/phone';
 import { supabase } from '@/lib/supabase';
 import { space, type } from '@/theme';
@@ -89,7 +89,8 @@ export default function AdminDriverDetail() {
   const { profile, driver, vehicle, docs, types, pricing, history } = q.data;
   const chosenType = rideType ?? vehicle?.ride_type ?? 'lift';
   // Only this driver's country's documents (plus anything they uploaded anyway).
-  const country = markets.data?.find((m) => m.code === driver.market_code)?.country_iso;
+  const driverMarket = markets.data?.find((m) => m.code === driver.market_code);
+  const country = driverMarket?.country_iso;
   const shownTypes = types.filter((t) => !t.country_iso || t.country_iso === country || docs.some((d) => d.doc_type === t.code));
 
   return (
@@ -156,6 +157,12 @@ export default function AdminDriverDetail() {
             />
           );
         })}
+      </Card>
+
+      <SectionTitle>Money</SectionTitle>
+      <Card>
+        <Row label="Balance" value={driver.wallet_balance < 0 ? `Owes ${formatMoney(-driver.wallet_balance, driverMarket?.currency, driverMarket?.currency_decimals)}` : driver.wallet_balance > 0 ? `Owed ${formatMoney(driver.wallet_balance, driverMarket?.currency, driverMarket?.currency_decimals)}` : 'Settled'} />
+        <Button title="Open driver money" variant="outline" small onPress={() => router.push(`/admin/money/${id}`)} />
       </Card>
 
       <SectionTitle>Decision</SectionTitle>

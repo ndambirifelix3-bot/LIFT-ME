@@ -37,7 +37,7 @@ values ('Manhattan (test)', 'nyc', extensions.st_geogfromtext(
 -- US document types come from the Indianapolis migration; this test needs only the licence.
 update public.document_types set required = false where country_iso = 'us' and code <> 'us_drivers_license';
 update public.markets set commission_percent = 20 where code = 'nyc';
-select t.ok((select count(*) from public.admin_actions where action = 'config_updated' and target_type = 'markets') = 2, 'market edits are audited');
+select t.ok((select count(*) from public.admin_actions where action = 'config_updated' and target_type = 'markets' and details -> 'after' ->> 'code' = 'nyc') = 1, 'market edits are audited');
 select t.ok(public.market_at_point(40.758, -73.9855) = 'nyc', 'Times Square is in the NYC market');
 select t.ok(public.market_at_point(-1.2864, 36.8172) = 'nairobi', 'Nairobi CBD is in the Nairobi market');
 select t.ok(public.market_at_point(51.5, -0.12) is null, 'London is not served');

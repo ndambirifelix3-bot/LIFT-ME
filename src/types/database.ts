@@ -116,6 +116,70 @@ export type Database = {
           },
         ]
       }
+      driver_ledger: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          driver_id: string
+          id: number
+          kind: string
+          note: string | null
+          reference: string | null
+          ride_id: string | null
+        }
+        Insert: {
+          amount: number
+          balance_after?: number
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          driver_id: string
+          id?: never
+          kind: string
+          note?: string | null
+          reference?: string | null
+          ride_id?: string | null
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          driver_id?: string
+          id?: never
+          kind?: string
+          note?: string | null
+          reference?: string | null
+          ride_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_ledger_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_ledger_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_ledger_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       driver_locations: {
         Row: {
           driver_id: string
@@ -161,6 +225,7 @@ export type Database = {
           reviewed_by: string | null
           status: Database["public"]["Enums"]["driver_status"]
           submitted_at: string | null
+          wallet_balance: number
         }
         Insert: {
           created_at?: string
@@ -177,6 +242,7 @@ export type Database = {
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["driver_status"]
           submitted_at?: string | null
+          wallet_balance?: number
         }
         Update: {
           created_at?: string
@@ -193,6 +259,7 @@ export type Database = {
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["driver_status"]
           submitted_at?: string | null
+          wallet_balance?: number
         }
         Relationships: [
           {
@@ -275,6 +342,8 @@ export type Database = {
           currency: string
           currency_decimals: number
           distance_unit: string
+          driver_debt_limit: number | null
+          driver_payment_instructions: string
           emergency_numbers: Json
           is_active: boolean
           name: string
@@ -294,6 +363,8 @@ export type Database = {
           currency: string
           currency_decimals?: number
           distance_unit?: string
+          driver_debt_limit?: number | null
+          driver_payment_instructions?: string
           emergency_numbers?: Json
           is_active?: boolean
           name: string
@@ -313,6 +384,8 @@ export type Database = {
           currency?: string
           currency_decimals?: number
           distance_unit?: string
+          driver_debt_limit?: number | null
+          driver_payment_instructions?: string
           emergency_numbers?: Json
           is_active?: boolean
           name?: string
@@ -1178,6 +1251,20 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_driver_balances: {
+        Args: { p_market_code: string }
+        Returns: {
+          balance: number
+          currency: string
+          currency_decimals: number
+          driver_id: string
+          full_name: string
+          is_online: boolean
+          last_entry_at: string
+          over_limit: boolean
+          phone: string
+        }[]
+      }
       admin_list_drivers: {
         Args: { p_status?: Database["public"]["Enums"]["driver_status"] }
         Returns: {
@@ -1195,6 +1282,34 @@ export type Database = {
         }[]
       }
       admin_overview: { Args: { p_market_code?: string }; Returns: Json }
+      admin_record_driver_money: {
+        Args: {
+          p_amount: number
+          p_driver_id: string
+          p_kind: string
+          p_note?: string
+          p_reference?: string
+        }
+        Returns: {
+          amount: number
+          balance_after: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          driver_id: string
+          id: number
+          kind: string
+          note: string | null
+          reference: string | null
+          ride_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "driver_ledger"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_resolve_report: {
         Args: { p_note?: string; p_report_id: string }
         Returns: {
@@ -1237,6 +1352,7 @@ export type Database = {
           reviewed_by: string | null
           status: Database["public"]["Enums"]["driver_status"]
           submitted_at: string | null
+          wallet_balance: number
         }
         SetofOptions: {
           from: "*"
@@ -1262,6 +1378,7 @@ export type Database = {
           reviewed_by: string | null
           status: Database["public"]["Enums"]["driver_status"]
           submitted_at: string | null
+          wallet_balance: number
         }
         SetofOptions: {
           from: "*"
@@ -1287,6 +1404,7 @@ export type Database = {
           reviewed_by: string | null
           status: Database["public"]["Enums"]["driver_status"]
           submitted_at: string | null
+          wallet_balance: number
         }
         SetofOptions: {
           from: "*"
@@ -1625,6 +1743,11 @@ export type Database = {
         }
       }
       driver_can_edit_application: { Args: never; Returns: boolean }
+      driver_debt_limit: { Args: { p_driver_id: string }; Returns: number }
+      driver_over_debt_limit: {
+        Args: { p_driver_id: string }
+        Returns: boolean
+      }
       driver_step: {
         Args: {
           p_from: Database["public"]["Enums"]["ride_status"]
@@ -1681,9 +1804,15 @@ export type Database = {
         Returns: string
       }
       get_driver_earnings: { Args: never; Returns: Json }
+      get_my_wallet: { Args: never; Returns: Json }
       get_ride_details: { Args: { p_ride_id: string }; Returns: Json }
       get_shared_trip: { Args: { p_token: string }; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
+      ledger_cash_commission: {
+        Args: { p_ride_id: string }
+        Returns: undefined
+      }
+      ledger_trip_earnings: { Args: { p_ride_id: string }; Returns: undefined }
       log_admin_action: {
         Args: {
           p_action: string
@@ -1861,6 +1990,7 @@ export type Database = {
           reviewed_by: string | null
           status: Database["public"]["Enums"]["driver_status"]
           submitted_at: string | null
+          wallet_balance: number
         }
         SetofOptions: {
           from: "*"
@@ -1934,6 +2064,7 @@ export type Database = {
           reviewed_by: string | null
           status: Database["public"]["Enums"]["driver_status"]
           submitted_at: string | null
+          wallet_balance: number
         }
         SetofOptions: {
           from: "*"

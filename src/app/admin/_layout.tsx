@@ -10,6 +10,7 @@ import { colors, fonts, space } from '@/theme';
 const NAV = [
   { href: '/admin', label: 'Overview', icon: 'grid-outline' },
   { href: '/admin/drivers', label: 'Drivers', icon: 'car-outline' },
+  { href: '/admin/money', label: 'Driver money', icon: 'wallet-outline' },
   { href: '/admin/rides', label: 'Rides', icon: 'navigate-outline' },
   { href: '/admin/pricing', label: 'Pricing', icon: 'pricetag-outline' },
   { href: '/admin/markets', label: 'Markets', icon: 'globe-outline' },
