@@ -11,7 +11,7 @@ export type Place = { placeId: string; name: string; address: string; lat: numbe
 export type Route = { distanceM: number; durationS: number; polyline: string | null; estimated: boolean };
 type Point = { lat: number; lng: number };
 
-const USER_AGENT = 'LiftMe/1.0 (+https://liftme.pro)';
+const USER_AGENT = 'LiftMe/1.0 (+https://rideliftme.com)';
 const OSRM = 'https://router.project-osrm.org';
 const CITY_SPEED_MPS = 5.5; // ≈ 20 km/h
 

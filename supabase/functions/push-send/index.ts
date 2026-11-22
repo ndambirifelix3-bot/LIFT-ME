@@ -42,7 +42,7 @@ async function deliver(db: SupabaseClient, cfg: Config, userId: string, message:
         JSON.stringify(message),
         {
           vapidDetails: {
-            subject: Deno.env.get('PUSH_SUBJECT') ?? 'https://liftme.pro',
+            subject: Deno.env.get('PUSH_SUBJECT') ?? 'https://rideliftme.com',
             publicKey: cfg.vapid_public_key,
             privateKey: cfg.vapid_private_key,
           },
