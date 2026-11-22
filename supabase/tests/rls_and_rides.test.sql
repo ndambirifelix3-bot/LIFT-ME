@@ -145,7 +145,7 @@ reset role;
 select t.ok(public.calculate_fare('nairobi', 'lift', 5000, 900) = 360, 'fare = 100 + 40*5km + 4*15min = 360');
 select t.ok(public.calculate_fare('nairobi', 'lift', 500, 60) = 200, 'minimum fare applies');
 select t.ok(pg_typeof(public.calculate_fare('nairobi', 'lift_premium', 12345, 1234))::text = 'integer', 'fares are integers');
-select t.expect_error($$select public.create_quote('00000000-0000-0000-0000-0000000000a1', 0.5, 36.0, 'Far away', null, -1.3, 36.78, 'X', 1, 1, null)$$, '%pickup_outside_service_area%');
+select t.expect_error($$select public.create_quote('00000000-0000-0000-0000-0000000000a1', -6.7924, 39.2083, 'Dar es Salaam (Tanzania)', null, -1.3, 36.78, 'X', 1, 1, null)$$, '%pickup_outside_service_area%');
 create temp table q as
   select * from public.create_quote('00000000-0000-0000-0000-0000000000a1', -1.2864, 36.8172, 'Kenyatta Ave, CBD', 'Near the Shell station',
                                     -1.2676, 36.8108, 'Westlands', 5000, 900, null);

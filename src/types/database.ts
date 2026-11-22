@@ -335,6 +335,8 @@ export type Database = {
       }
       markets: {
         Row: {
+          center_lat: number | null
+          center_lng: number | null
           code: string
           commission_percent: number
           country_iso: string
@@ -356,6 +358,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          center_lat?: number | null
+          center_lng?: number | null
           code: string
           commission_percent?: number
           country_iso: string
@@ -377,6 +381,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          center_lat?: number | null
+          center_lng?: number | null
           code?: string
           commission_percent?: number
           country_iso?: string
@@ -495,6 +501,7 @@ export type Database = {
       pricing: {
         Row: {
           can_take: string[]
+          countries: string[] | null
           description: string
           display_name: string
           is_active: boolean
@@ -508,6 +515,7 @@ export type Database = {
         }
         Insert: {
           can_take?: string[]
+          countries?: string[] | null
           description?: string
           display_name: string
           is_active?: boolean
@@ -521,6 +529,7 @@ export type Database = {
         }
         Update: {
           can_take?: string[]
+          countries?: string[] | null
           description?: string
           display_name?: string
           is_active?: boolean
@@ -1473,6 +1482,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      auto_offline_quiet_drivers: { Args: never; Returns: number }
       average_rating: { Args: { p_user_id: string }; Returns: number }
       calculate_fare: {
         Args: {
@@ -1651,6 +1661,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      country_area: { Args: { p_wkt: string }; Returns: unknown }
       create_quote: {
         Args: {
           p_distance_m: number

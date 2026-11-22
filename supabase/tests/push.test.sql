@@ -82,7 +82,10 @@ reset role;
 -- ===================== MARKET CENTRES (address search bias) =====================
 reset role;
 select t.ok((select round(lat::numeric, 1) from public.market_centers() where code = 'nairobi') = -1.3
-            and (select round(lng::numeric, 1) from public.market_centers() where code = 'nairobi') = 36.9, 'Nairobi centre is in Nairobi');
+            and (select round(lng::numeric, 1) from public.market_centers() where code = 'nairobi') = 36.8, 'Kenya search centre is Nairobi');
+-- (markets.test.sql switches the US market off, so check its stored centre directly.)
+select t.ok((select round(center_lat::numeric, 1) from public.markets where code = 'indianapolis') = 41.7
+            and (select round(center_lng::numeric, 1) from public.markets where code = 'indianapolis') = -86.3, 'US search centre is South Bend, Indiana');
 set role authenticated;
 select t.as_user('00000000-0000-0000-0000-0000000000a1');
 select t.expect_error($$select * from public.market_centers()$$, '%permission denied%');

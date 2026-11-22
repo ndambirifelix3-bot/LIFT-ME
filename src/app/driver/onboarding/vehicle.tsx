@@ -29,7 +29,7 @@ export default function VehicleDetails() {
   const v = me.data?.vehicle;
   const market = me.data?.driver?.market_code ?? null;
   const allTypes = useRideTypes();
-  // Only the ride types this driver's city offers (e.g. bodas are Nairobi only).
+  // Only the ride types this driver's city offers (e.g. bodas are Kenya only).
   const offered = useQuery({
     queryKey: ['offered-ride-types', market],
     enabled: !!market,

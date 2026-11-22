@@ -20,7 +20,7 @@ export const PRIVACY: Section[] = [
   {
     title: 'Who we are',
     body: [
-      `${LEGAL.company} ("Lift Me", "we") runs the Lift Me app and website at ${LEGAL.website}. Lift Me connects passengers with independent drivers and boda riders in Kenya (Nairobi) and the USA (Indianapolis).`,
+      `${LEGAL.company} ("Lift Me", "we") runs the Lift Me app and website at ${LEGAL.website}. Lift Me connects passengers with independent drivers and boda riders in Kenya, and with independent drivers in the United States.`,
       `We decide how your personal data is used, so we are its "data controller". Questions about your data: ${LEGAL.email}.`,
     ],
   },
@@ -142,7 +142,7 @@ export const TERMS: Section[] = [
     title: 'What Lift Me does',
     body: [
       'Lift Me is a technology platform. It lets passengers request rides and lets independent drivers and boda riders accept them. Drivers are independent and are not Lift Me employees. Lift Me does not own the vehicles.',
-      'Lift Me is available only in its service areas (currently Nairobi, Kenya and Indianapolis, USA).',
+      'Lift Me is available only in its service areas (currently Kenya and the United States). Boda rides are available in Kenya only.',
     ],
   },
   {

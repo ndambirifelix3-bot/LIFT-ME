@@ -271,7 +271,10 @@ export default function AdminPricing() {
         <Notice tone="error" text={`These are PLACEHOLDER prices for ${market.name}. Enter your real prices, then switch off "Prices are still placeholders" below.`} />
       ) : null}
       {market && prices.data
-        ? rideTypes.data?.map((t) => {
+        ? rideTypes.data
+            // Ride types limited to some countries (bodas: Kenya only) are hidden elsewhere.
+            ?.filter((t) => !t.countries || t.countries.includes(market.country_iso))
+            .map((t) => {
             const price = prices.data.find((p) => p.ride_type === t.ride_type);
             return <PriceCard key={`${market.code}-${t.ride_type}-${price?.updated_at ?? 'new'}`} market={market} rideType={t} price={price} />;
           })
