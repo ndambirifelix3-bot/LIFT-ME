@@ -6,6 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button, ErrorMessage, Header, Input, Loading, Screen, SectionTitle } from '@/components';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { driverHints } from '@/features/driver/countryHints';
 import { useMyDriver } from '@/features/driver/hooks';
 import { RideTypeIcon, useRideTypes, type RideType } from '@/features/rides/rideTypes';
 import { supabase } from '@/lib/supabase';
@@ -18,7 +19,7 @@ const schema = z.object({
   model: z.string().trim().min(1, 'Required').max(40),
   year: z.string().regex(/^\d{4}$/, 'Enter a year like 2016').refine((y) => +y >= 1980 && +y <= thisYear + 1, 'Enter a valid year'),
   colour: z.string().trim().min(1, 'Required').max(30),
-  plate: z.string().trim().toUpperCase().regex(/^[A-Z0-9 ]{3,12}$/, 'Enter the number plate, e.g. KDA 123A or 7ABC123'),
+  plate: z.string().trim().toUpperCase().regex(/^[A-Z0-9 -]{3,12}$/, 'Enter the number plate exactly as shown (letters and numbers)'),
 });
 type Form = z.infer<typeof schema>;
 
@@ -64,6 +65,7 @@ export default function VehicleDetails() {
 
   if (me.isLoading || allTypes.isLoading) return <Loading />;
   const isBike = types.find((t) => t.ride_type === rideType)?.vehicle_kind === 'motorcycle';
+  const hints = driverHints(me.data?.country);
   const submit = handleSubmit((f) => {
     if (!rideType) return setTypeError('Choose what you drive');
     save.mutate(f);
@@ -95,11 +97,11 @@ export default function VehicleDetails() {
       {typeError ? <Text style={styles.error}>{typeError}</Text> : null}
       <Text style={[type.small, { marginVertical: space.sm }]}>Our team checks this when approving your application.</Text>
       <SectionTitle>Vehicle</SectionTitle>
-      {field('make', 'Make', { placeholder: isBike ? 'Bajaj' : 'Toyota' })}
-      {field('model', 'Model', { placeholder: isBike ? 'Boxer' : 'Axio' })}
-      {field('year', 'Year', { keyboardType: 'number-pad', maxLength: 4, placeholder: '2016' })}
-      {field('colour', 'Colour', { placeholder: 'Silver' })}
-      {field('plate', 'Number plate', { autoCapitalize: 'characters', placeholder: 'KDA 123A' })}
+      {field('make', 'Make', { placeholder: isBike ? hints.bikeMake : hints.carMake })}
+      {field('model', 'Model', { placeholder: isBike ? hints.bikeModel : hints.carModel })}
+      {field('year', 'Year', { keyboardType: 'number-pad', maxLength: 4, placeholder: hints.year })}
+      {field('colour', me.data?.country === 'us' ? 'Color' : 'Colour', { placeholder: hints.colour })}
+      {field('plate', me.data?.country === 'us' ? 'License plate' : 'Number plate', { autoCapitalize: 'characters', placeholder: isBike ? hints.bikePlateExample : hints.plateExample })}
       <ErrorMessage error={save.error} />
     </Screen>
   );

@@ -25,7 +25,7 @@ export function useMyDriver(userId: string | undefined) {
         country = m.data?.country_iso ?? null;
       }
       const documentTypes = (types.data ?? []).filter((t) => !t.country_iso || t.country_iso === country);
-      return { driver: driver.data, vehicle: vehicle.data, documents: docs.data ?? [], documentTypes };
+      return { driver: driver.data, vehicle: vehicle.data, documents: docs.data ?? [], documentTypes, country };
     },
   });
 }

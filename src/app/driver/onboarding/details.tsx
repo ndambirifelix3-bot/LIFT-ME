@@ -4,6 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button, ErrorMessage, Header, Input, Loading, Screen } from '@/components';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { driverHints } from '@/features/driver/countryHints';
 import { useMyDriver } from '@/features/driver/hooks';
 import { supabase } from '@/lib/supabase';
 import { goBack } from '@/lib/nav';
@@ -43,6 +44,7 @@ export default function DriverDetails() {
   });
 
   if (me.isLoading) return <Loading />;
+  const hints = driverHints(me.data?.country);
   const field = (name: keyof Form, label: string, extra: object = {}) => (
     <Controller
       control={control}
@@ -55,8 +57,8 @@ export default function DriverDetails() {
     <Screen footer={<Button title="Save" onPress={handleSubmit((v) => save.mutate(v))} loading={save.isPending} />}>
       <Header title="Personal details" back />
       {field('full_name', 'Full name (as on your ID)', { autoCapitalize: 'words' })}
-      {field('id_number', 'ID number (National ID, passport or state ID)', { autoCapitalize: 'characters', maxLength: 20 })}
-      {field('licence_number', 'Driving licence number', { autoCapitalize: 'characters', maxLength: 30 })}
+      {field('id_number', hints.idLabel, { autoCapitalize: 'characters', maxLength: 20, placeholder: hints.idExample })}
+      {field('licence_number', hints.licenceLabel, { autoCapitalize: 'characters', maxLength: 30, placeholder: hints.licenceExample })}
       {field('email', 'Email (optional)', { keyboardType: 'email-address', autoCapitalize: 'none' })}
       <ErrorMessage error={save.error} />
     </Screen>
