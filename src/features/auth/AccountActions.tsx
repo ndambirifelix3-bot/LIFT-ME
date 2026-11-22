@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Text } from 'react-native';
-import { Button, Card, ErrorMessage, Input, Notice, Row } from '@/components';
+import { router } from 'expo-router';
+import { Button, Card, ErrorMessage, Input, ListItem, Notice, Row } from '@/components';
 import { confirm } from '@/lib/confirm';
 import { formatPhoneForDisplay } from '@/lib/phone';
 import { supabase } from '@/lib/supabase';
@@ -44,6 +45,10 @@ export function AccountBasics() {
       </Card>
       <NotificationsCard role={profile.role === 'driver' ? 'driver' : 'passenger'} />
       <InstallApp />
+      <Card>
+        <ListItem icon="shield-checkmark-outline" title="Privacy Policy" onPress={() => router.push('/privacy')} />
+        <ListItem icon="document-text-outline" title="Terms of Use" onPress={() => router.push('/terms')} />
+      </Card>
       <Button title="Log out" variant="outline" onPress={() => confirm('Log out?', 'You will need a new SMS code to log in again.', signOut)} />
       <ErrorMessage error={del.error} />
       {profile.delete_requested_at ? (

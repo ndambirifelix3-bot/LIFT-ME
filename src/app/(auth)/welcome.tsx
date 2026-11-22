@@ -1,4 +1,4 @@
-import { Redirect, router } from 'expo-router';
+import { Link, Redirect, router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Logo } from '@/components';
@@ -19,7 +19,10 @@ export default function Welcome() {
       <View style={styles.bottom}>
         <Button title="Get started" onPress={() => router.push('/phone')} />
         <InstallApp tone="dark" />
-        <Text style={styles.legal}>By continuing you agree to the Lift Me Terms and Privacy Policy.</Text>
+        <Text style={styles.legal}>
+          By continuing you agree to the Lift Me <Link href="/terms" style={styles.legalLink}>Terms of Use</Link> and{' '}
+          <Link href="/privacy" style={styles.legalLink}>Privacy Policy</Link>.
+        </Text>
       </View>
     </SafeAreaView>
   );
@@ -30,5 +33,6 @@ const styles = StyleSheet.create({
   top: { flex: 1, justifyContent: 'center', alignItems: 'center', maxWidth: 480, width: '100%', alignSelf: 'center' },
   copy: { fontFamily: fonts.regular, fontSize: 16, color: colors.ivory, marginTop: space.xl, lineHeight: 23, opacity: 0.85, textAlign: 'center' },
   bottom: { gap: space.md, maxWidth: 480, width: '100%', alignSelf: 'center' },
-  legal: { fontFamily: fonts.regular, fontSize: 12, color: colors.ivory, opacity: 0.6, textAlign: 'center' },
+  legal: { fontFamily: fonts.regular, fontSize: 12, color: colors.ivory, opacity: 0.75, textAlign: 'center', lineHeight: 18 },
+  legalLink: { textDecorationLine: 'underline', fontFamily: fonts.semibold },
 });

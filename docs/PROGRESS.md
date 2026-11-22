@@ -116,3 +116,8 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - Privacy (`src/lib/monitoringScrub.ts`): only the anonymous account id + role; addresses lose their query; phone
   numbers hidden. Admin Overview has "Send a test error".
 - To switch on: Cloudflare -> lift-me Worker -> Settings -> Build -> Variables: EXPO_PUBLIC_SENTRY_DSN, then rebuild.
+
+## Privacy Policy + Terms of Use — live 2026-11-22 (DRAFT, lawyer review needed)
+- Public pages https://rideliftme.com/privacy and /terms (no login). Text in `src/features/legal/content.ts`
+  (company name TODO, LEGAL_IS_DRAFT=true shows a "Draft" note). Linked from the welcome screen and Account.
+- Needs before launch: lawyer review in Kenya + Indiana, registered company names, a working support@rideliftme.com.
