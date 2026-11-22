@@ -82,3 +82,14 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - Verified live on a real iPhone: Boda Electric request → "New boda request 🏍️" in ~1 s → accept → cancel alert;
   a Lift Mini request was not offered to the boda rider.
 - Fixed: bottom tab labels were cut off on phones.
+
+## New home: https://rideliftme.com (Cloudflare) — live 2026-11-22
+- Web app hosted on Cloudflare Workers (static assets) in the developer's Cloudflare account, built from branch `pwa`
+  on every push (`npm run build:web`, `npx wrangler deploy`, settings in `wrangler.jsonc`, headers in `public/_headers`).
+  No "Powered by Netlify" badge. Domain rideliftme.com + www bought 2026-11-22 on Cloudflare (owner details: client).
+- Can move to the client's Cloudflare account after 2026-12-02 (Cloudflare blocks moves for 10 days after purchase).
+- liftme.pro (client's account) not used yet — plan: forward it to rideliftme.com.
+- Speed: fonts subset to WOFF2 (7.7 MB -> 0.6 MB), per-set icon imports; first load on slow 3G 9.9 s -> 6.2 s.
+- Verified on real phones: iPhone (driver) + Android Chrome (passenger) notifications; boda request -> accept ->
+  "driver on the way". Drivers must keep the app open on screen (web apps can't send location in the background).
+- Netlify site (liftmerides.netlify.app) is retired: its free credits ran out and deploys are paused.
