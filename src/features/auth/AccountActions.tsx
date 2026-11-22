@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Alert, Platform, Text } from 'react-native';
+import { Text } from 'react-native';
 import { Button, Card, ErrorMessage, Input, Notice, Row } from '@/components';
+import { confirm } from '@/lib/confirm';
 import { formatPhoneForDisplay } from '@/lib/phone';
 import { supabase } from '@/lib/supabase';
 import { space, type } from '@/theme';
@@ -9,13 +10,6 @@ import { InstallApp } from '@/features/pwa/InstallApp';
 import { NotificationsCard } from '@/features/pwa/NotificationsCard';
 import { useAuth } from './AuthProvider';
 
-function confirm(title: string, message: string, onYes: () => void) {
-  if (Platform.OS === 'web') {
-    if (window.confirm(`${title}\n\n${message}`)) onYes();
-    return;
-  }
-  Alert.alert(title, message, [{ text: 'Cancel', style: 'cancel' }, { text: 'Yes', style: 'destructive', onPress: onYes }]);
-}
 
 /** Name, phone, logout and delete-account request — shared by passenger and driver. */
 export function AccountBasics() {

@@ -6,6 +6,7 @@ import { Logo } from '@/components';
 import { RoleGate } from '@/features/auth/RoleGate';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { colors, fonts, space } from '@/theme';
+import { confirm } from '@/lib/confirm';
 
 const NAV = [
   { href: '/admin', label: 'Overview', icon: 'grid-outline' },
@@ -51,7 +52,7 @@ export default function AdminLayout() {
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 4 }}>{links}</ScrollView>
           )}
-          <Pressable onPress={signOut} style={[styles.link, !wide && styles.linkNarrow]} accessibilityRole="button">
+          <Pressable onPress={() => confirm('Log out?', '', signOut)} style={[styles.link, !wide && styles.linkNarrow]} accessibilityRole="button">
             <Ionicons name="log-out-outline" size={18} color={colors.ivory} />
             <Text style={styles.linkText}>Log out</Text>
           </Pressable>

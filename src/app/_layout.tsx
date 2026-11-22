@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '@/features/auth/AuthProvider';
 import '@/features/driver/tracking'; // registers the background location task at startup
 import '@/features/pwa/pwa'; // web only: service worker + install prompt, must start early
+import { ExitGuard } from '@/features/pwa/ExitGuard';
 import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -37,6 +38,7 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <StatusBar style="dark" />
+          <ExitGuard />
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ivory } }} />
         </AuthProvider>
       </QueryClientProvider>
