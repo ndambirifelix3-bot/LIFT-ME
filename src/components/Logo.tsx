@@ -4,7 +4,7 @@ import { Image, type ImageStyle, type StyleProp } from 'react-native';
 // gold + white artwork: only place it on dark (black / navy) backgrounds.
 const FULL = require('../../assets/brand/logo-full.png');
 const MARK = require('../../assets/brand/logo-mark.png');
-const FULL_RATIO = 800 / 637; // width / height of logo-full.png
+const FULL_RATIO = 600 / 478; // width / height of logo-full.png
 
 /**
  * The Lift Me logo.

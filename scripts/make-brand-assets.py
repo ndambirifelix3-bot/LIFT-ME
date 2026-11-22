@@ -63,8 +63,11 @@ def main() -> None:
 
     outputs = {
         # Transparent logos used inside the app (welcome + loading screens).
-        "brand/logo-full.png": full.resize((800, round(800 * full.height / full.width)), Image.LANCZOS),
-        "brand/logo-mark.png": place(mark, 512, 1.0),
+        # (2x the largest size shown; colours reduced in save() to keep them small: ~45 KB and ~10 KB.)
+        "brand/logo-full.png": full.resize((600, round(600 * full.height / full.width)), Image.LANCZOS),
+        "brand/logo-mark.png": place(mark, 256, 1.0),
+        # Instant splash in public/index.html (shown 220 px wide before the app's code loads).
+        "../public/brand/splash-logo.png": full.resize((440, round(440 * full.height / full.width)), Image.LANCZOS),
         # Main app icon (iOS rounds the corners itself).
         "icon.png": place(mark, 1024, 0.72, ICON_BG),
         # Android adaptive icon: navy background layer + logo in the centre safe zone.
@@ -87,6 +90,9 @@ def main() -> None:
         # iOS shows transparency as black, so home-screen icons are saved without it.
         if name.endswith(("apple-touch-icon.png", "icon.png")):
             image = image.convert("RGB")
+        # The in-app logos have few colours: a 256-colour palette makes them ~6x smaller, same look.
+        if "brand/" in name:
+            image = image.quantize(colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
         image.save(path, optimize=True)
         print("wrote", path.resolve().relative_to(ROOT), image.size)
 

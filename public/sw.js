@@ -7,11 +7,15 @@
  * - /_expo/static/* and /assets/*: file names contain a content hash, so cache first (fast, safe).
  * - Other files (icons, manifest): use the cache, refresh it in the background.
  *
+ * - Opening the app: latest page from the server, or the saved copy if the network is slow (see openPage).
  * Bump VERSION to force every phone to drop the old cache.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = `liftme-${VERSION}`;
-const PRECACHE = ['/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
+const PRECACHE = ['/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/brand/splash-logo.png'];
+// Last good copy of the main page (the same for every address), used when the network is slow.
+const SHELL = '/__liftme-shell';
+const SLOW_NETWORK_MS = 2500;
 const MAX_HASHED_FILES = 120; // old app versions' files are trimmed beyond this
 
 // The offline page lives inside this file rather than as offline.html: some hosts rewrite or
@@ -80,9 +84,7 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return; // Supabase, Google, etc: straight to the network
 
   if (request.mode === 'navigate') {
-    // `no-cache`: always ask the server (the page is tiny), so "no internet" is noticed reliably
-    // instead of the browser quietly reusing an old copy of the page.
-    event.respondWith(fetch(request, { cache: 'no-cache' }).catch(offlinePage));
+    event.respondWith(openPage(request, event));
     return;
   }
 
@@ -94,6 +96,30 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname === '/sw.js') return;
   event.respondWith(staleWhileRevalidate(request));
 });
+
+/**
+ * Opening the app: ask the server for the latest page (`no-cache`), so updates arrive and "no internet"
+ * is noticed reliably. But if the network is slow (no answer within 2.5 s) and we have a saved copy,
+ * open the saved copy straight away; the fresh one is saved for next time.
+ */
+async function openPage(request, event) {
+  const cache = await caches.open(CACHE);
+  const network = fetch(request, { cache: 'no-cache' }).then((response) => {
+    if (response.ok && (response.headers.get('content-type') || '').includes('text/html')) {
+      cache.put(SHELL, response.clone());
+    }
+    return response;
+  });
+  event.waitUntil(network.catch(() => undefined));
+  const saved = await cache.match(SHELL);
+  if (!saved) return network.catch(offlinePage);
+  const slow = new Promise((resolve) => setTimeout(() => resolve(null), SLOW_NETWORK_MS));
+  try {
+    return (await Promise.race([network, slow])) || saved;
+  } catch {
+    return offlinePage(); // no internet at all
+  }
+}
 
 async function cacheFirst(request) {
   const cache = await caches.open(CACHE);

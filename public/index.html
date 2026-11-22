@@ -16,6 +16,8 @@
     <meta name="apple-mobile-web-app-title" content="Lift Me" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <!-- Logo for the instant splash below: start downloading it straight away. -->
+    <link rel="preload" as="image" href="/brand/splash-logo.png" />
 
     <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
     <style id="expo-reset">
@@ -41,6 +43,10 @@
       /* Netlify's free plan adds a "Powered by Netlify" badge (64px tall) at the bottom right, on top of
          the page. When it is there, end the app above it so it never covers a button.
          On any other host there is no badge and nothing changes. */
+      /* Instant splash: the logo shows as soon as this page arrives, before the app's code has loaded.
+         The app replaces it with its own (identical) loading screen, then the real screen. */
+      #splash { flex: 1; display: flex; align-items: center; justify-content: center; background-color: #101010; }
+      #splash img { width: 220px; height: auto; max-width: 70vw; }
       body:has(#nl-badge-frame) #root {
         height: calc(100% - 64px);
       }
@@ -50,6 +56,6 @@
   <body>
     <noscript> You need to enable JavaScript to run Lift Me. </noscript>
     <!-- The root element for your Expo app. -->
-    <div id="root"></div>
+    <div id="root"><div id="splash"><img id="splash-logo" src="/brand/splash-logo.png" width="220" height="175" alt="Lift Me" /></div></div>
   </body>
 </html>
