@@ -122,3 +122,12 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   (company name TODO, LEGAL_IS_DRAFT=true shows a "Draft" note). Linked from the welcome screen and Account.
 - Needs before launch: lawyer review in Kenya + Indiana, registered company names.
 - support@rideliftme.com works (Cloudflare Email Routing, forwards to the developer's inbox; receive only) since 2026-11-22.
+
+## Whole countries + South Bend test city — live 2026-11-23
+- Migration `20261123000001_nationwide_markets.sql`: markets renamed Kenya / United States (codes still `nairobi` /
+  `indianapolis`), service areas = whole countries (Natural Earth borders), centres Nairobi + South Bend, IN.
+  Live: the borders were loaded by the database from rideliftme.com/geo/*.wkt (same files as in the migration,
+  checksums matched), then those files were removed from the site.
+- Bodas can only be priced in Kenya (`pricing.countries` + trigger). US: Lift Mini, Lift, Lift XL, Lift Premium
+  (Mini and XL prices are placeholders). Test: `nationwide.test.sql`.
+- US test numbers (add in Supabase Auth -> Phone -> test numbers): passenger 15745550101, driver 15745550102 (OTP 123456).
