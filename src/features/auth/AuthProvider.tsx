@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { supabase } from '@/lib/supabase';
 import { forgetThisDeviceForPush } from '@/features/pwa/push';
 import type { Tables } from '@/types/database';
+import { setMonitoringUser } from '@/lib/monitoring';
 
 export type Profile = Tables<'profiles'>;
 
@@ -45,6 +46,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return data;
     },
   });
+
+  // Error reports carry the anonymous account id and role (never the name or phone number).
+  useEffect(() => setMonitoringUser(userId ?? null, profileQuery.data?.role), [userId, profileQuery.data?.role]);
 
   const value = useMemo<AuthState>(
     () => ({

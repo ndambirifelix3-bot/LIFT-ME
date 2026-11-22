@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '@/features/auth/AuthProvider';
+import { withMonitoring } from '@/lib/monitoring'; // error alerts: starts before anything else runs
 import '@/features/driver/tracking'; // registers the background location task at startup
 import '@/features/pwa/pwa'; // web only: service worker + install prompt, must start early
 import { ExitGuard } from '@/features/pwa/ExitGuard';
@@ -14,7 +15,7 @@ import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
-export default function RootLayout() {
+function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({ Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold });
   const [queryClient] = useState(
     () =>
@@ -45,3 +46,6 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+// Reports crashes in any screen to Sentry (does nothing until a Sentry DSN is set).
+export default withMonitoring(RootLayout);

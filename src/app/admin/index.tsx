@@ -1,12 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { View } from 'react-native';
+import { useState } from 'react';
+import { Text, View } from 'react-native';
 import { Button, ErrorMessage, Loading, Notice } from '@/components';
 import { AdminPage, Stat } from '@/features/admin/AdminPage';
 import { AdminMarketSwitcher, useAdminMarket } from '@/features/admin/market';
 import { formatMoney } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
-import { space } from '@/theme';
+import { space, type } from '@/theme';
+import { monitoringEnabled, reportError } from '@/lib/monitoring';
 
 type Overview = {
   market_code: string; currency: string; currency_decimals: number; prices_are_placeholder: boolean; rides_today: number; completed_today: number; active_rides: number; online_drivers: number;
@@ -56,6 +58,23 @@ export default function AdminOverview() {
           <Stat label="Open support reports" value={o.open_reports} />
         </View>
       ) : null}
+      <ErrorAlertsCheck />
     </AdminPage>
+  );
+}
+
+/** Sends a harmless test error, to check that error alerts (Sentry) reach the team. */
+function ErrorAlertsCheck() {
+  const [sent, setSent] = useState(false);
+  return (
+    <View style={{ marginTop: space.lg, gap: space.sm, alignItems: 'flex-start' }}>
+      <Text style={type.small}>
+        Error alerts: {monitoringEnabled ? 'on — crashes are reported to Sentry and emailed to the team.' : 'off (no Sentry key set).'}
+      </Text>
+      {monitoringEnabled ? (
+        <Button title={sent ? 'Test error sent' : 'Send a test error'} small variant="outline" disabled={sent}
+          onPress={() => { reportError(new Error('Test error from the admin dashboard (safe to ignore)')); setSent(true); }} />
+      ) : null}
+    </View>
   );
 }

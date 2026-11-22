@@ -108,3 +108,11 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - Web app: phone Back on a main screen asks "Exit Lift Me?" (src/features/pwa/ExitGuard.tsx); admin Log out asks too.
 - Migration `20261122000002_auto_offline.sql`: every minute, online drivers with no trip whose app sent no
   location for `auto_offline_seconds` (150 s) are set offline and notified. Test: `auto_offline.test.sql`.
+
+## Error alerts (Sentry) — code live 2026-11-22, switched on when EXPO_PUBLIC_SENTRY_DSN is set
+- Website: small errors-only Sentry file served from our domain (`/sentry.js`, 28 KB gzipped, built by
+  `scripts/build-sentry-web.mjs`), loaded after start-up (`src/lib/monitoring.web.ts`). Phone apps: `@sentry/react-native`
+  (`src/lib/monitoring.ts`, version ~8.28 as Expo SDK 58 expects).
+- Privacy (`src/lib/monitoringScrub.ts`): only the anonymous account id + role; addresses lose their query; phone
+  numbers hidden. Admin Overview has "Send a test error".
+- To switch on: Cloudflare -> lift-me Worker -> Settings -> Build -> Variables: EXPO_PUBLIC_SENTRY_DSN, then rebuild.

@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:db": "bash supabase/tests/run_local.sh",
-    "build:web": "LIFTME_WEB_EXPORT=1 expo export -p web --clear && node scripts/subset-fonts.mjs dist"
+    "build:web": "LIFTME_WEB_EXPORT=1 expo export -p web --clear && node scripts/subset-fonts.mjs dist && node scripts/build-sentry-web.mjs dist"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
@@ -20,6 +20,7 @@
     "@expo/vector-icons": "^15.0.2",
     "@hookform/resolvers": "^7.0.6",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@sentry/react-native": "~8.28.0",
     "@supabase/supabase-js": "^2.119.0",
     "@tanstack/react-query": "^5.107.1",
     "expo": "~58.0.25",
@@ -53,8 +54,10 @@
     "zustand": "^5.1.0"
   },
   "devDependencies": {
+    "@sentry/browser": "^10.75.2",
     "@types/jest": "^30.0.0",
     "@types/react": "~19.3.0",
+    "esbuild": "^0.28.2",
     "eslint": "^9.39.5",
     "eslint-config-expo": "^58.0.4",
     "jest": "^30.5.2",
