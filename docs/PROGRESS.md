@@ -103,3 +103,8 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - App: wallet card + money history in driver Earnings, warning on driver Home, Admin -> Driver money (list +
   per-driver page with record form). Tests: `supabase/tests/driver_wallet.test.sql`.
 - Not yet automatic: drivers paying by M-Pesa from the app (STK push) and payouts by M-Pesa B2C — need the live Paybill.
+
+## Exit question + auto-offline — live 2026-11-22
+- Web app: phone Back on a main screen asks "Exit Lift Me?" (src/features/pwa/ExitGuard.tsx); admin Log out asks too.
+- Migration `20261122000002_auto_offline.sql`: every minute, online drivers with no trip whose app sent no
+  location for `auto_offline_seconds` (150 s) are set offline and notified. Test: `auto_offline.test.sql`.

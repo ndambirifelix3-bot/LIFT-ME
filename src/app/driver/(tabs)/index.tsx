@@ -125,7 +125,7 @@ function OnlineSwitch({ online, intervalSeconds, hasActiveRide }: { online: bool
           {online
             ? mode === 'foreground'
               ? Platform.OS === 'web'
-                ? 'Keep Lift Me open and your phone plugged in. Requests stop if you switch apps.'
+                ? 'Keep Lift Me open on screen and your phone plugged in. To stop, switch Offline. If Lift Me is closed for about 2 minutes, you are set offline.'
                 : 'Keep Lift Me open to receive requests.'
               : 'Receiving requests nearby.'
             : 'Go online to receive requests.'}
