@@ -4,8 +4,38 @@
     <meta charset="utf-8" />
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
-    <title>%WEB_TITLE%</title>
-    <meta name="description" content="Book a ride, track your driver and pay with M-Pesa or cash. Move smarter." />
+    <title>Lift Me — Rides and bodas in Kenya, rides in the USA · Move smarter.</title>
+    <meta name="description" content="Lift Me is a ride-hailing app. In Kenya: book a car or a boda (electric or fuel motorbike) anywhere in the country and pay with M-Pesa or cash. In the United States: book a car ride. See the price first, track your driver live." />
+    <link rel="canonical" href="https://rideliftme.com/" />
+
+    <!-- Link previews (WhatsApp, Facebook, X, LinkedIn) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Lift Me" />
+    <meta property="og:url" content="https://rideliftme.com/" />
+    <meta property="og:title" content="Lift Me — Move smarter." />
+    <meta property="og:description" content="Book a car or a boda in Kenya, or a car ride in the USA. See the price first and track your driver live." />
+    <meta property="og:image" content="https://rideliftme.com/brand/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Lift Me logo — Move smarter." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Lift Me — Move smarter." />
+    <meta name="twitter:description" content="Book a car or a boda in Kenya, or a car ride in the USA. See the price first and track your driver live." />
+    <meta name="twitter:image" content="https://rideliftme.com/brand/og-image.png" />
+
+    <!-- What Lift Me is, for search engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Lift Me",
+        "url": "https://rideliftme.com/",
+        "logo": "https://rideliftme.com/icons/icon-512.png",
+        "slogan": "Move smarter.",
+        "email": "support@rideliftme.com",
+        "areaServed": ["Kenya", "United States"]
+      }
+    </script>
 
     <!-- Installable web app (PWA) -->
     <link rel="manifest" href="/manifest.webmanifest" />
@@ -54,7 +84,24 @@
   </head>
 
   <body>
-    <noscript> You need to enable JavaScript to run Lift Me. </noscript>
+    <!-- Readable text for tools that don't run the app (search engines, link readers, AI assistants). -->
+    <noscript>
+      <main style="color:#fff;font-family:system-ui,sans-serif;max-width:640px;margin:0 auto;padding:24px;line-height:1.5">
+        <h1>Lift Me — Move smarter.</h1>
+        <p>Lift Me is a ride-hailing app that connects passengers with independent drivers.</p>
+        <h2>Kenya</h2>
+        <p>Available across the whole country. Choose Boda Electric (electric motorbike, the cheapest), Boda (motorbike),
+          Lift Mini (small car), Lift (standard car), Lift XL (7-seater or van) or Lift Premium. Pay with M-Pesa or cash.</p>
+        <h2>United States</h2>
+        <p>Car rides across the country (Lift Mini, Lift, Lift XL, Lift Premium), starting with South Bend, Indiana.</p>
+        <h2>How it works</h2>
+        <p>Enter where you're going, see the price before you book, and track your driver live on the map.
+          Drivers can apply in the app. Works on iPhone, Android and computers; add it to your home screen like an app.</p>
+        <p>To use Lift Me, open rideliftme.com in a browser with JavaScript turned on.</p>
+        <p><a href="/privacy" style="color:#ffc107">Privacy Policy</a> · <a href="/terms" style="color:#ffc107">Terms of Use</a> ·
+          Contact: <a href="mailto:support@rideliftme.com" style="color:#ffc107">support@rideliftme.com</a></p>
+      </main>
+    </noscript>
     <!-- The root element for your Expo app. -->
     <div id="root"><div id="splash"><img id="splash-logo" src="/brand/splash-logo.png" width="220" height="175" alt="Lift Me" /></div></div>
   </body>

@@ -1,0 +1,10 @@
+# Lift Me — https://rideliftme.com
+User-agent: *
+Allow: /
+# Signed-in areas have nothing useful for search engines.
+Disallow: /passenger
+Disallow: /driver
+Disallow: /admin
+Disallow: /share
+
+Sitemap: https://rideliftme.com/sitemap.xml

@@ -56,6 +56,16 @@ def silhouette(logo: Image.Image) -> Image.Image:
     return black
 
 
+def og_image(full: Image.Image) -> Image.Image:
+    """Link-preview picture: the full logo centred on black, 1200x630."""
+    bg = Image.new("RGBA", (1200, 630), (16, 16, 16, 255))
+    h = 500
+    w = round(h * full.width / full.height)
+    logo = full.resize((w, h), Image.LANCZOS)
+    bg.paste(logo, ((1200 - w) // 2, (630 - h) // 2), logo)
+    return bg.convert("RGB")
+
+
 def main() -> None:
     source = Image.open(SRC)
     full = trim(cut_out(source.crop(FULL_LOGO_BOX)))
@@ -66,6 +76,8 @@ def main() -> None:
         # (2x the largest size shown; colours reduced in save() to keep them small: ~45 KB and ~10 KB.)
         "brand/logo-full.png": full.resize((600, round(600 * full.height / full.width)), Image.LANCZOS),
         "brand/logo-mark.png": place(mark, 256, 1.0),
+        # Link preview (WhatsApp, Facebook, X): 1200x630, logo on black.
+        "../public/brand/og-image.png": og_image(full),
         # Instant splash in public/index.html (shown 220 px wide before the app's code loads).
         "../public/brand/splash-logo.png": full.resize((440, round(440 * full.height / full.width)), Image.LANCZOS),
         # Main app icon (iOS rounds the corners itself).
