@@ -60,6 +60,24 @@ export function formatNorthAmericaInput(text: string): string {
   return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
 }
 
+/**
+ * Formats a Kenyan number while it's being typed, after the +254 shown in front: "712345678" -> "712 345 678".
+ * A leading 0 (0712…) or 254 (254712…) is dropped, because +254 is already there.
+ */
+export function formatKenyaInput(text: string): string {
+  let d = text.replace(/\D/g, '');
+  if (d.startsWith('254') && d.length > 9) d = d.slice(3);
+  d = d.replace(/^0+/, '').slice(0, 9);
+  return [d.slice(0, 3), d.slice(3, 6), d.slice(6)].filter(Boolean).join(' ');
+}
+
+/** Formats what's typed in the phone box for the chosen country code. */
+export function formatPhoneInput(text: string, dialCode: string): string {
+  if (dialCode === '+254') return formatKenyaInput(text);
+  if (dialCode === '+1') return formatNorthAmericaInput(text);
+  return text.replace(/[^\d ()+-]/g, '');
+}
+
 export function formatPhoneForDisplay(e164: string | null | undefined): string {
   if (!e164) return '';
   const ke = /^\+254(\d{3})(\d{3})(\d{3})$/.exec(e164);

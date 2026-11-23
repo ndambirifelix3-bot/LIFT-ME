@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { flagEmoji, formatNorthAmericaInput, formatPhoneForDisplay, normalizeKenyanPhone, normalizePhone } from '../phone';
+import { flagEmoji, formatKenyaInput, formatNorthAmericaInput, formatPhoneForDisplay, normalizeKenyanPhone, normalizePhone } from '../phone';
 
 describe('normalizeKenyanPhone', () => {
   it.each([
@@ -63,5 +63,23 @@ describe('formatNorthAmericaInput', () => {
   });
   it('the formatted number is accepted', () => {
     expect(normalizePhone(formatNorthAmericaInput('5745550101'), '+1')).toBe('+15745550101');
+  });
+});
+
+describe('formatKenyaInput', () => {
+  it('starts from the 7 or 1, grouped 3-3-3', () => {
+    expect(formatKenyaInput('712')).toBe('712');
+    expect(formatKenyaInput('7123')).toBe('712 3');
+    expect(formatKenyaInput('712345678')).toBe('712 345 678');
+    expect(formatKenyaInput('110345678')).toBe('110 345 678');
+  });
+  it('drops a leading 0 or 254 (+254 is already shown)', () => {
+    expect(formatKenyaInput('0712345678')).toBe('712 345 678');
+    expect(formatKenyaInput('0')).toBe('');
+    expect(formatKenyaInput('254712345678')).toBe('712 345 678');
+    expect(formatKenyaInput('+254 712 345 678')).toBe('712 345 678');
+  });
+  it('the formatted number is accepted', () => {
+    expect(normalizePhone(formatKenyaInput('0712345678'), '+254')).toBe('+254712345678');
   });
 });
