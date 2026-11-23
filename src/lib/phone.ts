@@ -42,8 +42,22 @@ export function normalizeKenyanPhone(input: string): string | null {
 /** Example shown inside the phone box for each country code. */
 export function phonePlaceholder(dialCode: string): string {
   if (dialCode === '+254') return '712 345 678';
-  if (dialCode === '+1') return '415 555 0100';
+  if (dialCode === '+1') return '(574) 555-0101';
   return 'Phone number';
+}
+
+/**
+ * Formats a US / Canada number while it's being typed: "5745550101" -> "(574) 555-0101".
+ * Up to 3 digits stay plain, so deleting never gets stuck on a bracket or dash.
+ * A leading country "1" (1 574 555 0101) is dropped because +1 is already shown.
+ */
+export function formatNorthAmericaInput(text: string): string {
+  let d = text.replace(/\D/g, '');
+  if (d.length === 11 && d.startsWith('1')) d = d.slice(1);
+  d = d.slice(0, 10);
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
 }
 
 export function formatPhoneForDisplay(e164: string | null | undefined): string {

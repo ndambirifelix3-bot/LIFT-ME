@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { flagEmoji, phonePlaceholder } from '@/lib/phone';
+import { flagEmoji, formatNorthAmericaInput, phonePlaceholder } from '@/lib/phone';
 import { colors, fonts, radius, space } from '@/theme';
 
 export type PhoneCountry = { dialCode: string; countryIso: string };
@@ -39,7 +39,7 @@ export function PhoneInput({ value, onChangeText, error, country, countries = []
         </Pressable>
         <TextInput
           value={value}
-          onChangeText={(t) => onChangeText(t.replace(/[^\d ()+-]/g, ''))}
+          onChangeText={(t) => onChangeText(country.dialCode === '+1' ? formatNorthAmericaInput(t) : t.replace(/[^\d ()+-]/g, ''))}
           keyboardType="phone-pad"
           autoComplete="tel"
           textContentType="telephoneNumber"

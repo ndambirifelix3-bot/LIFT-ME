@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { flagEmoji, formatPhoneForDisplay, normalizeKenyanPhone, normalizePhone } from '../phone';
+import { flagEmoji, formatNorthAmericaInput, formatPhoneForDisplay, normalizeKenyanPhone, normalizePhone } from '../phone';
 
 describe('normalizeKenyanPhone', () => {
   it.each([
@@ -46,5 +46,22 @@ describe('display', () => {
     expect(flagEmoji('ke')).toBe('🇰🇪');
     expect(flagEmoji('us')).toBe('🇺🇸');
     expect(flagEmoji('x')).toBe('');
+  });
+});
+
+describe('formatNorthAmericaInput', () => {
+  it('formats US numbers as they are typed', () => {
+    expect(formatNorthAmericaInput('574')).toBe('574');
+    expect(formatNorthAmericaInput('5745')).toBe('(574) 5');
+    expect(formatNorthAmericaInput('574555')).toBe('(574) 555');
+    expect(formatNorthAmericaInput('5745550101')).toBe('(574) 555-0101');
+    expect(formatNorthAmericaInput('1 574 555 0101')).toBe('(574) 555-0101');
+    expect(formatNorthAmericaInput('(574) 555-01011')).toBe('(574) 555-0101');
+  });
+  it('deleting never gets stuck on a bracket', () => {
+    expect(formatNorthAmericaInput('(574) ')).toBe('574');
+  });
+  it('the formatted number is accepted', () => {
+    expect(normalizePhone(formatNorthAmericaInput('5745550101'), '+1')).toBe('+15745550101');
   });
 });
