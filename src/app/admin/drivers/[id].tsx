@@ -10,6 +10,7 @@ import { formatDateTime, formatMoney } from '@/lib/format';
 import { flagEmoji, formatPhoneForDisplay } from '@/lib/phone';
 import { supabase } from '@/lib/supabase';
 import { space, type } from '@/theme';
+import { confirm } from '@/lib/confirm';
 
 async function openSigned(path: string) {
   // Open the tab straight away, while the click still counts: browsers (Safari especially) block
@@ -188,7 +189,7 @@ export default function AdminDriverDetail() {
           {driver.status !== 'rejected' && driver.status !== 'suspended' ? (
             <Button title="Reject" variant="danger" onPress={() => review.mutate(false)} loading={review.isPending && !review.variables} disabled={!reason.trim()} />
           ) : null}
-          {driver.status === 'approved' ? <Button title="Suspend" variant="danger" onPress={() => suspend.mutate(true)} loading={suspend.isPending} /> : null}
+          {driver.status === 'approved' ? <Button title="Suspend" variant="danger" onPress={() => confirm(`Suspend ${profile.full_name || 'this driver'}?`, 'They will be taken offline and cannot drive until you unsuspend them.', () => suspend.mutate(true))} loading={suspend.isPending} /> : null}
           {driver.status === 'suspended' ? <Button title="Unsuspend" variant="dark" onPress={() => suspend.mutate(false)} loading={suspend.isPending} /> : null}
         </View>
       </Card>

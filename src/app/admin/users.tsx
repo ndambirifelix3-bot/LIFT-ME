@@ -8,6 +8,7 @@ import { formatDateTime } from '@/lib/format';
 import { formatPhoneForDisplay } from '@/lib/phone';
 import { supabase } from '@/lib/supabase';
 import { type } from '@/theme';
+import { confirm } from '@/lib/confirm';
 
 export default function AdminUsers() {
   const { session } = useAuth();
@@ -55,7 +56,11 @@ export default function AdminUsers() {
               variant={u.is_suspended ? 'dark' : 'danger'}
               title={u.is_suspended ? 'Unsuspend' : 'Suspend'}
               loading={suspend.isPending && suspend.variables?.id === u.id}
-              onPress={() => suspend.mutate({ id: u.id, on: !u.is_suspended })}
+              onPress={() => {
+                const who = `${u.full_name || 'this user'} (${formatPhoneForDisplay(u.phone)})`;
+                if (u.is_suspended) suspend.mutate({ id: u.id, on: false });
+                else confirm(`Suspend ${who}?`, 'They will not be able to book rides, drive or use their account until you unsuspend them.', () => suspend.mutate({ id: u.id, on: true }));
+              }}
             />
           ),
         ])}
