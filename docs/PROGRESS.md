@@ -160,6 +160,9 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   driver's share to Driver money. If cash is confirmed while a charge is running, the card charge is refunded.
 - `stripe-webhook` (backup confirmation from Stripe): set up 2026-11-24, signature checked, test event answered 200.
 - Secrets: STRIPE_SECRET_KEY (Supabase). Public key: EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY (.env + Cloudflare build vars).
+- Full US trip 2026-11-24: Joseph booked Four Winds Field → Notre Dame Stadium ($7.10, card), JOE (approved,
+  driven by a script because the tester is in Kenya) accepted, arrived, started, completed; card charged
+  automatically; JOE's Driver money +$6.03 (85%).
 - Tested live: Visa 4242 saved and charged $6.50; decline card 0341 → failed screen → new card → Try again → paid.
 - At launch: client creates his own Stripe account (business details, bank), swap both keys + webhook secret.
 
@@ -170,7 +173,6 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   GOOGLE_MAPS_SERVER_KEY, sets daily quotas. Then set the US traffic_factor back if needed and re-quote the airport trip.
 - **SMS for real phone logins** — client to choose Twilio Verify (recommended to start) and upgrade Twilio.
 - **Client admin account** — client signs up with nderitondungu@gmail.com, then switch his role to admin.
-- **US driver test (JOE, +1 574 555 0102)** — finish the 4 application steps, submit, approve in Admin.
 - **Google Search Console** — verify rideliftme.com (DNS TXT in Cloudflare), submit sitemap.xml, request indexing.
 - **Stripe (at launch)** — the client's own Stripe account: swap STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET (new
   webhook in his account) and the Cloudflare variable EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY to live keys.
