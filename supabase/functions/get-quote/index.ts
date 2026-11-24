@@ -40,10 +40,13 @@ serve(async (req) => {
   if (!pickupMarket) return errorResponse('pickup_outside_service_area', 422, 'Sorry, Lift Me is not available at this pickup point yet.');
   if (dropoffMarket !== pickupMarket) return errorResponse('dropoff_outside_service_area', 422, 'Sorry, this destination is outside our service area.');
 
+  const { data: market } = await db.from('markets').select('traffic_factor').eq('code', pickupMarket).single();
+  const trafficFactor = Number(market?.traffic_factor ?? 1.3);
+
   let route: Route | null;
   const key = googleKey();
   try {
-    route = key ? await googleRoute(key, pickup, dropoff) : await freeRoute(pickup, dropoff);
+    route = key ? await googleRoute(key, pickup, dropoff) : await freeRoute(pickup, dropoff, trafficFactor);
   } catch (err) {
     console.error('route', err);
     return errorResponse('maps_unavailable', 502, 'We could not calculate the route. Please try again.');

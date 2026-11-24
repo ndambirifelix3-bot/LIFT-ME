@@ -13,7 +13,8 @@ type Point = { lat: number; lng: number };
 
 const USER_AGENT = 'LiftMe/1.0 (+https://rideliftme.com)';
 const OSRM = 'https://router.project-osrm.org';
-const CITY_SPEED_MPS = 5.5; // ≈ 20 km/h
+// When the route service is down: assume ~35 km/h on empty roads (the traffic allowance is added on top).
+const FALLBACK_SPEED_MPS = 9.7;
 
 export function googleKey(): string | null {
   return Deno.env.get('GOOGLE_MAPS_SERVER_KEY') || null;
@@ -56,24 +57,26 @@ function haversine(a: Point, b: Point): number {
   return 2 * r * Math.asin(Math.sqrt(h));
 }
 
-/** Road route from OSRM; if it's unavailable, a cautious estimate so booking still works. */
-export async function freeRoute(from: Point, to: Point): Promise<Route> {
+/**
+ * Road route from OSRM; if it's unavailable, a cautious estimate so booking still works.
+ * `trafficFactor`: OSRM times assume empty roads, so they're multiplied by the market's traffic allowance
+ * (e.g. 1.8 for Nairobi, 1.15 for the USA). Google's times already include live traffic.
+ */
+export async function freeRoute(from: Point, to: Point, trafficFactor = 1.3): Promise<Route> {
   try {
     const url = `${OSRM}/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=polyline`;
     const data = (await getJson(url)) as { code?: string; routes?: { distance: number; duration: number; geometry: string }[] };
     const r = data.code === 'Ok' ? data.routes?.[0] : undefined;
-    // OSRM times assume empty roads. City traffic is slower, so never assume faster than ~20 km/h on
-    // average (per-minute fares would otherwise come out too low). Google's times include live traffic.
     if (r) {
-      const durationS = Math.round(Math.max(r.duration, r.distance / CITY_SPEED_MPS));
+      const durationS = Math.max(60, Math.round(r.duration * trafficFactor));
       return { distanceM: Math.round(r.distance), durationS, polyline: r.geometry ?? null, estimated: false };
     }
   } catch (err) {
     console.warn('osrm unavailable, estimating', err);
   }
-  // Roads are rarely straight: ~1.35× the straight line, at the same ~20 km/h average city speed.
+  // Roads are rarely straight: ~1.35× the straight line.
   const distanceM = Math.round(haversine(from, to) * 1.35);
-  return { distanceM, durationS: Math.max(60, Math.round(distanceM / CITY_SPEED_MPS)), polyline: null, estimated: true };
+  return { distanceM, durationS: Math.max(60, Math.round((distanceM / FALLBACK_SPEED_MPS) * trafficFactor)), polyline: null, estimated: true };
 }
 
 // ---------------------------------------------------------------------------
