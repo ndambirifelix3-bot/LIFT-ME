@@ -150,3 +150,15 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - Emails the admin team (setting `admin_notify_emails`, default support@rideliftme.com) when a driver submits an
   application or someone sends a help report (safety = URGENT). Migration `20261124000004_admin_email_notices.sql`,
   Edge Function `admin-notify` (Resend API), test `admin_notify.test.sql`. Admin Overview: recipients, test, recent.
+
+## Waiting on someone (as of 2026-11-24)
+- **Google Maps key** — client's Google Cloud project "LIFT ME" (lift-me-515711, free trial $300 until 2027-02-23) exists.
+  Left: client grants the developer's Gmail the roles Service Usage Admin + API Keys Admin + Viewer (IAM -> Grant access);
+  developer enables Places API (New), Routes API, Geocoding API, creates + restricts the key, adds Supabase secret
+  GOOGLE_MAPS_SERVER_KEY, sets daily quotas. Then set the US traffic_factor back if needed and re-quote the airport trip.
+- **SMS for real phone logins** — client to choose Twilio Verify (recommended to start) and upgrade Twilio.
+- **Client admin account** — client signs up with nderitondungu@gmail.com, then switch his role to admin.
+- **US driver test (JOE, +1 574 555 0102)** — finish the 4 application steps, submit, approve in Admin.
+- **Google Search Console** — verify rideliftme.com (DNS TXT in Cloudflare), submit sitemap.xml, request indexing.
+- **Before launch** — EXPO_PUBLIC_PHONE_LOGIN=off until SMS is paid; remove test numbers; real prices; lawyer review
+  of /privacy and /terms; move domain + app to the client's Cloudflare account (possible from 2026-12-02).
