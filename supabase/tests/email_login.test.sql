@@ -33,4 +33,19 @@ select t.ok((select email from public.profiles where id = '00000000-0000-0000-00
             'adding an email to a phone account is mirrored on the profile');
 select t.ok((select phone from public.profiles where id = '00000000-0000-0000-0000-0000000000a1') is not null, 'the login phone is kept');
 
+
+-- ===================== LOG IN or SIGN UP? =====================
+reset role;
+update auth.users set email_confirmed_at = now() where id = '00000000-0000-0000-0000-0000000000f1';
+insert into auth.users (id, email) values ('00000000-0000-0000-0000-0000000000f3', 'abandoned@example.com');  -- never entered the code
+insert into auth.users (id, phone, phone_confirmed_at) values ('00000000-0000-0000-0000-0000000000f4', '254711000444', now());
+set role anon;
+select t.ok(public.account_exists(p_email => 'rider.one@EXAMPLE.com'), 'existing email is recognised (any capitals)');
+select t.ok(not public.account_exists(p_email => 'nobody@example.com'), 'unknown email: no account');
+select t.ok(not public.account_exists(p_email => 'abandoned@example.com'), 'an abandoned sign-up does not count');
+select t.ok(public.account_exists(p_phone => '+254711000444'), 'existing phone is recognised');
+select t.ok(not public.account_exists(p_phone => '+254711000999'), 'unknown phone: no account');
+select t.ok(not public.account_exists(), 'nothing given: false');
+reset role;
+
 \warn 'email_login.test.sql: ALL PASSED'

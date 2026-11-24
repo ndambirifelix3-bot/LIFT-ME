@@ -1263,6 +1263,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      account_exists: {
+        Args: { p_email?: string; p_phone?: string }
+        Returns: boolean
+      }
       admin_driver_balances: {
         Args: { p_market_code: string }
         Returns: {

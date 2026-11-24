@@ -141,3 +141,7 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - Migrations `20261124000001_email_login.sql`, `20261124000002_submit_requires_phone.sql`; test `email_login.test.sql`.
 - Supabase setup needed: SMTP = Resend; email templates "Magic Link" and "Change Email Address" must show
   {{ .Token }}; email OTP length 6.
+- 2026-11-24: Welcome now has "Sign up" and "Log in". Email and phone screens have Log in / Sign up tabs and check
+  first (`account_exists`, migration `20261124000003_account_lookup.sql`): log in with an unknown email/phone ->
+  "no account" + Sign up instead; sign up with a known one -> "already have an account" + Log in instead.
+  Resend verified (records added by hand in the developer's Cloudflare account); email codes working.

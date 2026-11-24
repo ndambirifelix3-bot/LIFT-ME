@@ -1,7 +1,7 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, type ViewStyle } from 'react-native';
 import { colors, fonts, radius } from '@/theme';
 
-type Variant = 'primary' | 'dark' | 'outline' | 'ghost' | 'danger';
+type Variant = 'primary' | 'dark' | 'outline' | 'outlineLight' | 'ghost' | 'danger';
 
 type Props = {
   title: string;
@@ -55,6 +55,8 @@ const variantStyles: Record<Variant, { box: ViewStyle; text: { color: string } }
   primary: { box: { backgroundColor: colors.brand }, text: { color: colors.black } },
   dark: { box: { backgroundColor: colors.black }, text: { color: colors.white } },
   outline: { box: { borderWidth: 1, borderColor: colors.black, backgroundColor: 'transparent' }, text: { color: colors.black } },
+  // For dark backgrounds (e.g. the welcome screen).
+  outlineLight: { box: { borderWidth: 1.5, borderColor: colors.white, backgroundColor: 'transparent' }, text: { color: colors.white } },
   ghost: { box: { backgroundColor: 'transparent' }, text: { color: colors.text } },
   danger: { box: { borderWidth: 1, borderColor: colors.error, backgroundColor: 'transparent' }, text: { color: colors.error } },
 };
