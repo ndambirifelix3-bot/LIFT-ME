@@ -7,6 +7,8 @@ import { colors, fonts, radius, space } from '@/theme';
 export type PhoneCountry = { dialCode: string; countryIso: string };
 
 type Props = {
+  /** Focus the box straight away (login screen). Default true. */
+  autoFocus?: boolean;
   value: string;
   onChangeText: (v: string) => void;
   error?: string;
@@ -18,7 +20,7 @@ type Props = {
 };
 
 /** Phone number box with the country code in front; tap the code to switch country. */
-export function PhoneInput({ value, onChangeText, error, country, countries = [], onChangeCountry }: Props) {
+export function PhoneInput({ value, onChangeText, error, country, countries = [], onChangeCountry, autoFocus = true }: Props) {
   const [open, setOpen] = useState(false);
   const canPick = countries.length > 1 && !!onChangeCountry;
 
@@ -48,7 +50,7 @@ export function PhoneInput({ value, onChangeText, error, country, countries = []
           maxLength={18}
           style={styles.input}
           accessibilityLabel="Phone number"
-          autoFocus
+          autoFocus={autoFocus}
         />
       </View>
       {open ? (

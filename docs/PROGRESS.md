@@ -131,3 +131,13 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - Bodas can only be priced in Kenya (`pricing.countries` + trigger). US: Lift Mini, Lift, Lift XL, Lift Premium
   (Mini and XL prices are placeholders). Test: `nationwide.test.sql`.
 - US test numbers (add in Supabase Auth -> Phone -> test numbers): passenger 15745550101, driver 15745550102 (OTP 123456).
+
+## Email login — code live 2026-11-24 (needs Resend SMTP in Supabase to work for real users)
+- Welcome: "Continue with email" (6-digit code by email) + "Use my phone number instead" (hidden when the
+  Cloudflare build variable EXPO_PUBLIC_PHONE_LOGIN=off; /phone still works for test numbers).
+- An existing account with that email opens; a new email creates an account (choose passenger / driver).
+- Account: add/change email with a code (same account opens with phone or email); email users add a
+  contact phone. Driver applications need a phone (sets the driver's country); checked on the server too.
+- Migrations `20261124000001_email_login.sql`, `20261124000002_submit_requires_phone.sql`; test `email_login.test.sql`.
+- Supabase setup needed: SMTP = Resend; email templates "Magic Link" and "Change Email Address" must show
+  {{ .Token }}; email OTP length 6.

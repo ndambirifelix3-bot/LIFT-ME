@@ -2,12 +2,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Button, ErrorMessage, Header, Input, Loading, Screen } from '@/components';
+import { Text } from 'react-native';
+import { Button, Card, ErrorMessage, Header, Input, Loading, Screen } from '@/components';
+import { ContactPhoneForm } from '@/features/auth/ContactDetails';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { driverHints } from '@/features/driver/countryHints';
 import { useMyDriver } from '@/features/driver/hooks';
 import { supabase } from '@/lib/supabase';
 import { goBack } from '@/lib/nav';
+import { space, type } from '@/theme';
 
 const schema = z.object({
   full_name: z.string().trim().min(3, 'Enter your full name as on your ID').max(100),
@@ -30,6 +33,7 @@ export default function DriverDetails() {
 
   const save = useMutation({
     mutationFn: async (v: Form) => {
+      if (!profile?.phone) throw new Error('Add your phone number first (above).');
       const uid = session!.user.id;
       const a = await supabase.from('profiles').update({ full_name: v.full_name }).eq('id', uid);
       if (a.error) throw a.error;
@@ -56,6 +60,20 @@ export default function DriverDetails() {
   return (
     <Screen footer={<Button title="Save" onPress={handleSubmit((v) => save.mutate(v))} loading={save.isPending} />}>
       <Header title="Personal details" back />
+      {!profile?.phone ? (
+        <Card>
+          <Text style={[type.h3, { marginBottom: 4 }]}>Your phone number</Text>
+          <Text style={[type.small, { marginBottom: space.md }]}>
+            Passengers call you on this during trips. It also tells us which country you drive in.
+          </Text>
+          <ContactPhoneForm
+            onDone={async () => {
+              await refreshProfile();
+              await qc.invalidateQueries({ queryKey: ['my-driver'] });
+            }}
+          />
+        </Card>
+      ) : null}
       {field('full_name', 'Full name (as on your ID)', { autoCapitalize: 'words' })}
       {field('id_number', hints.idLabel, { autoCapitalize: 'characters', maxLength: 20, placeholder: hints.idExample })}
       {field('licence_number', hints.licenceLabel, { autoCapitalize: 'characters', maxLength: 30, placeholder: hints.licenceExample })}

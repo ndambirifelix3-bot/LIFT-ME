@@ -26,5 +26,6 @@ done
 "${PSQL[@]}" -f "$HERE/driver_wallet.test.sql" >/dev/null
 "${PSQL[@]}" -f "$HERE/auto_offline.test.sql" >/dev/null
 "${PSQL[@]}" -f "$HERE/nationwide.test.sql" >/dev/null
+"${PSQL[@]}" -f "$HERE/email_login.test.sql" >/dev/null
 bash "$HERE/concurrent_accept.test.sh" "$PORT"
 echo "ALL DATABASE TESTS PASSED"

@@ -547,6 +547,7 @@ export type Database = {
         Row: {
           created_at: string
           delete_requested_at: string | null
+          email: string | null
           full_name: string
           id: string
           is_suspended: boolean
@@ -557,6 +558,7 @@ export type Database = {
         Insert: {
           created_at?: string
           delete_requested_at?: string | null
+          email?: string | null
           full_name?: string
           id: string
           is_suspended?: boolean
@@ -567,6 +569,7 @@ export type Database = {
         Update: {
           created_at?: string
           delete_requested_at?: string | null
+          email?: string | null
           full_name?: string
           id?: string
           is_suspended?: boolean
@@ -1430,6 +1433,7 @@ export type Database = {
         Returns: {
           created_at: string
           delete_requested_at: string | null
+          email: string | null
           full_name: string
           id: string
           is_suspended: boolean
@@ -1449,6 +1453,7 @@ export type Database = {
         Returns: {
           created_at: string
           delete_requested_at: string | null
+          email: string | null
           full_name: string
           id: string
           is_suspended: boolean
@@ -1468,6 +1473,7 @@ export type Database = {
         Returns: {
           created_at: string
           delete_requested_at: string | null
+          email: string | null
           full_name: string
           id: string
           is_suspended: boolean
@@ -1574,6 +1580,7 @@ export type Database = {
         Returns: {
           created_at: string
           delete_requested_at: string | null
+          email: string | null
           full_name: string
           id: string
           is_suspended: boolean
@@ -1661,7 +1668,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      country_area: { Args: { p_wkt: string }; Returns: unknown }
       create_quote: {
         Args: {
           p_distance_m: number
@@ -2006,6 +2012,26 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "drivers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_my_contact_phone: {
+        Args: { p_phone: string }
+        Returns: {
+          created_at: string
+          delete_requested_at: string | null
+          email: string | null
+          full_name: string
+          id: string
+          is_suspended: boolean
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          role_chosen: boolean
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
           isOneToOne: true
           isSetofReturn: false
         }

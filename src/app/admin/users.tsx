@@ -19,7 +19,7 @@ export default function AdminUsers() {
     queryFn: async () => {
       let query = supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(200);
       const s = search.trim().replace(/[%,()]/g, '');
-      if (s) query = query.or(`full_name.ilike.%${s}%,phone.ilike.%${s.replace(/^0/, '')}%`);
+      if (s) query = query.or(`full_name.ilike.%${s}%,phone.ilike.%${s.replace(/^0/, '')}%,email.ilike.%${s}%`);
       const { data, error } = await query;
       if (error) throw error;
       return data;
@@ -36,14 +36,15 @@ export default function AdminUsers() {
 
   return (
     <AdminPage title="Users" subtitle="Passengers, drivers and admins. Suspended users cannot book or drive.">
-      <Input placeholder="Search by name or phone" value={search} onChangeText={setSearch} />
+      <Input placeholder="Search by name, phone or email" value={search} onChangeText={setSearch} />
       {q.isLoading ? <Loading /> : null}
       <ErrorMessage error={q.error ?? suspend.error} />
       <Table
-        headers={['Name', 'Phone', 'Role', 'Joined', 'Status', '']}
+        headers={['Name', 'Phone', 'Email', 'Role', 'Joined', 'Status', '']}
         rows={rows.map((u) => [
           u.full_name || '—',
-          formatPhoneForDisplay(u.phone),
+          u.phone ? formatPhoneForDisplay(u.phone) : '—',
+          u.email ?? '—',
           u.role,
           formatDateTime(u.created_at),
           u.is_suspended ? <Pill key="s" text="Suspended" tone="bad" /> : u.delete_requested_at ? <Pill key="s" text="Deletion requested" tone="wait" /> : <Pill key="s" text="Active" tone="good" />,

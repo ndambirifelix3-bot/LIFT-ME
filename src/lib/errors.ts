@@ -22,6 +22,7 @@ const MESSAGES: Record<string, string> = {
   missing_photo: 'Please add your profile photo.',
   missing_vehicle: 'Please add your vehicle details.',
   missing_name: 'Please add your full name.',
+  missing_phone: 'Please add your phone number (Personal details).',
   reason_required: 'Please give a reason.',
   application_not_submitted: 'The driver has not submitted their application yet.',
   admin_only: 'Only admins can do this.',
@@ -36,6 +37,14 @@ const MESSAGES: Record<string, string> = {
   amount_required: 'Enter an amount.',
   driver_market_required: 'Set the driver\'s city first.',
   not_a_driver: 'This is only for drivers.',
+  invalid_phone: 'Enter a valid phone number.',
+  phone_country_not_served: 'Lift Me isn\'t available for phone numbers from that country yet.',
+  phone_is_login_phone: 'Your login phone is already your contact number.',
+  email_address_invalid: 'Enter a valid email address.',
+  over_email_send_rate_limit: 'Too many codes were sent. Please wait a few minutes and try again.',
+  'only request this after': 'Please wait a minute before asking for another code.',
+  email_exists: 'This email is already used by another Lift Me account.',
+  'already been registered': 'This email is already used by another Lift Me account.',
 };
 
 export function friendlyError(err: unknown): string {

@@ -1,15 +1,14 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Text } from 'react-native';
 import { router } from 'expo-router';
-import { Button, Card, ErrorMessage, Input, ListItem, Notice, Row } from '@/components';
+import { Button, Card, ErrorMessage, Input, ListItem, Notice } from '@/components';
 import { confirm } from '@/lib/confirm';
-import { formatPhoneForDisplay } from '@/lib/phone';
 import { supabase } from '@/lib/supabase';
-import { space, type } from '@/theme';
+import { space } from '@/theme';
 import { InstallApp } from '@/features/pwa/InstallApp';
 import { NotificationsCard } from '@/features/pwa/NotificationsCard';
 import { useAuth } from './AuthProvider';
+import { ContactDetails } from './ContactDetails';
 
 
 /** Name, phone, logout and delete-account request — shared by passenger and driver. */
@@ -37,12 +36,11 @@ export function AccountBasics() {
     <>
       <Card>
         <Input label="Full name" value={name} onChangeText={setName} autoCapitalize="words" maxLength={100} />
-        <Row label="Phone" value={formatPhoneForDisplay(profile.phone)} />
-        <Text style={[type.small, { marginBottom: space.md }]}>To change your phone number, contact support.</Text>
         <ErrorMessage error={save.error} />
         {save.isSuccess ? <Notice tone="success" text="Saved." /> : null}
         <Button title="Save" variant="dark" small disabled={name.trim().length < 3 || name.trim() === profile.full_name} loading={save.isPending} onPress={() => save.mutate()} />
       </Card>
+      <ContactDetails />
       <NotificationsCard role={profile.role === 'driver' ? 'driver' : 'passenger'} />
       <InstallApp />
       <Card>

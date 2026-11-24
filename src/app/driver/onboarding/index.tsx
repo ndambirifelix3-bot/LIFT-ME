@@ -29,7 +29,7 @@ export default function Onboarding() {
   const required = documentTypes.filter((t) => t.required);
   const docsDone = required.every((t) => documents.some((d) => d.doc_type === t.code));
   const steps = [
-    { key: 'details', title: 'Personal details', done: !!(profile?.full_name && driver?.id_number && driver?.licence_number) },
+    { key: 'details', title: 'Personal details', done: !!(profile?.full_name && profile?.phone && driver?.id_number && driver?.licence_number) },
     { key: 'photo', title: 'Profile photo', done: !!driver?.photo_path },
     { key: 'documents', title: `Documents (${documents.length}/${required.length})`, done: docsDone },
     { key: 'vehicle', title: 'Vehicle details', done: !!vehicle },

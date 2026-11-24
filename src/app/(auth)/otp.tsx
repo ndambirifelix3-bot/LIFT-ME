@@ -11,7 +11,8 @@ import { colors, fonts, space, type } from '@/theme';
 const RESEND_SECONDS = 60;
 
 export default function Otp() {
-  const { phone } = useLocalSearchParams<{ phone: string }>();
+  // Either a phone (code by SMS) or an email (code by email).
+  const { phone, email } = useLocalSearchParams<{ phone?: string; email?: string }>();
   const { refreshProfile } = useAuth();
   const [code, setCode] = useState('');
   const [wait, setWait] = useState(RESEND_SECONDS);
@@ -23,7 +24,9 @@ export default function Otp() {
 
   const verify = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.auth.verifyOtp({ phone: phone!, token: code, type: 'sms' });
+      const { error } = email
+        ? await supabase.auth.verifyOtp({ email, token: code, type: 'email' })
+        : await supabase.auth.verifyOtp({ phone: phone!, token: code, type: 'sms' });
       if (error) throw error;
     },
     onSuccess: async () => {
@@ -34,7 +37,9 @@ export default function Otp() {
 
   const resend = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.auth.signInWithOtp({ phone: phone! });
+      const { error } = email
+        ? await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } })
+        : await supabase.auth.signInWithOtp({ phone: phone! });
       if (error) throw error;
     },
     onSuccess: () => setWait(RESEND_SECONDS),
@@ -47,9 +52,9 @@ export default function Otp() {
 
   return (
     <Screen footer={<Button title="Verify" onPress={() => verify.mutate()} loading={verify.isPending} disabled={code.length !== 6} />}>
-      <Header title="Enter the code" subtitle={`Sent to ${formatPhoneForDisplay(phone)}`} back />
+      <Header title="Enter the code" subtitle={email ? `Sent to ${email}. Check your inbox (and spam).` : `Sent to ${formatPhoneForDisplay(phone)}`} back />
       <OTPInput value={code} onChange={setCode} error={!!verify.error} />
-      <ErrorMessage error={verify.error ? 'That code is not right or has expired. Check the SMS and try again.' : resend.error} />
+      <ErrorMessage error={verify.error ? `That code is not right or has expired. Check the ${email ? 'email' : 'SMS'} and try again.` : resend.error} />
       <Text
         style={[type.body, { marginTop: space.xl, textAlign: 'center', fontFamily: fonts.medium, color: wait ? colors.secondary : colors.text }]}
         onPress={wait || resend.isPending ? undefined : () => resend.mutate()}
