@@ -29,12 +29,16 @@ export default function WhereTo() {
   const [error, setError] = useState<unknown>(null);
   const token = useRef(newSessionToken());
   const dropRef = useRef<TextInputInstance>(null);
+  // The current location fills the pickup only once, and never after the passenger has typed or cleared it.
+  const pickupTouched = useRef(!!pickup);
 
   // Default pickup = current location (address looked up on the server).
   useEffect(() => {
-    if (pickup || !loc.position) return;
+    if (pickup || !loc.position || pickupTouched.current) return;
     reverseGeocode(loc.position)
       .then((address) => {
+        if (pickupTouched.current) return; // the passenger typed or cleared it meanwhile
+        pickupTouched.current = true;
         const a = address ?? 'Current location';
         setPickup({ ...loc.position!, address: a });
         setText((t) => ({ ...t, pickup: a }));
@@ -44,12 +48,14 @@ export default function WhereTo() {
   }, [loc.position, pickup, setPickup]);
 
   const query = useDebounced(text[focus].trim());
+  // Look for the destination around the pickup (and the pickup around the destination), else around the phone.
+  const near = (focus === 'dropoff' ? pickup : dropoff) ?? loc.position;
   const committed = focus === 'pickup' ? pickup?.address : dropoff?.address;
   const suggestions = useQuery({
-    queryKey: ['places', query, focus],
+    queryKey: ['places', query, focus, near?.lat, near?.lng],
     enabled: query.length >= 2 && query !== committed,
     staleTime: 60_000,
-    queryFn: () => searchPlaces(query, token.current, loc.position),
+    queryFn: () => searchPlaces(query, token.current, near),
   });
 
   const choose = async (placeId: string) => {
@@ -97,7 +103,10 @@ export default function WhereTo() {
               onFocus={() => setFocus(f.key)}
               onChangeText={(v) => {
                 setText((t) => ({ ...t, [f.key]: v }));
-                if (f.key === 'pickup') setPickup(null);
+                if (f.key === 'pickup') {
+                  pickupTouched.current = true;
+                  setPickup(null);
+                }
                 else setDropoff(null);
               }}
               placeholder={f.placeholder}
@@ -110,8 +119,11 @@ export default function WhereTo() {
               <Pressable
                 onPress={() => {
                   setText((t) => ({ ...t, [f.key]: '' }));
-                  if (f.key === 'pickup') setPickup(null);
-                  else setDropoff(null);
+                  if (f.key === 'pickup') {
+                    pickupTouched.current = true;
+                    setPickup(null);
+                    setFocus('pickup');
+                  } else setDropoff(null);
                 }}
                 accessibilityLabel="Clear"
                 hitSlop={8}

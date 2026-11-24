@@ -10,12 +10,22 @@ type SearchResponse = { suggestions: Suggestion[]; provider?: 'google' | 'device
 // Google calls go through Edge Functions so the server key never ships in the app. Without a Google
 // key the server answers provider 'device' (with the countries and centre to use) and the phone runs
 // the free OpenStreetMap search itself — see ./osm.ts.
-export async function searchPlaces(input: string, sessionToken: string, near?: LatLng | null) {
+async function searchOnce(input: string, sessionToken: string, near?: LatLng | null) {
   const res = await callFunction<SearchResponse>('places', {
     action: 'autocomplete', input, sessionToken, near: near ?? undefined,
   });
   if (res.provider === 'device') return osmSearch(input, res.bias ?? near ?? null, res.countries ?? []);
   return res.suggestions;
+}
+
+/**
+ * Places near `near` (in that country) first; if none match, every country Lift Me serves —
+ * e.g. someone in Nairobi booking a ride for family in South Bend.
+ */
+export async function searchPlaces(input: string, sessionToken: string, near?: LatLng | null) {
+  const local = await searchOnce(input, sessionToken, near);
+  if (local.length || !near) return local;
+  return searchOnce(input, sessionToken, null);
 }
 
 export async function placeDetails(placeId: string, sessionToken: string) {
