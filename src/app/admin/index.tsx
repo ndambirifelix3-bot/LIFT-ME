@@ -9,6 +9,7 @@ import { formatMoney } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import { space, type } from '@/theme';
 import { monitoringEnabled, reportError } from '@/lib/monitoring';
+import { AdminEmailsCard } from '@/features/admin/AdminEmailsCard';
 
 type Overview = {
   market_code: string; currency: string; currency_decimals: number; prices_are_placeholder: boolean; rides_today: number; completed_today: number; active_rides: number; online_drivers: number;
@@ -58,6 +59,7 @@ export default function AdminOverview() {
           <Stat label="Open support reports" value={o.open_reports} />
         </View>
       ) : null}
+      <AdminEmailsCard />
       <ErrorAlertsCheck />
     </AdminPage>
   );

@@ -44,6 +44,36 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_email_outbox: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: number
+          kind: string
+          payload: Json
+          recipients: string[] | null
+          sent_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: never
+          kind: string
+          payload?: Json
+          recipients?: string[] | null
+          sent_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: never
+          kind?: string
+          payload?: Json
+          recipients?: string[] | null
+          sent_at?: string | null
+        }
+        Relationships: []
+      }
       document_types: {
         Row: {
           code: string
@@ -1297,6 +1327,10 @@ export type Database = {
           submitted_at: string
         }[]
       }
+      admin_notify: {
+        Args: { p_kind: string; p_payload: Json }
+        Returns: undefined
+      }
       admin_overview: { Args: { p_market_code?: string }; Returns: Json }
       admin_record_driver_money: {
         Args: {
@@ -1377,6 +1411,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_send_test_email: { Args: never; Returns: undefined }
       admin_set_driver_market: {
         Args: { p_driver_id: string; p_market_code: string }
         Returns: {

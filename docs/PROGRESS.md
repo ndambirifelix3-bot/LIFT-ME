@@ -145,3 +145,8 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   first (`account_exists`, migration `20261124000003_account_lookup.sql`): log in with an unknown email/phone ->
   "no account" + Sign up instead; sign up with a known one -> "already have an account" + Log in instead.
   Resend verified (records added by hand in the developer's Cloudflare account); email codes working.
+
+## Admin email notices — live 2026-11-24 (needs Supabase secret RESEND_API_KEY)
+- Emails the admin team (setting `admin_notify_emails`, default support@rideliftme.com) when a driver submits an
+  application or someone sends a help report (safety = URGENT). Migration `20261124000004_admin_email_notices.sql`,
+  Edge Function `admin-notify` (Resend API), test `admin_notify.test.sql`. Admin Overview: recipients, test, recent.
