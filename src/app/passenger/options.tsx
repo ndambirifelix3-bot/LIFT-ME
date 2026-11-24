@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, ErrorMessage, Header, Notice, Row, Screen, SectionTitle } from '@/components';
 import { useBooking } from '@/features/booking/store';
 import { useMarket } from '@/features/markets';
+import { cardLabel, useSavedCard } from '@/features/payments/cards';
 import { RideTypeIcon } from '@/features/rides/rideTypes';
 import type { Ride } from '@/features/rides/types';
 import { formatCountdown, formatDistance, formatDuration, formatMoney, secondsUntil } from '@/lib/format';
@@ -15,9 +16,10 @@ import { colors, fonts, radius, space, type } from '@/theme';
 
 type Method = Ride['payment_method'];
 
-const METHOD_LABEL: Record<Method, { label: string; icon: 'cash-outline' | 'phone-portrait-outline'; hint: string }> = {
+const METHOD_LABEL: Record<Method, { label: string; icon: 'cash-outline' | 'phone-portrait-outline' | 'card-outline'; hint: string }> = {
   mpesa: { label: 'M-Pesa', icon: 'phone-portrait-outline', hint: 'You will get an M-Pesa prompt on your phone at the end of the trip.' },
   cash: { label: 'Cash', icon: 'cash-outline', hint: 'Pay your driver in cash at the end of the trip.' },
+  card: { label: 'Card', icon: 'card-outline', hint: 'Add a card to pay automatically at the end of the trip.' },
 };
 
 export default function RideOptions() {
@@ -26,8 +28,12 @@ export default function RideOptions() {
   const market = useMarket(quote?.market_code);
   // Only the payment methods this city offers, in the order the market lists them.
   const methods = (market?.payment_methods ?? ['cash']) as Method[];
+  const savedCard = useSavedCard();
   const [picked, setPicked] = useState<Method | null>(null);
-  const method: Method = picked && methods.includes(picked) ? picked : methods[0];
+  // A passenger with a saved card pays by card unless they pick something else.
+  const preferred: Method = savedCard.data && methods.includes('card') ? 'card' : methods[0];
+  const method: Method = picked && methods.includes(picked) ? picked : preferred;
+  const needsCard = method === 'card' && !savedCard.data;
   const [left, setLeft] = useState(secondsUntil(quote?.expires_at));
 
   useEffect(() => {
@@ -61,6 +67,8 @@ export default function RideOptions() {
       footer={
         expired ? (
           <Button title="Price expired — get a new price" variant="dark" onPress={() => goBack('/passenger/where-to')} />
+        ) : needsCard ? (
+          <Button title="Add a card" onPress={() => router.push('/passenger/payment?from=options')} loading={savedCard.isLoading} />
         ) : (
           <Button title={`Request ${quote.options.find((o) => o.ride_type === rideType)?.display_name ?? "ride"}`} onPress={() => request.mutate()} loading={request.isPending} disabled={!rideType} />
         )
@@ -118,7 +126,9 @@ export default function RideOptions() {
         ))}
       </View>
       <Text style={[type.small, { marginTop: space.sm }]}>
-        {METHOD_LABEL[method].hint}
+        {method === 'card' && savedCard.data
+          ? `Your ${cardLabel(savedCard.data.brand, savedCard.data.last4)} is charged automatically at the end of the trip.`
+          : METHOD_LABEL[method].hint}
       </Text>
 
       <View style={{ height: space.lg }} />

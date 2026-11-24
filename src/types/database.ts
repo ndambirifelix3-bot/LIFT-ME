@@ -465,6 +465,9 @@ export type Database = {
       payments: {
         Row: {
           amount: number
+          card_brand: string | null
+          card_last4: string | null
+          charge_attempts: number
           confirmed_by: string | null
           created_at: string
           currency: string
@@ -479,10 +482,14 @@ export type Database = {
           result_desc: string | null
           ride_id: string
           status: Database["public"]["Enums"]["payment_status"]
+          stripe_payment_intent_id: string | null
           updated_at: string
         }
         Insert: {
           amount: number
+          card_brand?: string | null
+          card_last4?: string | null
+          charge_attempts?: number
           confirmed_by?: string | null
           created_at?: string
           currency: string
@@ -497,10 +504,14 @@ export type Database = {
           result_desc?: string | null
           ride_id: string
           status?: Database["public"]["Enums"]["payment_status"]
+          stripe_payment_intent_id?: string | null
           updated_at?: string
         }
         Update: {
           amount?: number
+          card_brand?: string | null
+          card_last4?: string | null
+          charge_attempts?: number
           confirmed_by?: string | null
           created_at?: string
           currency?: string
@@ -515,6 +526,7 @@ export type Database = {
           result_desc?: string | null
           ride_id?: string
           status?: Database["public"]["Enums"]["payment_status"]
+          stripe_payment_intent_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1143,6 +1155,47 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_customers: {
+        Row: {
+          card_brand: string | null
+          card_exp_month: number | null
+          card_exp_year: number | null
+          card_last4: string | null
+          customer_id: string
+          payment_method_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          card_brand?: string | null
+          card_exp_month?: number | null
+          card_exp_year?: number | null
+          card_last4?: string | null
+          customer_id: string
+          payment_method_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          card_brand?: string | null
+          card_exp_month?: number | null
+          card_exp_year?: number | null
+          card_last4?: string | null
+          customer_id?: string
+          payment_method_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stripe_customers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_reports: {
         Row: {
           admin_note: string | null
@@ -1597,6 +1650,9 @@ export type Database = {
         }
         Returns: {
           amount: number
+          card_brand: string | null
+          card_last4: string | null
+          charge_attempts: number
           confirmed_by: string | null
           created_at: string
           currency: string
@@ -1611,6 +1667,7 @@ export type Database = {
           result_desc: string | null
           ride_id: string
           status: Database["public"]["Enums"]["payment_status"]
+          stripe_payment_intent_id: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -1690,6 +1747,9 @@ export type Database = {
         Args: { p_ride_id: string }
         Returns: {
           amount: number
+          card_brand: string | null
+          card_last4: string | null
+          charge_attempts: number
           confirmed_by: string | null
           created_at: string
           currency: string
@@ -1704,6 +1764,7 @@ export type Database = {
           result_desc: string | null
           ride_id: string
           status: Database["public"]["Enums"]["payment_status"]
+          stripe_payment_intent_id: string | null
           updated_at: string
         }
         SetofOptions: {
@@ -2167,7 +2228,7 @@ export type Database = {
     Enums: {
       driver_status: "pending" | "approved" | "rejected" | "suspended"
       offer_response: "pending" | "accepted" | "declined" | "expired"
-      payment_method: "cash" | "mpesa"
+      payment_method: "cash" | "mpesa" | "card"
       payment_status: "pending" | "paid" | "failed"
       ride_status:
         | "searching"
@@ -2307,7 +2368,7 @@ export const Constants = {
     Enums: {
       driver_status: ["pending", "approved", "rejected", "suspended"],
       offer_response: ["pending", "accepted", "declined", "expired"],
-      payment_method: ["cash", "mpesa"],
+      payment_method: ["cash", "mpesa", "card"],
       payment_status: ["pending", "paid", "failed"],
       ride_status: [
         "searching",

@@ -7,6 +7,7 @@ import { AdminPage, Table } from '@/features/admin/AdminPage';
 import { formatDateTime, formatMoney, RIDE_STATUS_LABEL } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import { space } from '@/theme';
+import { methodLabel } from '@/features/payments/cards';
 
 const FILTERS = ['all', 'active', 'completed', 'cancelled', 'no_driver_found'] as const;
 
@@ -48,7 +49,7 @@ export default function AdminRides() {
             `${r.pickup_address.split(',')[0]} → ${r.dropoff_address.split(',')[0]}`,
             formatMoney(r.fare, r.currency),
             <Pill key="s" text={RIDE_STATUS_LABEL[r.status]} tone={toneForStatus(r.status)} />,
-            `${r.payment_method === 'mpesa' ? 'M-Pesa' : 'Cash'}${pay ? ` · ${pay.status}` : ''}`,
+            `${methodLabel(r.payment_method)}${pay ? ` · ${pay.status}` : ''}`,
           ];
         })}
         onRowPress={(i) => router.push(`/admin/rides/${rows[i].id}`)}

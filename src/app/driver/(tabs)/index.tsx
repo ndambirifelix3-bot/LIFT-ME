@@ -19,6 +19,7 @@ import { useSettings } from '@/features/settings';
 import { formatCountdown, formatDistance, formatDuration, formatMoney, RIDE_STATUS_LABEL, secondsUntil } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import { colors, fonts, space, switchColors, type } from '@/theme';
+import { methodLabel } from '@/features/payments/cards';
 
 function navigate(lat: number, lng: number) {
   // Opens Google Maps turn-by-turn (app if installed, otherwise browser).
@@ -190,7 +191,7 @@ function Offers({ uid }: { uid: string }) {
               </View>
               <Pill text={formatCountdown(secondsUntil(o.expires_at))} tone="wait" />
             </View>
-            <Text style={type.small}>{t?.display_name ?? fallbackName(r.ride_type)} · {formatDistance(r.distance_m, unitFor(r.market_code))} · {formatDuration(r.duration_s)} · {r.payment_method === 'mpesa' ? 'M-Pesa' : 'Cash'}</Text>
+            <Text style={type.small}>{t?.display_name ?? fallbackName(r.ride_type)} · {formatDistance(r.distance_m, unitFor(r.market_code))} · {formatDuration(r.duration_s)} · {methodLabel(r.payment_method)}</Text>
             <View style={{ marginVertical: space.md, gap: 6 }}>
               <Text style={type.body}><Text style={{ fontFamily: fonts.semibold }}>Pickup: </Text>{r.pickup_address}</Text>
               {r.pickup_note ? <Text style={type.small}>Note: {r.pickup_note}</Text> : null}
@@ -241,7 +242,7 @@ function ActiveRide({ ride }: { ride: Ride }) {
         <Row label="Pickup" value={r.pickup_address} />
         {r.pickup_note ? <Row label="Note" value={r.pickup_note} /> : null}
         <Row label="Drop-off" value={r.dropoff_address} />
-        <Row label="Payment" value={r.payment_method === 'mpesa' ? 'M-Pesa' : 'Cash'} />
+        <Row label="Payment" value={methodLabel(r.payment_method)} />
       </Card>
       <View style={{ borderRadius: 16, overflow: 'hidden', marginBottom: space.md }}>
         <Map

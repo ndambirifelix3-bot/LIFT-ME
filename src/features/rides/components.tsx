@@ -1,9 +1,11 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Image, Linking, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, ErrorMessage, Input, Notice, Pill, Row, Stars, toneForStatus } from '@/components';
 import { formatDateTime, formatDistance, formatDuration, formatMoney, RIDE_STATUS_LABEL } from '@/lib/format';
+import { methodLabel, paymentLabel } from '@/features/payments/cards';
 import { callFunction, supabase } from '@/lib/supabase';
 import { colors, fonts, radius, space, type } from '@/theme';
 import { useSignedPhoto } from './hooks';
@@ -58,8 +60,8 @@ export function Receipt({ details }: { details: RideDetails }) {
       {details.driver ? <Row label="Driver" value={details.driver.full_name} /> : null}
       <View style={styles.divider} />
       <Row label="Total" value={formatMoney(r.fare, r.currency, details.market?.currency_decimals)} bold />
-      <Row label="Payment" value={p ? `${p.method === 'mpesa' ? 'M-Pesa' : 'Cash'} · ${p.status}` : r.payment_method === 'mpesa' ? 'M-Pesa' : 'Cash'} />
-      {p?.mpesa_receipt ? <Row label="M-Pesa receipt" value={p.mpesa_receipt} /> : null}
+      <Row label="Payment" value={p ? `${paymentLabel(p)} · ${p.status}` : methodLabel(r.payment_method)} />
+      {p?.method === 'mpesa' && p.mpesa_receipt ? <Row label="M-Pesa receipt" value={p.mpesa_receipt} /> : null}
     </Card>
   );
 }
@@ -98,8 +100,9 @@ export function PassengerPayment({ details }: { details: RideDetails }) {
 
   if (!p) return null;
   const cashAllowed = details.market?.payment_methods?.includes('cash') ?? true;
-  if (p.status === 'paid') return <Notice tone="success" text={`Paid ${formatMoney(p.amount, p.currency)}${p.mpesa_receipt ? ` · ${p.mpesa_receipt}` : ''}. Thank you!`} />;
+  if (p.status === 'paid') return <Notice tone="success" text={`Paid ${formatMoney(p.amount, p.currency)} · ${paymentLabel(p)}. Thank you!`} />;
   if (p.method === 'cash') return <Notice text={`Please pay your driver ${formatMoney(p.amount, p.currency)} in cash.`} />;
+  if (p.method === 'card') return <CardPayment details={details} cashAllowed={cashAllowed} onCash={() => toCash.mutate()} cashPending={toCash.isPending} cashError={toCash.error} />;
 
   return (
     <Card>
@@ -119,6 +122,36 @@ export function PassengerPayment({ details }: { details: RideDetails }) {
       <Button title={push.isSuccess ? 'Send the prompt again' : 'Pay with M-Pesa'} onPress={() => push.mutate()} loading={push.isPending} />
       {cashAllowed ? (
         <Button title="I'll pay cash instead" variant="ghost" onPress={() => toCash.mutate()} loading={toCash.isPending} style={{ marginTop: space.sm }} />
+      ) : null}
+    </Card>
+  );
+}
+
+/** Card trips: the saved card is charged automatically when the trip ends. If it fails: try again, change card, or pay cash. */
+function CardPayment({ details, cashAllowed, onCash, cashPending, cashError }: {
+  details: RideDetails; cashAllowed: boolean; onCash: () => void; cashPending: boolean; cashError: unknown;
+}) {
+  const qc = useQueryClient();
+  const p = details.payment!;
+  const retry = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.rpc('change_payment_method', { p_ride_id: details.ride.id, p_method: 'card' });
+      if (error) throw error;
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['ride', details.ride.id] }),
+  });
+  if (p.status === 'pending') {
+    return <Notice text={`Charging ${formatMoney(p.amount, p.currency)} to your card… This updates in a moment.`} />;
+  }
+  return (
+    <Card>
+      <Text style={type.h3}>Card payment of {formatMoney(p.amount, p.currency)} did not go through</Text>
+      <Notice tone="error" text={p.result_desc || 'Your card was declined.'} />
+      <ErrorMessage error={retry.error ?? cashError} />
+      <Button title="Try again" onPress={() => retry.mutate()} loading={retry.isPending} />
+      <Button title="Use a different card" variant="outline" onPress={() => router.push('/passenger/payment')} style={{ marginTop: space.sm }} />
+      {cashAllowed ? (
+        <Button title="I'll pay cash instead" variant="ghost" onPress={onCash} loading={cashPending} style={{ marginTop: space.sm }} />
       ) : null}
     </Card>
   );

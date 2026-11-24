@@ -11,6 +11,7 @@ import { NotificationsCard } from '@/features/pwa/NotificationsCard';
 import { formatCountdown, formatMoney, RIDE_STATUS_LABEL, secondsUntil } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import { colors, space, type } from '@/theme';
+import { methodLabel } from '@/features/payments/cards';
 
 function confirmAsync(title: string, message: string): Promise<boolean> {
   if (Platform.OS === 'web') return Promise.resolve(window.confirm(`${title}\n\n${message}`));
@@ -131,7 +132,7 @@ export default function PassengerTrip() {
             <Row label="Pickup" value={ride.pickup_address} />
             {ride.pickup_note ? <Row label="Note" value={ride.pickup_note} /> : null}
             <Row label="Destination" value={ride.dropoff_address} />
-            <Row label="Fare" value={`${formatMoney(ride.fare, ride.currency)} · ${ride.payment_method === 'mpesa' ? 'M-Pesa' : 'Cash'}`} />
+            <Row label="Fare" value={`${formatMoney(ride.fare, ride.currency)} · ${methodLabel(ride.payment_method)}`} />
           </Card>
           <View style={{ flexDirection: 'row', gap: space.sm }}>
             <Button title="Share trip" variant="outline" onPress={shareTrip} style={{ flex: 1 }} />

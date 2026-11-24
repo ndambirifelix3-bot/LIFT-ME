@@ -3,6 +3,7 @@ import { Text } from 'react-native';
 import { Button, Card, ErrorMessage, Header, Loading, Notice, Row, Screen } from '@/components';
 import { RatePanel, Receipt } from '@/features/rides/components';
 import { useRideAction, useRideDetails, useRideRealtime } from '@/features/rides/hooks';
+import { paymentLabel } from '@/features/payments/cards';
 import { formatMoney } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import { space, type } from '@/theme';
@@ -33,9 +34,14 @@ export default function DriverRideDetail() {
               <Row label="You earn" value={formatMoney(r.driver_earnings, r.currency)} bold />
             </Card>
           ) : null}
-          {p && p.status !== 'paid' ? (
+          {p && p.method === 'card' && p.status === 'pending' ? (
+            <Notice text="The passenger's card is being charged automatically. No cash needed." />
+          ) : null}
+          {p && p.status !== 'paid' && !(p.method === 'card' && p.status === 'pending') ? (
             <Card>
-              {p.method === 'cash' ? (
+              {p.method === 'card' ? (
+                <Notice tone="error" text="The passenger's card payment failed. They can try again in their app. If they pay you cash instead, tap below." />
+              ) : p.method === 'cash' ? (
                 <Text style={[type.h3, { marginBottom: space.md }]}>Collect {formatMoney(p.amount, p.currency)} cash</Text>
               ) : (
                 <Notice text={`Waiting for the passenger's M-Pesa payment (${p.status}). If they pay you cash instead, tap below.`} />
@@ -44,7 +50,7 @@ export default function DriverRideDetail() {
               <Button title="Cash received" onPress={() => cash.mutate(undefined)} loading={cash.isPending} />
             </Card>
           ) : null}
-          {p?.status === 'paid' ? <Notice tone="success" text={`Paid · ${p.method === 'mpesa' ? `M-Pesa ${p.mpesa_receipt ?? ''}` : 'Cash'}`} /> : null}
+          {p?.status === 'paid' ? <Notice tone="success" text={`Paid · ${paymentLabel(p)}`} /> : null}
           <Receipt details={d} />
           <RatePanel details={d} who="passenger" />
           <Button title="Back to home" variant="dark" onPress={() => router.replace('/driver')} />

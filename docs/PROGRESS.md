@@ -151,6 +151,18 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   application or someone sends a help report (safety = URGENT). Migration `20261124000004_admin_email_notices.sql`,
   Edge Function `admin-notify` (Resend API), test `admin_notify.test.sql`. Admin Overview: recipients, test, recent.
 
+## Card payments (Stripe, USA) — live 2026-11-24 in TEST mode (developer's Stripe test account)
+- Passenger: Account → Payment → add a card (Stripe's secure form on rideliftme.com; card numbers go straight to
+  Stripe). Booking in the US: Card is chosen automatically when a card is saved (Cash still offered).
+- At the end of the trip the database hands the payment to `stripe-charge`, which charges the saved card once
+  (idempotency key per attempt). Declined → passenger sees "Try again / Use a different card / I'll pay cash".
+  Driver sees "charged automatically"; Cash received only appears if the card failed. Paid card trips add the
+  driver's share to Driver money. If cash is confirmed while a charge is running, the card charge is refunded.
+- `stripe-webhook` (backup confirmation from Stripe) needs the Supabase secret STRIPE_WEBHOOK_SECRET.
+- Secrets: STRIPE_SECRET_KEY (Supabase). Public key: EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY (.env + Cloudflare build vars).
+- Tested live: Visa 4242 saved and charged $6.50; decline card 0341 → failed screen → new card → Try again → paid.
+- At launch: client creates his own Stripe account (business details, bank), swap both keys + webhook secret.
+
 ## Waiting on someone (as of 2026-11-24)
 - **Google Maps key** — client's Google Cloud project "LIFT ME" (lift-me-515711, free trial $300 until 2027-02-23) exists.
   Left: client grants the developer's Gmail the roles Service Usage Admin + API Keys Admin + Viewer (IAM -> Grant access);
@@ -160,5 +172,7 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - **Client admin account** — client signs up with nderitondungu@gmail.com, then switch his role to admin.
 - **US driver test (JOE, +1 574 555 0102)** — finish the 4 application steps, submit, approve in Admin.
 - **Google Search Console** — verify rideliftme.com (DNS TXT in Cloudflare), submit sitemap.xml, request indexing.
+- **Stripe** — add EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY to Cloudflare build variables; create the webhook and save
+  STRIPE_WEBHOOK_SECRET. At launch: the client's own Stripe account and live keys.
 - **Before launch** — EXPO_PUBLIC_PHONE_LOGIN=off until SMS is paid; remove test numbers; real prices; lawyer review
   of /privacy and /terms; move domain + app to the client's Cloudflare account (possible from 2026-12-02).

@@ -121,7 +121,7 @@ function PriceCard({ market, rideType, price }: { market: Market; rideType: Ride
   );
 }
 
-const PAYMENT_LABELS: Record<Market['payment_methods'][number], string> = { mpesa: 'M-Pesa', cash: 'Cash' };
+const PAYMENT_LABELS: Record<Market['payment_methods'][number], string> = { mpesa: 'M-Pesa', cash: 'Cash', card: 'Card (Stripe)' };
 
 /** Things that differ per market: commission, payment methods, emergency/support numbers, placeholder flag. */
 function MarketSettingsCard({ market }: { market: Market }) {
