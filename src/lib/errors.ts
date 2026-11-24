@@ -31,6 +31,7 @@ const MESSAGES: Record<string, string> = {
   already_paid: 'This trip is already paid.',
   maps_unavailable: 'Maps are unavailable right now. Please try again.',
   duplicate_key: 'This already exists.',
+  trip_too_long: 'This trip is longer than Lift Me allows. Please choose a closer destination.',
   balance_due: 'You owe Lift Me more than the limit. Pay your balance to go online (see Earnings).',
   payout_more_than_owed: 'That is more than Lift Me owes this driver.',
   payment_more_than_owed: 'That is more than this driver owes.',

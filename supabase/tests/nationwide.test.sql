@@ -33,4 +33,10 @@ select t.ok((select count(*) from jsonb_array_elements((select options from (
               select * from public.create_quote('00000000-0000-0000-0000-0000000000a1', -4.0435, 39.6682, 'Mombasa', null, -4.06, 39.67, 'Nyali', 4000, 600, null)) k)) o
               where o ->> 'vehicle_kind' = 'motorcycle') = 2, 'Mombasa quote includes both bodas');
 
+-- Longest trip.
+select t.expect_error($$select public.create_quote('00000000-0000-0000-0000-0000000000a1', -1.2864, 36.8172, 'Nairobi', null, -4.0435, 39.6682, 'Mombasa', 480000, 30000, null)$$, '%trip_too_long%');
+select t.ok((select id from public.create_quote('00000000-0000-0000-0000-0000000000a1', -1.2864, 36.8172, 'Nairobi', null, -0.7167, 36.4333, 'Naivasha', 95000, 5400, null)) is not null,
+            'a 95 km trip (Nairobi -> Naivasha) is allowed');
+select t.expect_error($$select public.create_quote('00000000-0000-0000-0000-0000000000a1', 41.6764, -86.2520, 'South Bend', null, 34.0522, -118.2437, 'Los Angeles', 2800000, 100000, null)$$, '%trip_too_long%');
+
 \warn 'nationwide.test.sql: ALL PASSED'

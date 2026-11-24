@@ -10,6 +10,14 @@ import { freeRoute, googleKey, googleRoute, type Route } from '../_shared/maps.t
 
 type Stop = { lat: number; lng: number; address: string; note?: string };
 
+/** Straight-line distance in metres (a road trip is always at least this long). */
+function straightLineM(a: Stop, b: Stop): number {
+  const r = 6371000, rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) ** 2;
+  return 2 * r * Math.asin(Math.sqrt(h));
+}
+
 function readStop(v: unknown): Stop | null {
   if (!isLatLng(v)) return null;
   const o = v as Stop;
@@ -40,8 +48,15 @@ serve(async (req) => {
   if (!pickupMarket) return errorResponse('pickup_outside_service_area', 422, 'Sorry, Lift Me is not available at this pickup point yet.');
   if (dropoffMarket !== pickupMarket) return errorResponse('dropoff_outside_service_area', 422, 'Sorry, this destination is outside our service area.');
 
-  const { data: market } = await db.from('markets').select('traffic_factor').eq('code', pickupMarket).single();
+  const { data: market } = await db.from('markets').select('traffic_factor, max_trip_distance_m, distance_unit').eq('code', pickupMarket).single();
   const trafficFactor = Number(market?.traffic_factor ?? 1.3);
+  const maxM: number | null = market?.max_trip_distance_m ?? null;
+  const tooLong = () => {
+    const limit = market?.distance_unit === 'mi' ? `${Math.round(maxM! / 1609.344)} miles` : `${Math.round(maxM! / 1000)} km`;
+    return errorResponse('trip_too_long', 422, `Lift Me trips can be up to ${limit}. Please choose a closer destination.`);
+  };
+  // Obviously too far (straight line already over the limit): stop before asking for a route.
+  if (maxM && straightLineM(pickup, dropoff) > maxM) return tooLong();
 
   let route: Route | null;
   const key = googleKey();
@@ -54,6 +69,7 @@ serve(async (req) => {
   if (!route) return errorResponse('no_route', 422, 'No driving route found between these points.');
   const distanceM = route.distanceM;
   const durationS = route.durationS;
+  if (maxM && distanceM > maxM) return tooLong();
 
   const { data: quote, error } = await db.rpc('create_quote', {
     p_passenger_id: user.id,

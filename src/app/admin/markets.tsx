@@ -96,13 +96,18 @@ function MarketCard({ market }: { market: Market }) {
   const d = market.currency_decimals;
   const [debtLimit, setDebtLimit] = useState(market.driver_debt_limit == null ? '' : toMoneyInput(market.driver_debt_limit, d));
   const [payInfo, setPayInfo] = useState(market.driver_payment_instructions);
+  const unitM = market.distance_unit === 'mi' ? 1609.344 : 1000;
+  const [maxTrip, setMaxTrip] = useState(market.max_trip_distance_m == null ? '' : String(Math.round(market.max_trip_distance_m / unitM)));
   const save = useMutation({
     mutationFn: async () => {
       if (!/^\+\d{1,4}$/.test(form.phone_country_code)) throw new Error('Phone code looks like +1 or +254.');
       const limit = debtLimit.trim() === '' ? null : fromMoneyInput(debtLimit, d);
       if (debtLimit.trim() !== '' && limit == null) throw new Error(d ? 'Driver limit: enter an amount like 50.00.' : 'Driver limit: enter a whole amount, e.g. 1000.');
+      const trip = maxTrip.trim() === '' ? null : Number(maxTrip);
+      if (trip !== null && !(Number.isInteger(trip) && trip >= 1 && trip <= 5000)) throw new Error('Longest trip: a whole number, e.g. 150.');
       const { error } = await supabase.from('markets').update({
         ...form, name: form.name.trim(), driver_debt_limit: limit, driver_payment_instructions: payInfo.trim(),
+        max_trip_distance_m: trip === null ? null : Math.round(trip * unitM),
       }).eq('code', market.code);
       if (error) throw error;
     },
@@ -137,6 +142,11 @@ function MarketCard({ market }: { market: Market }) {
         {(['km', 'mi'] as const).map((u) => (
           <Chip key={u} label={u === 'km' ? 'Kilometres' : 'Miles'} selected={form.distance_unit === u} onPress={() => setForm((f) => ({ ...f, distance_unit: u }))} />
         ))}
+      </View>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
+        <View style={{ flexGrow: 1, flexBasis: 200 }}>
+          <Input label={`Longest trip (${market.distance_unit === 'mi' ? 'miles' : 'km'}); empty = no limit`} value={maxTrip} onChangeText={setMaxTrip} keyboardType="number-pad" />
+        </View>
       </View>
       <Text style={[type.label, { marginBottom: space.sm }]}>Driver money</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>

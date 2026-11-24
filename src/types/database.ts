@@ -378,6 +378,7 @@ export type Database = {
           driver_payment_instructions: string
           emergency_numbers: Json
           is_active: boolean
+          max_trip_distance_m: number | null
           name: string
           payment_methods: Database["public"]["Enums"]["payment_method"][]
           phone_country_code: string
@@ -385,6 +386,7 @@ export type Database = {
           sort_order: number
           support_phone: string
           timezone: string
+          traffic_factor: number
           updated_at: string
         }
         Insert: {
@@ -401,6 +403,7 @@ export type Database = {
           driver_payment_instructions?: string
           emergency_numbers?: Json
           is_active?: boolean
+          max_trip_distance_m?: number | null
           name: string
           payment_methods?: Database["public"]["Enums"]["payment_method"][]
           phone_country_code: string
@@ -408,6 +411,7 @@ export type Database = {
           sort_order?: number
           support_phone?: string
           timezone: string
+          traffic_factor?: number
           updated_at?: string
         }
         Update: {
@@ -424,6 +428,7 @@ export type Database = {
           driver_payment_instructions?: string
           emergency_numbers?: Json
           is_active?: boolean
+          max_trip_distance_m?: number | null
           name?: string
           payment_methods?: Database["public"]["Enums"]["payment_method"][]
           phone_country_code?: string
@@ -431,6 +436,7 @@ export type Database = {
           sort_order?: number
           support_phone?: string
           timezone?: string
+          traffic_factor?: number
           updated_at?: string
         }
         Relationships: []
