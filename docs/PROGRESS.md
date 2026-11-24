@@ -158,7 +158,7 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   (idempotency key per attempt). Declined → passenger sees "Try again / Use a different card / I'll pay cash".
   Driver sees "charged automatically"; Cash received only appears if the card failed. Paid card trips add the
   driver's share to Driver money. If cash is confirmed while a charge is running, the card charge is refunded.
-- `stripe-webhook` (backup confirmation from Stripe) needs the Supabase secret STRIPE_WEBHOOK_SECRET.
+- `stripe-webhook` (backup confirmation from Stripe): set up 2026-11-24, signature checked, test event answered 200.
 - Secrets: STRIPE_SECRET_KEY (Supabase). Public key: EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY (.env + Cloudflare build vars).
 - Tested live: Visa 4242 saved and charged $6.50; decline card 0341 → failed screen → new card → Try again → paid.
 - At launch: client creates his own Stripe account (business details, bank), swap both keys + webhook secret.
@@ -172,7 +172,7 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - **Client admin account** — client signs up with nderitondungu@gmail.com, then switch his role to admin.
 - **US driver test (JOE, +1 574 555 0102)** — finish the 4 application steps, submit, approve in Admin.
 - **Google Search Console** — verify rideliftme.com (DNS TXT in Cloudflare), submit sitemap.xml, request indexing.
-- **Stripe** — add EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY to Cloudflare build variables; create the webhook and save
-  STRIPE_WEBHOOK_SECRET. At launch: the client's own Stripe account and live keys.
+- **Stripe (at launch)** — the client's own Stripe account: swap STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET (new
+  webhook in his account) and the Cloudflare variable EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY to live keys.
 - **Before launch** — EXPO_PUBLIC_PHONE_LOGIN=off until SMS is paid; remove test numbers; real prices; lawyer review
   of /privacy and /terms; move domain + app to the client's Cloudflare account (possible from 2026-12-02).
