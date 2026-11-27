@@ -172,7 +172,8 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   first N trips (0 = off; both = whichever ends first), counted from the driver's first approval.
 - Drivers see "Welcome offer: Lift Me takes no commission …" on Home and Earnings; trips under the offer show
   "Lift Me commission (welcome offer): None" and add nothing to what they owe on cash trips.
-- Not set yet (client's decision): Kenya is still 15% for everything, offer off.
+- Set 2026-11-27 (client agreed): Kenya cars 12%, bodas 10% (country default 12%), offer 60 days or 100 trips.
+  USA unchanged: 15%, no offer.
 
 ## Waiting on someone (as of 2026-11-24)
 - **Google Maps key** — client's Google Cloud project "LIFT ME" (lift-me-515711, free trial $300 until 2027-02-23) exists.
