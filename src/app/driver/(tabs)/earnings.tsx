@@ -4,7 +4,7 @@ import { Card, EmptyState, ErrorMessage, Header, ListItem, Loading, Pill, Screen
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useEarnings } from '@/features/driver/hooks';
 import { useWallet } from '@/features/driver/wallet';
-import { LedgerRow, WalletCard } from '@/features/driver/WalletCard';
+import { LaunchOfferNotice, LedgerRow, WalletCard } from '@/features/driver/WalletCard';
 import { useRideHistory } from '@/features/rides/hooks';
 import { formatDateTime, formatMoney, RIDE_STATUS_LABEL } from '@/lib/format';
 import { colors, fonts, space, type } from '@/theme';
@@ -20,6 +20,7 @@ export default function DriverEarnings() {
   return (
     <Screen onRefresh={() => { earnings.refetch(); trips.refetch(); wallet.refetch(); }} refreshing={earnings.isRefetching}>
       <Header title="Earnings" subtitle="Your share after Lift Me commission" />
+      {w ? <LaunchOfferNotice wallet={w} /> : null}
       {w ? <WalletCard wallet={w} /> : null}
       <ErrorMessage error={wallet.error} onRetry={() => wallet.refetch()} />
       {earnings.isLoading ? <Loading /> : null}

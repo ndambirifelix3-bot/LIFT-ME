@@ -166,6 +166,14 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - Tested live: Visa 4242 saved and charged $6.50; decline card 0341 → failed screen → new card → Try again → paid.
 - At launch: client creates his own Stripe account (business details, bank), swap both keys + webhook secret.
 
+## Commission per ride type + welcome offer for new drivers — live 2026-11-27
+- Admin → Pricing: each ride type can have its own commission % (empty = the country's rate), e.g. Kenya cars 12%,
+  bodas 10%. The country card has "Launch offer for new drivers": no commission for their first N days and/or
+  first N trips (0 = off; both = whichever ends first), counted from the driver's first approval.
+- Drivers see "Welcome offer: Lift Me takes no commission …" on Home and Earnings; trips under the offer show
+  "Lift Me commission (welcome offer): None" and add nothing to what they owe on cash trips.
+- Not set yet (client's decision): Kenya is still 15% for everything, offer off.
+
 ## Waiting on someone (as of 2026-11-24)
 - **Google Maps key** — client's Google Cloud project "LIFT ME" (lift-me-515711, free trial $300 until 2027-02-23) exists.
   Left: client grants the developer's Gmail the roles Service Usage Admin + API Keys Admin + Viewer (IAM -> Grant access);

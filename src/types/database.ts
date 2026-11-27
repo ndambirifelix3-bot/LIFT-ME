@@ -243,6 +243,7 @@ export type Database = {
         Row: {
           created_at: string
           email: string | null
+          first_approved_at: string | null
           id: string
           id_number: string | null
           is_online: boolean
@@ -260,6 +261,7 @@ export type Database = {
         Insert: {
           created_at?: string
           email?: string | null
+          first_approved_at?: string | null
           id: string
           id_number?: string | null
           is_online?: boolean
@@ -277,6 +279,7 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string | null
+          first_approved_at?: string | null
           id?: string
           id_number?: string | null
           is_online?: boolean
@@ -318,6 +321,7 @@ export type Database = {
       market_prices: {
         Row: {
           base_fare: number
+          commission_percent: number | null
           is_active: boolean
           market_code: string
           minimum_fare: number
@@ -328,6 +332,7 @@ export type Database = {
         }
         Insert: {
           base_fare: number
+          commission_percent?: number | null
           is_active?: boolean
           market_code: string
           minimum_fare: number
@@ -338,6 +343,7 @@ export type Database = {
         }
         Update: {
           base_fare?: number
+          commission_percent?: number | null
           is_active?: boolean
           market_code?: string
           minimum_fare?: number
@@ -380,6 +386,8 @@ export type Database = {
           is_active: boolean
           max_trip_distance_m: number | null
           name: string
+          new_driver_free_days: number
+          new_driver_free_trips: number
           payment_methods: Database["public"]["Enums"]["payment_method"][]
           phone_country_code: string
           prices_are_placeholder: boolean
@@ -405,6 +413,8 @@ export type Database = {
           is_active?: boolean
           max_trip_distance_m?: number | null
           name: string
+          new_driver_free_days?: number
+          new_driver_free_trips?: number
           payment_methods?: Database["public"]["Enums"]["payment_method"][]
           phone_country_code: string
           prices_are_placeholder?: boolean
@@ -430,6 +440,8 @@ export type Database = {
           is_active?: boolean
           max_trip_distance_m?: number | null
           name?: string
+          new_driver_free_days?: number
+          new_driver_free_trips?: number
           payment_methods?: Database["public"]["Enums"]["payment_method"][]
           phone_country_code?: string
           prices_are_placeholder?: boolean
@@ -957,6 +969,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
+          commission_waived: boolean
           completed_at: string | null
           currency: string
           distance_m: number
@@ -994,6 +1007,7 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: Database["public"]["Enums"]["user_role"] | null
           commission_percent?: number | null
+          commission_waived?: boolean
           completed_at?: string | null
           currency: string
           distance_m: number
@@ -1031,6 +1045,7 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: Database["public"]["Enums"]["user_role"] | null
           commission_percent?: number | null
+          commission_waived?: boolean
           completed_at?: string | null
           currency?: string
           distance_m?: number
@@ -1315,6 +1330,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
+          commission_waived: boolean
           completed_at: string | null
           currency: string
           distance_m: number
@@ -1449,6 +1465,7 @@ export type Database = {
         Returns: {
           created_at: string
           email: string | null
+          first_approved_at: string | null
           id: string
           id_number: string | null
           is_online: boolean
@@ -1476,6 +1493,7 @@ export type Database = {
         Returns: {
           created_at: string
           email: string | null
+          first_approved_at: string | null
           id: string
           id_number: string | null
           is_online: boolean
@@ -1502,6 +1520,7 @@ export type Database = {
         Returns: {
           created_at: string
           email: string | null
+          first_approved_at: string | null
           id: string
           id_number: string | null
           is_online: boolean
@@ -1606,6 +1625,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
+          commission_waived: boolean
           completed_at: string | null
           currency: string
           distance_m: number
@@ -1706,6 +1726,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
+          commission_waived: boolean
           completed_at: string | null
           currency: string
           distance_m: number
@@ -1828,6 +1849,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
+          commission_waived: boolean
           completed_at: string | null
           currency: string
           distance_m: number
@@ -1867,6 +1889,10 @@ export type Database = {
       }
       driver_can_edit_application: { Args: never; Returns: boolean }
       driver_debt_limit: { Args: { p_driver_id: string }; Returns: number }
+      driver_launch_offer: {
+        Args: { p_driver_id: string; p_market_code: string }
+        Returns: Json
+      }
       driver_over_debt_limit: {
         Args: { p_driver_id: string }
         Returns: boolean
@@ -1884,6 +1910,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
+          commission_waived: boolean
           completed_at: string | null
           currency: string
           distance_m: number
@@ -2020,6 +2047,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
+          commission_waived: boolean
           completed_at: string | null
           currency: string
           distance_m: number
@@ -2101,6 +2129,7 @@ export type Database = {
         Returns: {
           created_at: string
           email: string | null
+          first_approved_at: string | null
           id: string
           id_number: string | null
           is_online: boolean
@@ -2153,6 +2182,7 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
+          commission_waived: boolean
           completed_at: string | null
           currency: string
           distance_m: number
@@ -2195,6 +2225,7 @@ export type Database = {
         Returns: {
           created_at: string
           email: string | null
+          first_approved_at: string | null
           id: string
           id_number: string | null
           is_online: boolean

@@ -30,7 +30,10 @@ export default function DriverRideDetail() {
             <Card>
               <Text style={type.h3}>Your earnings</Text>
               <Row label="Fare" value={formatMoney(r.fare, r.currency)} />
-              <Row label={`Lift Me commission (${r.commission_percent ?? 0}%)`} value={`− ${formatMoney(r.platform_commission, r.currency)}`} />
+              <Row
+                label={r.commission_waived ? 'Lift Me commission (welcome offer)' : `Lift Me commission (${r.commission_percent ?? 0}%)`}
+                value={r.commission_waived ? 'None' : `− ${formatMoney(r.platform_commission, r.currency)}`}
+              />
               <Row label="You earn" value={formatMoney(r.driver_earnings, r.currency)} bold />
             </Card>
           ) : null}

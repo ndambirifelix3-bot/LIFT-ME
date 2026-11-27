@@ -8,7 +8,7 @@ import { Map } from '@/components/Map';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useMyDriver, useOffers } from '@/features/driver/hooks';
 import { useWallet } from '@/features/driver/wallet';
-import { BalanceDueCard } from '@/features/driver/WalletCard';
+import { BalanceDueCard, LaunchOfferNotice } from '@/features/driver/WalletCard';
 import { startDriverTracking, stopDriverTracking, type TrackingMode } from '@/features/driver/tracking';
 import { useActiveRide, useRideAction, useRideDetails, useRideRealtime } from '@/features/rides/hooks';
 import { fallbackName, RideTypeIcon, useRideTypes } from '@/features/rides/rideTypes';
@@ -56,6 +56,7 @@ export default function DriverHome() {
       {approved && driver ? (
         <>
           {wallet.data ? <BalanceDueCard wallet={wallet.data} /> : null}
+          {wallet.data ? <LaunchOfferNotice wallet={wallet.data} /> : null}
           <OnlineSwitch online={driver.is_online} intervalSeconds={settings.data?.location_interval_seconds ?? 5} hasActiveRide={!!active.data} />
           <NotificationsCard role="driver" compact />
           {active.data ? <ActiveRide ride={active.data} /> : driver.is_online ? <Offers uid={uid!} /> : (

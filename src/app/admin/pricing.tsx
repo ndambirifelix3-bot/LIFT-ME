@@ -31,13 +31,16 @@ function PriceCard({ market, rideType, price }: { market: Market; rideType: Ride
     Object.fromEntries(PRICE_FIELDS.map((f) => [f, price ? toMoneyInput(price[f], d) : ''])) as Record<PriceField, string>,
   );
   const [name, setName] = useState({ display_name: rideType.display_name, description: rideType.description });
+  const [commission, setCommission] = useState(price?.commission_percent == null ? '' : String(price.commission_percent));
+  const commissionValue = commission.trim() === '' ? null : /^\d{1,3}$/.test(commission.trim()) && +commission <= 100 ? +commission : NaN;
   const parsed = Object.fromEntries(PRICE_FIELDS.map((f) => [f, fromMoneyInput(values[f], d)])) as Record<PriceField, number | null>;
   const invalid = PRICE_FIELDS.filter((f) => parsed[f] === null);
 
   const save = useMutation({
     mutationFn: async () => {
       if (invalid.length) throw new Error(d ? `Enter amounts like 2.50 (up to ${d} decimals).` : 'Enter whole amounts (no decimals).');
-      const amounts = parsed as Record<PriceField, number>;
+      if (Number.isNaN(commissionValue)) throw new Error('Commission: a whole number from 0 to 100, or leave it empty.');
+      const amounts = { ...(parsed as Record<PriceField, number>), commission_percent: commissionValue };
       const { error } = price
         ? await supabase.from('market_prices').update(amounts).eq('market_code', market.code).eq('ride_type', rideType.ride_type)
         : await supabase.from('market_prices').insert({ market_code: market.code, ride_type: rideType.ride_type, ...amounts });
@@ -102,6 +105,16 @@ function PriceCard({ market, rideType, price }: { market: Market; rideType: Ride
         {field('per_distance', `Per ${unit}`)}
         {field('per_minute', 'Per minute')}
         {field('minimum_fare', 'Minimum fare')}
+        <View style={{ flexGrow: 1, flexBasis: 160 }}>
+          <Input
+            label="Commission %"
+            value={commission}
+            onChangeText={setCommission}
+            keyboardType="number-pad"
+            placeholder={`${market.commission_percent} (country)`}
+            error={Number.isNaN(commissionValue) ? 'Whole number 0–100' : undefined}
+          />
+        </View>
       </View>
       {!invalid.length ? (
         <Text style={[type.small, { marginBottom: space.md }]}>
@@ -131,6 +144,8 @@ function MarketSettingsCard({ market }: { market: Market }) {
   const [emergency, setEmergency] = useState((Array.isArray(market.emergency_numbers) ? market.emergency_numbers : []).join(', '));
   const [support, setSupport] = useState(market.support_phone);
   const [placeholder, setPlaceholder] = useState(market.prices_are_placeholder);
+  const [freeDays, setFreeDays] = useState(String(market.new_driver_free_days));
+  const [freeTrips, setFreeTrips] = useState(String(market.new_driver_free_trips));
   // M-Pesa only takes Kenyan shillings.
   const available = (Object.keys(PAYMENT_LABELS) as Market['payment_methods']).filter((m) => m !== 'mpesa' || market.currency === 'KES');
 
@@ -138,6 +153,8 @@ function MarketSettingsCard({ market }: { market: Market }) {
     mutationFn: async () => {
       if (!/^\d{1,3}$/.test(commission) || +commission > 100) throw new Error('Commission: enter a whole number from 0 to 100.');
       if (!methods.length) throw new Error('Pick at least one payment method.');
+      if (!/^\d{1,3}$/.test(freeDays) || +freeDays > 365) throw new Error('Launch offer days: a whole number from 0 to 365.');
+      if (!/^\d{1,5}$/.test(freeTrips) || +freeTrips > 10000) throw new Error('Launch offer trips: a whole number from 0 to 10000.');
       const numbers = emergency.split(',').map((s) => s.trim()).filter(Boolean);
       if (numbers.some((x) => !/^[0-9+]{2,15}$/.test(x))) throw new Error('Emergency numbers: digits only, separated by commas.');
       const { error } = await supabase.from('markets').update({
@@ -146,6 +163,8 @@ function MarketSettingsCard({ market }: { market: Market }) {
         emergency_numbers: numbers,
         support_phone: support.trim(),
         prices_are_placeholder: placeholder,
+        new_driver_free_days: +freeDays,
+        new_driver_free_trips: +freeTrips,
       }).eq('code', market.code);
       if (error) throw error;
     },
@@ -156,7 +175,7 @@ function MarketSettingsCard({ market }: { market: Market }) {
     <Card>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
         <View style={{ flexGrow: 1, flexBasis: 200 }}>
-          <Input label="Commission % per completed ride" value={commission} onChangeText={setCommission} keyboardType="number-pad" />
+          <Input label="Commission % per completed ride (unless a ride type sets its own)" value={commission} onChangeText={setCommission} keyboardType="number-pad" />
         </View>
         <View style={{ flexGrow: 1, flexBasis: 200 }}>
           <Input label="Emergency numbers (comma separated)" value={emergency} onChangeText={setEmergency} keyboardType="phone-pad" />
@@ -165,6 +184,18 @@ function MarketSettingsCard({ market }: { market: Market }) {
           <Input label="Support phone (shown on Help page)" value={support} onChangeText={setSupport} keyboardType="phone-pad" />
         </View>
       </View>
+      <Text style={[type.label, { marginBottom: space.sm }]}>Launch offer for new drivers: no commission</Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
+        <View style={{ flexGrow: 1, flexBasis: 200 }}>
+          <Input label="For their first … days (0 = off)" value={freeDays} onChangeText={setFreeDays} keyboardType="number-pad" />
+        </View>
+        <View style={{ flexGrow: 1, flexBasis: 200 }}>
+          <Input label="For their first … trips (0 = off)" value={freeTrips} onChangeText={setFreeTrips} keyboardType="number-pad" />
+        </View>
+      </View>
+      <Text style={[type.small, { marginTop: -space.sm, marginBottom: space.lg }]}>
+        Counts from the day a driver is first approved. With both set, the offer ends at whichever comes first.
+      </Text>
       <Text style={[type.label, { marginBottom: space.sm }]}>Payment methods passengers can choose</Text>
       <View style={{ flexDirection: 'row', gap: space.sm, marginBottom: space.lg }}>
         {available.map((m) => (

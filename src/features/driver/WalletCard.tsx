@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button, Card, Notice } from '@/components';
-import { formatDateTime, formatMoney } from '@/lib/format';
+import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
 import { colors, fonts, space, type } from '@/theme';
 import { ledgerLabel, type LedgerEntry, type Wallet } from './wallet';
 
@@ -39,6 +39,22 @@ export function WalletCard({ wallet }: { wallet: Wallet }) {
         </View>
       ) : null}
     </Card>
+  );
+}
+
+/** "Launch offer: no commission until … / for N more trips." */
+export function LaunchOfferNotice({ wallet }: { wallet: Wallet }) {
+  const o = wallet.launch_offer;
+  if (!o?.active) return null;
+  const parts = [
+    o.ends_at ? `until ${formatDate(o.ends_at)}` : '',
+    o.trips_left != null ? `for your next ${o.trips_left} ${o.trips_left === 1 ? 'trip' : 'trips'}` : '',
+  ].filter(Boolean);
+  return (
+    <Notice
+      tone="success"
+      text={`Welcome offer: Lift Me takes no commission ${parts.join(' or ')}${parts.length > 1 ? ', whichever comes first' : ''}. You keep the whole fare.`}
+    />
   );
 }
 

@@ -19,6 +19,8 @@ export type Wallet = {
   debt_limit: number | null;
   over_limit: boolean;
   payment_instructions: string;
+  /** No commission for new drivers: running, until when, how many free trips are left (null = no limit of that kind). */
+  launch_offer?: { active: boolean; ends_at?: string | null; trips_left?: number | null };
   entries: LedgerEntry[];
 };
 

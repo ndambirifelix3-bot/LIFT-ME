@@ -66,6 +66,12 @@ export function formatDateTime(iso: string | null | undefined): string {
   });
 }
 
+/** "27 Jan 2027" (style follows the phone's region). */
+export function formatDate(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 export function secondsUntil(iso: string | null | undefined, now = Date.now()): number {
   if (!iso) return 0;
   return Math.max(0, Math.round((new Date(iso).getTime() - now) / 1000));
