@@ -180,6 +180,8 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   Left: client grants the developer's Gmail the roles Service Usage Admin + API Keys Admin + Viewer (IAM -> Grant access);
   developer enables Places API (New), Routes API, Geocoding API, creates + restricts the key, adds Supabase secret
   GOOGLE_MAPS_SERVER_KEY, sets daily quotas. Then set the US traffic_factor back if needed and re-quote the airport trip.
+- **M-Pesa (Kenya)** — chosen 2026-11-27: Lift Me's own Safaricom Paybill, settling into the client's Equity Bank
+  business account. Needs the Kenyan business registered first. Meanwhile: Daraja sandbox keys to test the app.
 - **SMS for real phone logins** — client to choose Twilio Verify (recommended to start) and upgrade Twilio.
 - **Client admin account** — client signs up with nderitondungu@gmail.com, then switch his role to admin.
 - **Google Search Console** — verify rideliftme.com (DNS TXT in Cloudflare), submit sitemap.xml, request indexing.
