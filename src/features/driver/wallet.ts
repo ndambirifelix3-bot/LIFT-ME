@@ -21,6 +21,8 @@ export type Wallet = {
   payment_instructions: string;
   /** No commission for new drivers: running, until when, how many free trips are left (null = no limit of that kind). */
   launch_offer?: { active: boolean; ends_at?: string | null; trips_left?: number | null };
+  /** The driver's country takes M-Pesa: show "Pay now with M-Pesa". */
+  can_pay_mpesa?: boolean;
   entries: LedgerEntry[];
 };
 

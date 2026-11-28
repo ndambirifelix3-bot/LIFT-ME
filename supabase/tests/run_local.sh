@@ -31,5 +31,6 @@ done
 "${PSQL[@]}" -f "$HERE/card_payments.test.sql" >/dev/null
 "${PSQL[@]}" -f "$HERE/commission.test.sql" >/dev/null
 "${PSQL[@]}" -f "$HERE/mpesa_recheck.test.sql" >/dev/null
+"${PSQL[@]}" -f "$HERE/driver_mpesa.test.sql" >/dev/null
 bash "$HERE/concurrent_accept.test.sh" "$PORT"
 echo "ALL DATABASE TESTS PASSED"

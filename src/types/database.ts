@@ -239,6 +239,68 @@ export type Database = {
           },
         ]
       }
+      driver_mpesa_payments: {
+        Row: {
+          amount: number
+          checkout_request_id: string | null
+          created_at: string
+          currency: string
+          driver_id: string
+          id: string
+          merchant_request_id: string | null
+          mpesa_checked_at: string | null
+          mpesa_receipt: string | null
+          paid_at: string | null
+          phone: string
+          result_code: string | null
+          result_desc: string | null
+          status: Database["public"]["Enums"]["payment_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          checkout_request_id?: string | null
+          created_at?: string
+          currency?: string
+          driver_id: string
+          id?: string
+          merchant_request_id?: string | null
+          mpesa_checked_at?: string | null
+          mpesa_receipt?: string | null
+          paid_at?: string | null
+          phone: string
+          result_code?: string | null
+          result_desc?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          checkout_request_id?: string | null
+          created_at?: string
+          currency?: string
+          driver_id?: string
+          id?: string
+          merchant_request_id?: string | null
+          mpesa_checked_at?: string | null
+          mpesa_receipt?: string | null
+          paid_at?: string | null
+          phone?: string
+          result_code?: string | null
+          result_desc?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_mpesa_payments_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drivers: {
         Row: {
           created_at: string
@@ -485,6 +547,7 @@ export type Database = {
           currency: string
           id: string
           method: Database["public"]["Enums"]["payment_method"]
+          mpesa_checked_at: string | null
           mpesa_checkout_request_id: string | null
           mpesa_merchant_request_id: string | null
           mpesa_phone: string | null
@@ -507,6 +570,7 @@ export type Database = {
           currency: string
           id?: string
           method: Database["public"]["Enums"]["payment_method"]
+          mpesa_checked_at?: string | null
           mpesa_checkout_request_id?: string | null
           mpesa_merchant_request_id?: string | null
           mpesa_phone?: string | null
@@ -529,6 +593,7 @@ export type Database = {
           currency?: string
           id?: string
           method?: Database["public"]["Enums"]["payment_method"]
+          mpesa_checked_at?: string | null
           mpesa_checkout_request_id?: string | null
           mpesa_merchant_request_id?: string | null
           mpesa_phone?: string | null
@@ -1678,6 +1743,7 @@ export type Database = {
           currency: string
           id: string
           method: Database["public"]["Enums"]["payment_method"]
+          mpesa_checked_at: string | null
           mpesa_checkout_request_id: string | null
           mpesa_merchant_request_id: string | null
           mpesa_phone: string | null
@@ -1776,6 +1842,7 @@ export type Database = {
           currency: string
           id: string
           method: Database["public"]["Enums"]["payment_method"]
+          mpesa_checked_at: string | null
           mpesa_checkout_request_id: string | null
           mpesa_merchant_request_id: string | null
           mpesa_phone: string | null
@@ -1893,6 +1960,32 @@ export type Database = {
         Args: { p_driver_id: string; p_market_code: string }
         Returns: Json
       }
+      driver_mpesa_to_recheck: {
+        Args: { p_limit?: number }
+        Returns: {
+          amount: number
+          checkout_request_id: string | null
+          created_at: string
+          currency: string
+          driver_id: string
+          id: string
+          merchant_request_id: string | null
+          mpesa_checked_at: string | null
+          mpesa_receipt: string | null
+          paid_at: string | null
+          phone: string
+          result_code: string | null
+          result_desc: string | null
+          status: Database["public"]["Enums"]["payment_status"]
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "driver_mpesa_payments"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       driver_over_debt_limit: {
         Args: { p_driver_id: string }
         Returns: boolean
@@ -1997,6 +2090,39 @@ export type Database = {
         }[]
       }
       market_for_phone: { Args: { p_phone: string }; Returns: string }
+      mpesa_payments_to_recheck: {
+        Args: { p_limit?: number }
+        Returns: {
+          amount: number
+          card_brand: string | null
+          card_last4: string | null
+          charge_attempts: number
+          confirmed_by: string | null
+          created_at: string
+          currency: string
+          id: string
+          method: Database["public"]["Enums"]["payment_method"]
+          mpesa_checked_at: string | null
+          mpesa_checkout_request_id: string | null
+          mpesa_merchant_request_id: string | null
+          mpesa_phone: string | null
+          mpesa_receipt: string | null
+          paid_at: string | null
+          result_code: string | null
+          result_desc: string | null
+          ride_id: string
+          status: Database["public"]["Enums"]["payment_status"]
+          stripe_payment_intent_id: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "payments"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      mpesa_recheck_dispatch: { Args: never; Returns: undefined }
       point_in_service_area: {
         Args: { p_lat: number; p_lng: number }
         Returns: boolean

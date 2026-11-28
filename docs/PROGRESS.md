@@ -175,6 +175,13 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - Set 2026-11-27 (client agreed): Kenya cars 12%, bodas 10% (country default 12%), offer 60 days or 100 trips.
   USA unchanged: 15%, no offer.
 
+## Drivers pay with M-Pesa in the app — live 2026-11-28 (sandbox)
+- Earnings → "Pay now with M-Pesa" (Kenya, when the driver owes): amount (default: all owed) + number → M-Pesa
+  prompt → once Safaricom confirms (callback or the every-minute re-check), a 'driver_payment' entry clears the
+  balance automatically and the driver gets a "Payment received" notification. No admin step.
+- Table driver_mpesa_payments (driver reads own; written only by Edge Functions); function mpesa-driver-pay;
+  mpesa-callback and mpesa-reconcile handle both trip and driver payments.
+
 ## Waiting on someone (as of 2026-11-24)
 - **Google Maps key** — client's Google Cloud project "LIFT ME" (lift-me-515711, free trial $300 until 2027-02-23) exists.
   Left: client grants the developer's Gmail the roles Service Usage Admin + API Keys Admin + Viewer (IAM -> Grant access);

@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button, Card, Notice } from '@/components';
 import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
 import { colors, fonts, space, type } from '@/theme';
+import { MpesaPayCard } from './MpesaPayCard';
 import { ledgerLabel, type LedgerEntry, type Wallet } from './wallet';
 
 /** Balance at the top of Earnings: who owes whom, the limit, and how to pay. */
@@ -32,9 +33,10 @@ export function WalletCard({ wallet }: { wallet: Wallet }) {
           )}
         </View>
       ) : null}
+      {owes && wallet.can_pay_mpesa ? <MpesaPayCard wallet={wallet} /> : null}
       {owes && wallet.payment_instructions ? (
         <View style={styles.howTo}>
-          <Text style={[type.label, { marginBottom: 4 }]}>How to pay</Text>
+          <Text style={[type.label, { marginBottom: 4 }]}>{wallet.can_pay_mpesa ? 'Or pay another way' : 'How to pay'}</Text>
           <Text style={type.body}>{wallet.payment_instructions}</Text>
         </View>
       ) : null}
@@ -67,7 +69,7 @@ export function BalanceDueCard({ wallet }: { wallet: Wallet }) {
       <Text style={[type.body, { marginVertical: space.sm }]}>
         You owe Lift Me {formatMoney(-wallet.balance, wallet.currency, wallet.currency_decimals)} in commission. Pay it to go online again.
       </Text>
-      <Button title="How to pay" variant="dark" small onPress={() => router.push('/driver/earnings')} />
+      <Button title={wallet.can_pay_mpesa ? 'Pay now' : 'How to pay'} variant="dark" small onPress={() => router.push('/driver/earnings')} />
     </Card>
   );
 }
