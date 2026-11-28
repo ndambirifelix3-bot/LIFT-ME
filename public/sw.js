@@ -10,7 +10,7 @@
  * - Opening the app: latest page from the server, or the saved copy if the network is slow (see openPage).
  * Bump VERSION to force every phone to drop the old cache.
  */
-const VERSION = 'v2';
+const VERSION = 'v3'; // v3: drops caches that may hold a page saved in place of a missing app file
 const CACHE = `liftme-${VERSION}`;
 const PRECACHE = ['/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/brand/splash-logo.png'];
 // Last good copy of the main page (the same for every address), used when the network is slow.
@@ -126,6 +126,11 @@ async function cacheFirst(request) {
   const cached = await cache.match(request);
   if (cached) return cached;
   const response = await fetch(request);
+  // A file from an older app version that the server no longer has comes back as the main page
+  // (text/html). Never save that, and report it as missing so the app reloads the new version.
+  if ((response.headers.get('content-type') || '').includes('text/html')) {
+    return new Response('Not found (the app was updated)', { status: 404, headers: { 'Content-Type': 'text/plain' } });
+  }
   if (response.ok) {
     await cache.put(request, response.clone());
     trim(cache);

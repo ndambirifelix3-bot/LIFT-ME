@@ -11,6 +11,8 @@ import { withMonitoring } from '@/lib/monitoring'; // error alerts: starts befor
 import '@/features/driver/tracking'; // registers the background location task at startup
 import '@/features/pwa/pwa'; // web only: service worker + install prompt, must start early
 import { ExitGuard } from '@/features/pwa/ExitGuard';
+import { UpdateBanner } from '@/features/pwa/UpdateBanner';
+import '@/features/pwa/updates'; // web only: recover from old cached versions, offer updates
 import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -41,11 +43,15 @@ function RootLayout() {
           <StatusBar style="dark" />
           <ExitGuard />
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ivory } }} />
+          <UpdateBanner />
         </AuthProvider>
       </QueryClientProvider>
     </SafeAreaProvider>
   );
 }
+
+// A crashed screen shows "Something went wrong / Try again" (or updates itself) instead of going blank.
+export { AppErrorScreen as ErrorBoundary } from '@/features/pwa/AppErrorScreen';
 
 // Reports crashes in any screen to Sentry (does nothing until a Sentry DSN is set).
 export default withMonitoring(RootLayout);
