@@ -182,8 +182,9 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   GOOGLE_MAPS_SERVER_KEY, sets daily quotas. Then set the US traffic_factor back if needed and re-quote the airport trip.
 - **M-Pesa (Kenya)** — chosen 2026-11-27: Lift Me's own Safaricom Paybill, settling into the client's Equity Bank
   business account. Needs the Kenyan business registered first. Sandbox tested end to end 2026-11-28: boda trip, STK prompt on a
-  real Safaricom phone, PIN, callback + status check, paid with receipt. TODO before launch: re-check payments
-  left pending when Safaricom never calls back (seen with the sandbox test number).
+  real Safaricom phone, PIN, callback + status check, paid with receipt.
+  Payments left waiting (no callback) are re-checked every minute by `mpesa-reconcile` (status query); after
+  15 minutes with no answer they are marked failed so the passenger can retry or pay cash.
 - **SMS for real phone logins** — client to choose Twilio Verify (recommended to start) and upgrade Twilio.
 - **Client admin account** — client signs up with nderitondungu@gmail.com, then switch his role to admin.
 - **Google Search Console** — verify rideliftme.com (DNS TXT in Cloudflare), submit sitemap.xml, request indexing.

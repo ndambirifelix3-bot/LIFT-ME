@@ -30,5 +30,6 @@ done
 "${PSQL[@]}" -f "$HERE/admin_notify.test.sql" >/dev/null
 "${PSQL[@]}" -f "$HERE/card_payments.test.sql" >/dev/null
 "${PSQL[@]}" -f "$HERE/commission.test.sql" >/dev/null
+"${PSQL[@]}" -f "$HERE/mpesa_recheck.test.sql" >/dev/null
 bash "$HERE/concurrent_accept.test.sh" "$PORT"
 echo "ALL DATABASE TESTS PASSED"
