@@ -184,6 +184,19 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
 - Tested on a real phone 2026-11-28: first prompt cancelled (recorded as failed), second paid KES 5 → balance 0,
   ledger entry with the M-Pesa receipt.
 
+## Cancellation fees + promo codes — live 2026-11-28 (fee OFF until the client sets it)
+- Admin → Pricing → country card → "Cancellation fee": amount (0 = off), free minutes after a driver accepts
+  (default 2), minutes a driver must wait before "Passenger didn't show up" (default 5).
+- Late cancel / no-show → fee charged by card (automatic) or M-Pesa (passenger taps Pay), never cash; driver gets
+  it minus commission once paid; passenger can't book again until paid (Home shows "Unpaid cancellation fee");
+  admin can waive it on the ride page (reason saved in the audit log).
+- Admin → Promo codes: % off, optional cap per ride, first ride only, total + per-rider limits, end date, on/off.
+  Riders tap "Have a promo code?" when choosing a ride; prices show the discount. Lift Me pays the discount, the
+  driver earns on the full fare (cash trips: Lift Me owes the driver the difference in Driver money).
+- Tested live 2026-11-28: code preview + booking with a code; late cancel → KES 50 fee; booking blocked until
+  paid; all screens checked in a browser. Test fee removed and LIVETEST code turned off afterwards.
+- Client to decide: fee amounts (e.g. KES 100 / $5?) and the first launch promo code.
+
 ## Waiting on someone (as of 2026-11-24)
 - **Google Maps key** — client's Google Cloud project "LIFT ME" (lift-me-515711, free trial $300 until 2027-02-23) exists.
   Left: client grants the developer's Gmail the roles Service Usage Admin + API Keys Admin + Viewer (IAM -> Grant access);
