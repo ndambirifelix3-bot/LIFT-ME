@@ -181,6 +181,8 @@ Push notifications, in-app chat, scheduled rides, promo codes, driver payouts vi
   balance automatically and the driver gets a "Payment received" notification. No admin step.
 - Table driver_mpesa_payments (driver reads own; written only by Edge Functions); function mpesa-driver-pay;
   mpesa-callback and mpesa-reconcile handle both trip and driver payments.
+- Tested on a real phone 2026-11-28: first prompt cancelled (recorded as failed), second paid KES 5 → balance 0,
+  ledger entry with the M-Pesa receipt.
 
 ## Waiting on someone (as of 2026-11-24)
 - **Google Maps key** — client's Google Cloud project "LIFT ME" (lift-me-515711, free trial $300 until 2027-02-23) exists.
