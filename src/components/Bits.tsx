@@ -16,12 +16,12 @@ export function Row({ label, value, bold }: { label: string; value: ReactNode; b
   );
 }
 
-const PILL: Record<string, { bg: string; fg: string }> = {
+const PILL = {
   good: { bg: colors.successBg, fg: colors.success },
   bad: { bg: colors.errorBg, fg: colors.error },
   wait: { bg: colors.brandBg, fg: colors.text },
   neutral: { bg: colors.ivory, fg: colors.secondary },
-};
+} satisfies Record<string, { bg: string; fg: string }>;
 
 export function Pill({ text, tone = 'neutral' }: { text: string; tone?: keyof typeof PILL }) {
   return (

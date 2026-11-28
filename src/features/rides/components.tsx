@@ -59,7 +59,7 @@ export function Receipt({ details }: { details: RideDetails }) {
       <Row label="Ride type" value={rideTypeName} />
       {details.driver ? <Row label="Driver" value={details.driver.full_name} /> : null}
       <View style={styles.divider} />
-      {r.promo_code && r.promo_discount > 0 ? (
+      {r.promo_code && r.promo_discount > 0 && r.status !== 'cancelled' ? (
         <Row label={`Promo ${r.promo_code}`} value={`− ${formatMoney(r.promo_discount, r.currency, details.market?.currency_decimals)}`} />
       ) : null}
       {r.status === 'cancelled' && r.cancellation_fee > 0 ? (

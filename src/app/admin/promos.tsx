@@ -145,7 +145,7 @@ function PromoRow({ promo: p, market }: { promo: Promo; market: Market }) {
         <View style={{ flexShrink: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
             <Text style={type.h3}>{p.code}</Text>
-            <Pill text={!p.is_active ? 'Off' : ended ? 'Ended' : usedUp ? 'Used up' : 'Active'} tone={p.is_active && !ended && !usedUp ? 'success' : 'neutral'} />
+            <Pill text={!p.is_active ? 'Off' : ended ? 'Ended' : usedUp ? 'Used up' : 'Active'} tone={p.is_active && !ended && !usedUp ? 'good' : 'neutral'} />
           </View>
           {p.description ? <Text style={type.body}>{p.description}</Text> : null}
           <Text style={type.small}>{rules.join(' · ')}</Text>
