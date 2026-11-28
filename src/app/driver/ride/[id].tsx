@@ -37,10 +37,22 @@ export default function DriverRideDetail() {
               <Row label="You earn" value={formatMoney(r.driver_earnings, r.currency)} bold />
             </Card>
           ) : null}
-          {p && p.method === 'card' && p.status === 'pending' ? (
+          {r.status === 'cancelled' && r.cancellation_fee > 0 ? (
+            <Card>
+              <Text style={type.h3}>Cancellation fee</Text>
+              <Row label="Passenger pays" value={formatMoney(r.cancellation_fee, r.currency)} />
+              <Row label={`Lift Me commission (${r.commission_percent ?? 0}%)`} value={`− ${formatMoney(r.platform_commission, r.currency)}`} />
+              <Row label="You earn" value={formatMoney(r.driver_earnings, r.currency)} bold />
+              <Notice
+                tone={p?.status === 'paid' ? 'success' : 'brand'}
+                text={p?.status === 'paid' ? 'Paid. Your share is in Driver money.' : 'Added to your Driver money as soon as the passenger pays.'}
+              />
+            </Card>
+          ) : null}
+          {r.status !== 'cancelled' && p && p.method === 'card' && p.status === 'pending' ? (
             <Notice text="The passenger's card is being charged automatically. No cash needed." />
           ) : null}
-          {p && p.status !== 'paid' && !(p.method === 'card' && p.status === 'pending') ? (
+          {r.status !== 'cancelled' && p && p.status !== 'paid' && !(p.method === 'card' && p.status === 'pending') ? (
             <Card>
               {p.method === 'card' ? (
                 <Notice tone="error" text="The passenger's card payment failed. They can try again in their app. If they pay you cash instead, tap below." />
@@ -53,7 +65,7 @@ export default function DriverRideDetail() {
               <Button title="Cash received" onPress={() => cash.mutate(undefined)} loading={cash.isPending} />
             </Card>
           ) : null}
-          {p?.status === 'paid' ? <Notice tone="success" text={`Paid · ${paymentLabel(p)}`} /> : null}
+          {r.status !== 'cancelled' && p?.status === 'paid' ? <Notice tone="success" text={`Paid · ${paymentLabel(p)}`} /> : null}
           <Receipt details={d} />
           <RatePanel details={d} who="passenger" />
           <Button title="Back to home" variant="dark" onPress={() => router.replace('/driver')} />

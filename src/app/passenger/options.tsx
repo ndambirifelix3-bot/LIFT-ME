@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Redirect, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Button, Card, ErrorMessage, Header, Notice, Row, Screen, SectionTitle } from '@/components';
+import { Button, Card, ErrorMessage, Header, Input, Notice, Row, Screen, SectionTitle } from '@/components';
 import { useBooking } from '@/features/booking/store';
 import { useMarket } from '@/features/markets';
 import { cardLabel, useSavedCard } from '@/features/payments/cards';
@@ -35,6 +35,18 @@ export default function RideOptions() {
   const method: Method = picked && methods.includes(picked) ? picked : preferred;
   const needsCard = method === 'card' && !savedCard.data;
   const [left, setLeft] = useState(secondsUntil(quote?.expires_at));
+  // Promo code: checked by the server against this quote; the discount shows on each ride type.
+  const [promoOpen, setPromoOpen] = useState(false);
+  const [promoText, setPromoText] = useState('');
+  const promo = useMutation({
+    mutationFn: async (code: string) => {
+      const { data, error } = await supabase.rpc('preview_promo', { p_quote_id: quote!.id, p_code: code });
+      if (error) throw error;
+      return data as unknown as { code: string; description: string; options: { ride_type: string; discount: number }[] };
+    },
+  });
+  const applied = promo.data && !promo.isPending ? promo.data : null;
+  const discountFor = (rt: string) => applied?.options.find((o) => o.ride_type === rt)?.discount ?? 0;
 
   useEffect(() => {
     const t = setInterval(() => setLeft(secondsUntil(quote?.expires_at)), 1000);
@@ -48,6 +60,7 @@ export default function RideOptions() {
         p_quote_id: quote!.id,
         p_ride_type: rideType!,
         p_payment_method: method,
+        p_promo_code: applied?.code,
       });
       if (error) throw error;
       return data as unknown as Ride;
@@ -101,7 +114,14 @@ export default function RideOptions() {
                 {o.description} · {o.seats === 1 ? '1 passenger' : `${o.seats} seats`}
               </Text>
             </View>
-            <Text style={[styles.price, selected && { color: colors.brand }]}>{formatMoney(o.fare, o.currency, market?.currency_decimals)}</Text>
+            <View style={{ alignItems: 'flex-end' }}>
+              {discountFor(o.ride_type) > 0 ? (
+                <Text style={[styles.was, selected && { color: colors.ivory }]}>{formatMoney(o.fare, o.currency, market?.currency_decimals)}</Text>
+              ) : null}
+              <Text style={[styles.price, selected && { color: colors.brand }]}>
+                {formatMoney(o.fare - discountFor(o.ride_type), o.currency, market?.currency_decimals)}
+              </Text>
+            </View>
           </Pressable>
         );
       })}
@@ -132,6 +152,22 @@ export default function RideOptions() {
       </Text>
 
       <View style={{ height: space.lg }} />
+      {applied ? (
+        <View style={styles.promoRow}>
+          <Notice tone="success" text={`Promo ${applied.code} applied${applied.description ? `: ${applied.description}` : ''}.`} />
+          <Button title="Remove" variant="ghost" small onPress={() => { promo.reset(); setPromoText(''); }} />
+        </View>
+      ) : promoOpen ? (
+        <View style={styles.promoRow}>
+          <View style={{ flex: 1 }}>
+            <Input label="Promo code" value={promoText} onChangeText={(x) => setPromoText(x.toUpperCase())} autoCapitalize="characters" placeholder="e.g. WELCOME" />
+          </View>
+          <Button title="Apply" variant="dark" small onPress={() => promo.mutate(promoText.trim())} loading={promo.isPending} disabled={promoText.trim().length < 3} />
+        </View>
+      ) : (
+        <Button title="Have a promo code?" variant="ghost" small onPress={() => setPromoOpen(true)} style={{ alignSelf: 'flex-start' }} />
+      )}
+      <ErrorMessage error={promo.error} />
       {!expired ? <Notice text={`This price is held for ${formatCountdown(left)}.`} /> : null}
       <ErrorMessage error={request.error} />
     </Screen>
@@ -149,6 +185,8 @@ const styles = StyleSheet.create({
   optTitle: { fontFamily: fonts.semibold, fontSize: 17, color: colors.text },
   optSub: { fontFamily: fonts.regular, fontSize: 13, color: colors.secondary, marginTop: 2 },
   price: { fontFamily: fonts.bold, fontSize: 17, color: colors.text },
+  was: { fontFamily: fonts.regular, fontSize: 13, color: colors.secondary, textDecorationLine: 'line-through' },
+  promoRow: { flexDirection: 'row', alignItems: 'flex-end', gap: space.sm, marginBottom: space.md },
   pay: {
     flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.sm, padding: space.md, borderRadius: radius.md,
     backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border,

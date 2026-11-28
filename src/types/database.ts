@@ -433,6 +433,8 @@ export type Database = {
       }
       markets: {
         Row: {
+          cancellation_fee: number
+          cancellation_free_seconds: number
           center_lat: number | null
           center_lng: number | null
           code: string
@@ -450,6 +452,7 @@ export type Database = {
           name: string
           new_driver_free_days: number
           new_driver_free_trips: number
+          no_show_wait_seconds: number
           payment_methods: Database["public"]["Enums"]["payment_method"][]
           phone_country_code: string
           prices_are_placeholder: boolean
@@ -460,6 +463,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cancellation_fee?: number
+          cancellation_free_seconds?: number
           center_lat?: number | null
           center_lng?: number | null
           code: string
@@ -477,6 +482,7 @@ export type Database = {
           name: string
           new_driver_free_days?: number
           new_driver_free_trips?: number
+          no_show_wait_seconds?: number
           payment_methods?: Database["public"]["Enums"]["payment_method"][]
           phone_country_code: string
           prices_are_placeholder?: boolean
@@ -487,6 +493,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cancellation_fee?: number
+          cancellation_free_seconds?: number
           center_lat?: number | null
           center_lng?: number | null
           code?: string
@@ -504,6 +512,7 @@ export type Database = {
           name?: string
           new_driver_free_days?: number
           new_driver_free_trips?: number
+          no_show_wait_seconds?: number
           payment_methods?: Database["public"]["Enums"]["payment_method"][]
           phone_country_code?: string
           prices_are_placeholder?: boolean
@@ -703,6 +712,69 @@ export type Database = {
           role_chosen?: boolean
         }
         Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string
+          ends_at: string | null
+          first_ride_only: boolean
+          is_active: boolean
+          market_code: string
+          max_discount: number | null
+          max_uses: number | null
+          percent_off: number
+          starts_at: string
+          uses_per_passenger: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          ends_at?: string | null
+          first_ride_only?: boolean
+          is_active?: boolean
+          market_code: string
+          max_discount?: number | null
+          max_uses?: number | null
+          percent_off: number
+          starts_at?: string
+          uses_per_passenger?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          ends_at?: string | null
+          first_ride_only?: boolean
+          is_active?: boolean
+          market_code?: string
+          max_discount?: number | null
+          max_uses?: number | null
+          percent_off?: number
+          starts_at?: string
+          uses_per_passenger?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_codes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_codes_market_code_fkey"
+            columns: ["market_code"]
+            isOneToOne: false
+            referencedRelation: "markets"
+            referencedColumns: ["code"]
+          },
+        ]
       }
       push_config: {
         Row: {
@@ -1031,6 +1103,7 @@ export type Database = {
           accepted_at: string | null
           arrived_at: string | null
           cancel_reason: string | null
+          cancellation_fee: number
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
@@ -1057,6 +1130,8 @@ export type Database = {
           pickup_note: string | null
           platform_commission: number | null
           polyline: string | null
+          promo_code: string | null
+          promo_discount: number
           quote_id: string | null
           requested_at: string
           ride_type: string
@@ -1069,6 +1144,7 @@ export type Database = {
           accepted_at?: string | null
           arrived_at?: string | null
           cancel_reason?: string | null
+          cancellation_fee?: number
           cancelled_at?: string | null
           cancelled_by?: Database["public"]["Enums"]["user_role"] | null
           commission_percent?: number | null
@@ -1095,6 +1171,8 @@ export type Database = {
           pickup_note?: string | null
           platform_commission?: number | null
           polyline?: string | null
+          promo_code?: string | null
+          promo_discount?: number
           quote_id?: string | null
           requested_at?: string
           ride_type: string
@@ -1107,6 +1185,7 @@ export type Database = {
           accepted_at?: string | null
           arrived_at?: string | null
           cancel_reason?: string | null
+          cancellation_fee?: number
           cancelled_at?: string | null
           cancelled_by?: Database["public"]["Enums"]["user_role"] | null
           commission_percent?: number | null
@@ -1133,6 +1212,8 @@ export type Database = {
           pickup_note?: string | null
           platform_commission?: number | null
           polyline?: string | null
+          promo_code?: string | null
+          promo_discount?: number
           quote_id?: string | null
           requested_at?: string
           ride_type?: string
@@ -1162,6 +1243,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rides_promo_code_fkey"
+            columns: ["promo_code"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["code"]
           },
           {
             foreignKeyName: "rides_quote_id_fkey"
@@ -1392,6 +1480,7 @@ export type Database = {
           accepted_at: string | null
           arrived_at: string | null
           cancel_reason: string | null
+          cancellation_fee: number
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
@@ -1418,6 +1507,8 @@ export type Database = {
           pickup_note: string | null
           platform_commission: number | null
           polyline: string | null
+          promo_code: string | null
+          promo_discount: number
           quote_id: string | null
           requested_at: string
           ride_type: string
@@ -1650,6 +1741,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_waive_cancellation_fee: {
+        Args: { p_reason: string; p_ride_id: string }
+        Returns: undefined
+      }
       assert_active_user: {
         Args: never
         Returns: {
@@ -1687,6 +1782,7 @@ export type Database = {
           accepted_at: string | null
           arrived_at: string | null
           cancel_reason: string | null
+          cancellation_fee: number
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
@@ -1713,6 +1809,8 @@ export type Database = {
           pickup_note: string | null
           platform_commission: number | null
           polyline: string | null
+          promo_code: string | null
+          promo_discount: number
           quote_id: string | null
           requested_at: string
           ride_type: string
@@ -1763,6 +1861,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      charge_cancellation_fee: { Args: { p_ride_id: string }; Returns: number }
       choose_role: {
         Args: { p_role: Database["public"]["Enums"]["user_role"] }
         Returns: {
@@ -1789,6 +1888,7 @@ export type Database = {
           accepted_at: string | null
           arrived_at: string | null
           cancel_reason: string | null
+          cancellation_fee: number
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
@@ -1815,6 +1915,8 @@ export type Database = {
           pickup_note: string | null
           platform_commission: number | null
           polyline: string | null
+          promo_code: string | null
+          promo_discount: number
           quote_id: string | null
           requested_at: string
           ride_type: string
@@ -1913,6 +2015,7 @@ export type Database = {
           accepted_at: string | null
           arrived_at: string | null
           cancel_reason: string | null
+          cancellation_fee: number
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
@@ -1939,6 +2042,8 @@ export type Database = {
           pickup_note: string | null
           platform_commission: number | null
           polyline: string | null
+          promo_code: string | null
+          promo_discount: number
           quote_id: string | null
           requested_at: string
           ride_type: string
@@ -1990,16 +2095,13 @@ export type Database = {
         Args: { p_driver_id: string }
         Returns: boolean
       }
-      driver_step: {
-        Args: {
-          p_from: Database["public"]["Enums"]["ride_status"]
-          p_ride_id: string
-          p_to: Database["public"]["Enums"]["ride_status"]
-        }
+      driver_report_no_show: {
+        Args: { p_ride_id: string }
         Returns: {
           accepted_at: string | null
           arrived_at: string | null
           cancel_reason: string | null
+          cancellation_fee: number
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
@@ -2026,6 +2128,62 @@ export type Database = {
           pickup_note: string | null
           platform_commission: number | null
           polyline: string | null
+          promo_code: string | null
+          promo_discount: number
+          quote_id: string | null
+          requested_at: string
+          ride_type: string
+          search_expires_at: string
+          share_token: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["ride_status"]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "rides"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      driver_step: {
+        Args: {
+          p_from: Database["public"]["Enums"]["ride_status"]
+          p_ride_id: string
+          p_to: Database["public"]["Enums"]["ride_status"]
+        }
+        Returns: {
+          accepted_at: string | null
+          arrived_at: string | null
+          cancel_reason: string | null
+          cancellation_fee: number
+          cancelled_at: string | null
+          cancelled_by: Database["public"]["Enums"]["user_role"] | null
+          commission_percent: number | null
+          commission_waived: boolean
+          completed_at: string | null
+          currency: string
+          distance_m: number
+          driver_earnings: number | null
+          driver_id: string | null
+          dropoff: unknown
+          dropoff_address: string
+          dropoff_lat: number
+          dropoff_lng: number
+          duration_s: number
+          fare: number
+          id: string
+          market_code: string
+          passenger_id: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          pickup: unknown
+          pickup_address: string
+          pickup_lat: number
+          pickup_lng: number
+          pickup_note: string | null
+          platform_commission: number | null
+          polyline: string | null
+          promo_code: string | null
+          promo_discount: number
           quote_id: string | null
           requested_at: string
           ride_type: string
@@ -2127,6 +2285,19 @@ export type Database = {
         Args: { p_lat: number; p_lng: number }
         Returns: boolean
       }
+      preview_promo: {
+        Args: { p_code: string; p_quote_id: string }
+        Returns: Json
+      }
+      promo_discount_for: {
+        Args: {
+          p_code: string
+          p_fare: number
+          p_market_code: string
+          p_passenger_id: string
+        }
+        Returns: number
+      }
       push_notify: {
         Args: {
           p_body: string
@@ -2163,6 +2334,7 @@ export type Database = {
       request_ride: {
         Args: {
           p_payment_method: Database["public"]["Enums"]["payment_method"]
+          p_promo_code?: string
           p_quote_id: string
           p_ride_type: string
         }
@@ -2170,6 +2342,7 @@ export type Database = {
           accepted_at: string | null
           arrived_at: string | null
           cancel_reason: string | null
+          cancellation_fee: number
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
@@ -2196,6 +2369,8 @@ export type Database = {
           pickup_note: string | null
           platform_commission: number | null
           polyline: string | null
+          promo_code: string | null
+          promo_discount: number
           quote_id: string | null
           requested_at: string
           ride_type: string
@@ -2228,6 +2403,10 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      ride_commission_percent: {
+        Args: { p_ride: Database["public"]["Tables"]["rides"]["Row"] }
+        Returns: number
       }
       ride_money: {
         Args: { r: Database["public"]["Tables"]["rides"]["Row"] }
@@ -2305,6 +2484,7 @@ export type Database = {
           accepted_at: string | null
           arrived_at: string | null
           cancel_reason: string | null
+          cancellation_fee: number
           cancelled_at: string | null
           cancelled_by: Database["public"]["Enums"]["user_role"] | null
           commission_percent: number | null
@@ -2331,6 +2511,8 @@ export type Database = {
           pickup_note: string | null
           platform_commission: number | null
           polyline: string | null
+          promo_code: string | null
+          promo_discount: number
           quote_id: string | null
           requested_at: string
           ride_type: string
@@ -2372,6 +2554,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      unpaid_cancellation_fee_ride: {
+        Args: { p_passenger_id: string }
+        Returns: string
       }
       update_driver_location: {
         Args: { p_heading?: number; p_lat: number; p_lng: number }

@@ -15,7 +15,7 @@ export default function PassengerRideDetail() {
       <ErrorMessage error={details.error} onRetry={() => details.refetch()} />
       {details.data ? (
         <>
-          {details.data.ride.status === 'completed' ? <PassengerPayment details={details.data} /> : null}
+          {details.data.ride.status === 'completed' || details.data.ride.cancellation_fee > 0 ? <PassengerPayment details={details.data} /> : null}
           <Receipt details={details.data} />
           <RatePanel details={details.data} who="driver" />
           <Button title="Report a problem with this trip" variant="outline" onPress={() => router.push({ pathname: '/passenger/help', params: { rideId: id } })} />

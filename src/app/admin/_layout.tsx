@@ -14,6 +14,7 @@ const NAV = [
   { href: '/admin/money', label: 'Driver money', icon: 'wallet-outline' },
   { href: '/admin/rides', label: 'Rides', icon: 'navigate-outline' },
   { href: '/admin/pricing', label: 'Pricing', icon: 'pricetag-outline' },
+  { href: '/admin/promos', label: 'Promo codes', icon: 'gift-outline' },
   { href: '/admin/markets', label: 'Markets', icon: 'globe-outline' },
   { href: '/admin/users', label: 'Users', icon: 'people-outline' },
   { href: '/admin/reports', label: 'Reports', icon: 'chatbubbles-outline' },

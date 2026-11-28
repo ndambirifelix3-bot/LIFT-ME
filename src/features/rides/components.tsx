@@ -59,7 +59,14 @@ export function Receipt({ details }: { details: RideDetails }) {
       <Row label="Ride type" value={rideTypeName} />
       {details.driver ? <Row label="Driver" value={details.driver.full_name} /> : null}
       <View style={styles.divider} />
-      <Row label="Total" value={formatMoney(r.fare, r.currency, details.market?.currency_decimals)} bold />
+      {r.promo_code && r.promo_discount > 0 ? (
+        <Row label={`Promo ${r.promo_code}`} value={`− ${formatMoney(r.promo_discount, r.currency, details.market?.currency_decimals)}`} />
+      ) : null}
+      {r.status === 'cancelled' && r.cancellation_fee > 0 ? (
+        <Row label="Cancellation fee" value={formatMoney(r.cancellation_fee, r.currency, details.market?.currency_decimals)} bold />
+      ) : (
+        <Row label="Total" value={formatMoney(r.fare, r.currency, details.market?.currency_decimals)} bold />
+      )}
       <Row label="Payment" value={p ? `${paymentLabel(p)} · ${p.status}` : methodLabel(r.payment_method)} />
       {p?.method === 'mpesa' && p.mpesa_receipt ? <Row label="M-Pesa receipt" value={p.mpesa_receipt} /> : null}
     </Card>
@@ -99,7 +106,8 @@ export function PassengerPayment({ details }: { details: RideDetails }) {
   });
 
   if (!p) return null;
-  const cashAllowed = details.market?.payment_methods?.includes('cash') ?? true;
+  // A cancellation fee is never paid in cash (the driver isn't there to collect it).
+  const cashAllowed = details.ride.status !== 'cancelled' && (details.market?.payment_methods?.includes('cash') ?? true);
   if (p.status === 'paid') return <Notice tone="success" text={`Paid ${formatMoney(p.amount, p.currency)} · ${paymentLabel(p)}. Thank you!`} />;
   if (p.method === 'cash') return <Notice text={`Please pay your driver ${formatMoney(p.amount, p.currency)} in cash.`} />;
   if (p.method === 'card') return <CardPayment details={details} cashAllowed={cashAllowed} onCash={() => toCash.mutate()} cashPending={toCash.isPending} cashError={toCash.error} />;

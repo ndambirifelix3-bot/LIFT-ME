@@ -15,6 +15,8 @@ export default function AdminRideDetail() {
   const details = useRideDetails(id, { poll: 15_000 });
   const [reason, setReason] = useState('');
   const cancel = useRideAction(() => supabase.rpc('cancel_ride', { p_ride_id: id!, p_reason: reason || 'Cancelled by admin' }));
+  const [waiveReason, setWaiveReason] = useState('');
+  const waive = useRideAction(() => supabase.rpc('admin_waive_cancellation_fee', { p_ride_id: id!, p_reason: waiveReason }));
 
   if (details.isLoading) return <Loading />;
   const d = details.data;
@@ -44,7 +46,7 @@ export default function AdminRideDetail() {
         </Card>
       </View>
       <Receipt details={d} />
-      {r.status === 'completed' ? (
+      {r.status === 'completed' || r.cancellation_fee > 0 ? (
         <Card>
           <Row label="Commission" value={`${formatMoney(r.platform_commission, r.currency)} (${r.commission_percent ?? 0}%)`} />
           <Row label="Driver earnings" value={formatMoney(r.driver_earnings, r.currency)} />
@@ -66,6 +68,20 @@ export default function AdminRideDetail() {
           />
         ))}
       </Card>
+
+      {r.status === 'cancelled' && r.cancellation_fee > 0 && d.payment?.status !== 'paid' ? (
+        <>
+          <SectionTitle>Cancellation fee (unpaid)</SectionTitle>
+          <Card>
+            <Text style={[type.small, { marginBottom: space.sm }]}>
+              The passenger can’t book again until this {formatMoney(r.cancellation_fee, r.currency)} fee is paid. Waive it if it wasn’t their fault.
+            </Text>
+            <Input label="Reason (saved in the audit log)" value={waiveReason} onChangeText={setWaiveReason} />
+            <ErrorMessage error={waive.error} />
+            <Button title="Waive the fee" variant="outline" disabled={!waiveReason.trim()} onPress={() => waive.mutate(undefined)} loading={waive.isPending} />
+          </Card>
+        </>
+      ) : null}
 
       {active ? (
         <>

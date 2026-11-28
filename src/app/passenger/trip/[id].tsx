@@ -12,6 +12,7 @@ import { formatCountdown, formatMoney, RIDE_STATUS_LABEL, secondsUntil } from '@
 import { supabase } from '@/lib/supabase';
 import { colors, space, type } from '@/theme';
 import { methodLabel } from '@/features/payments/cards';
+import { cancelFeeNow } from '@/features/rides/fees';
 
 function confirmAsync(title: string, message: string): Promise<boolean> {
   if (Platform.OS === 'web') return Promise.resolve(window.confirm(`${title}\n\n${message}`));
@@ -68,7 +69,16 @@ export default function PassengerTrip() {
   const center = driverLoc ?? { lat: ride.pickup_lat, lng: ride.pickup_lng };
 
   const doCancel = async () => {
-    const msg = ride.status === 'searching' ? 'Stop looking for a driver?' : 'Your driver is already on the way.';
+    const fee = cancelFeeNow(ride, d.market);
+    const money = (n: number) => formatMoney(n, ride.currency, d.market?.currency_decimals);
+    const msg =
+      ride.status === 'searching'
+        ? 'Stop looking for a driver?'
+        : fee.fee > 0
+          ? `A ${money(fee.fee)} cancellation fee applies, because your driver ${ride.status === 'arrived' ? 'is already here' : 'has been on the way for a while'}.`
+          : fee.freeSecondsLeft > 0 && (d.market?.cancellation_fee ?? 0) > 0
+            ? `Free to cancel for ${Math.ceil(fee.freeSecondsLeft / 60)} more minute${fee.freeSecondsLeft > 60 ? 's' : ''}. After that a ${money(d.market!.cancellation_fee)} fee applies.`
+            : 'Your driver is already on the way.';
     if (await confirmAsync('Cancel this ride?', msg)) cancel.mutate('Cancelled by passenger');
   };
 
@@ -161,6 +171,12 @@ export default function PassengerTrip() {
           action="Back to home"
           onAction={() => router.replace('/passenger')}
         />
+      ) : null}
+      {status === 'cancelled' && ride.cancellation_fee > 0 ? (
+        <>
+          <Notice tone="error" text={`A ${formatMoney(ride.cancellation_fee, ride.currency, d.market?.currency_decimals)} cancellation fee applies to this ride.`} />
+          <Button title="Pay cancellation fee" onPress={() => router.replace(`/passenger/ride/${ride.id}`)} />
+        </>
       ) : null}
 
       <ErrorMessage error={cancel.error} />

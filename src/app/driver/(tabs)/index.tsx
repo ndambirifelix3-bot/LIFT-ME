@@ -20,6 +20,7 @@ import { formatCountdown, formatDistance, formatDuration, formatMoney, RIDE_STAT
 import { supabase } from '@/lib/supabase';
 import { colors, fonts, space, switchColors, type } from '@/theme';
 import { methodLabel } from '@/features/payments/cards';
+import { noShowSecondsLeft } from '@/features/rides/fees';
 
 function navigate(lat: number, lng: number) {
   // Opens Google Maps turn-by-turn (app if installed, otherwise browser).
@@ -259,6 +260,7 @@ function ActiveRide({ ride }: { ride: Ride }) {
       <Button title={toPickup ? 'Navigate to pickup' : 'Navigate to drop-off'} variant="dark" onPress={() => navigate(target.lat, target.lng)} style={{ marginBottom: space.sm }} />
       {r.status === 'accepted' ? <Button title="I've arrived" onPress={() => arrived.mutate(undefined)} loading={arrived.isPending} /> : null}
       {r.status === 'arrived' ? <Button title="Start trip" onPress={() => start.mutate(undefined)} loading={start.isPending} /> : null}
+      {r.status === 'arrived' ? <NoShowButton ride={r} market={details.data?.market ?? null} /> : null}
       {r.status === 'in_progress' ? (
         <Button
           title="Complete trip"
@@ -281,6 +283,37 @@ function ActiveRide({ ride }: { ride: Ride }) {
         />
       ) : null}
       {r.status === 'in_progress' ? <Notice text="Drive safely. Use Help in your Account tab if anything goes wrong." /> : null}
+    </>
+  );
+}
+
+/** After waiting at the pickup (5 minutes by default), the driver can end the ride; the passenger pays the cancellation fee. */
+function NoShowButton({ ride, market }: { ride: Pick<Ride, 'id' | 'status' | 'accepted_at' | 'arrived_at' | 'currency'>; market: Parameters<typeof noShowSecondsLeft>[1] }) {
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => tick((n) => n + 1), 5000);
+    return () => clearInterval(t);
+  }, []);
+  const noShow = useRideAction(() => supabase.rpc('driver_report_no_show', { p_ride_id: ride.id }));
+  const left = noShowSecondsLeft(ride, market);
+  if (left > 0) {
+    return <Text style={[type.small, { textAlign: 'center', marginTop: space.sm }]}>Passenger not here? You can end the ride in {Math.ceil(left / 60)} min.</Text>;
+  }
+  const fee = market?.cancellation_fee ? ` They will be charged ${formatMoney(market.cancellation_fee, ride.currency)}, and you get your share.` : '';
+  return (
+    <>
+      <ErrorMessage error={noShow.error} />
+      <Button
+        title="Passenger didn't show up"
+        variant="outline"
+        loading={noShow.isPending}
+        style={{ marginTop: space.sm }}
+        onPress={async () => {
+          if (await ask('End this ride?', `Only if you waited at the pickup and couldn't reach the passenger.${fee}`)) {
+            noShow.mutate(undefined, { onSuccess: () => router.push(`/driver/ride/${ride.id}`) });
+          }
+        }}
+      />
     </>
   );
 }

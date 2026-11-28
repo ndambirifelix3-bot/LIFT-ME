@@ -8,6 +8,9 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { useBooking } from '@/features/booking/store';
 import { useMyLocation } from '@/features/location';
 import { useActiveRide } from '@/features/rides/hooks';
+import { useUnpaidFee } from '@/features/rides/useUnpaidFee';
+import { useMarket } from '@/features/markets';
+import { formatMoney } from '@/lib/format';
 import { colors, fonts, radius, space, type } from '@/theme';
 
 // Map starts on central Nairobi until we know where the passenger is.
@@ -18,6 +21,8 @@ export default function PassengerHome() {
   const active = useActiveRide(session?.user.id, 'passenger');
   const loc = useMyLocation();
   const reset = useBooking((s) => s.reset);
+  const unpaid = useUnpaidFee();
+  const feeMarket = useMarket(unpaid.data?.market_code);
 
   if (active.isLoading) return <Loading />;
   // Reopened the app mid-ride → straight back to the live trip.
@@ -54,6 +59,15 @@ export default function PassengerHome() {
             </Card>
           ) : null}
           <ErrorMessage error={loc.error} />
+          {unpaid.data ? (
+            <Card style={{ borderColor: colors.error, borderWidth: 2 }}>
+              <Text style={type.h3}>Unpaid cancellation fee</Text>
+              <Text style={[type.small, { marginVertical: space.sm }]}>
+                Please pay {formatMoney(unpaid.data.cancellation_fee, unpaid.data.currency, feeMarket?.currency_decimals)} for a ride you cancelled late, then you can book again.
+              </Text>
+              <Button title="Pay now" variant="dark" small onPress={() => router.push(`/passenger/ride/${unpaid.data!.id}`)} />
+            </Card>
+          ) : null}
           <Pressable style={styles.whereTo} onPress={startBooking} accessibilityRole="button" accessibilityLabel="Where to?">
             <Ionicons name="search" size={20} color={colors.text} />
             <Text style={styles.whereText}>Where to?</Text>

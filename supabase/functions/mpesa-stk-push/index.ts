@@ -19,7 +19,8 @@ serve(async (req) => {
     .eq('id', rideId)
     .maybeSingle();
   if (!ride || ride.passenger_id !== user.id) return errorResponse('not_your_ride', 403);
-  if (ride.status !== 'completed') return errorResponse('ride_not_completed', 409, 'You can pay once the trip is complete.');
+  // A completed trip, or a cancelled one that carries a cancellation fee (checked via its payment below).
+  if (ride.status !== 'completed' && ride.status !== 'cancelled') return errorResponse('ride_not_completed', 409, 'You can pay once the trip is complete.');
 
   // M-Pesa only takes whole Kenyan shillings, and only where the market offers it.
   const { data: market } = await db.from('markets').select('payment_methods').eq('code', ride.market_code).maybeSingle();

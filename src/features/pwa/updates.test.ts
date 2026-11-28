@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals';
 import { isStaleCodeError } from './updates';
 
 describe('isStaleCodeError', () => {

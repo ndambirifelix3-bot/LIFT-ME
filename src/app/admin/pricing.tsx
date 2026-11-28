@@ -146,6 +146,9 @@ function MarketSettingsCard({ market }: { market: Market }) {
   const [placeholder, setPlaceholder] = useState(market.prices_are_placeholder);
   const [freeDays, setFreeDays] = useState(String(market.new_driver_free_days));
   const [freeTrips, setFreeTrips] = useState(String(market.new_driver_free_trips));
+  const [cancelFee, setCancelFee] = useState(toMoneyInput(market.cancellation_fee, market.currency_decimals));
+  const [freeCancelMin, setFreeCancelMin] = useState(String(Math.round(market.cancellation_free_seconds / 60)));
+  const [noShowMin, setNoShowMin] = useState(String(Math.round(market.no_show_wait_seconds / 60)));
   // M-Pesa only takes Kenyan shillings.
   const available = (Object.keys(PAYMENT_LABELS) as Market['payment_methods']).filter((m) => m !== 'mpesa' || market.currency === 'KES');
 
@@ -155,6 +158,10 @@ function MarketSettingsCard({ market }: { market: Market }) {
       if (!methods.length) throw new Error('Pick at least one payment method.');
       if (!/^\d{1,3}$/.test(freeDays) || +freeDays > 365) throw new Error('Launch offer days: a whole number from 0 to 365.');
       if (!/^\d{1,5}$/.test(freeTrips) || +freeTrips > 10000) throw new Error('Launch offer trips: a whole number from 0 to 10000.');
+      const fee = cancelFee.trim() === '' ? 0 : fromMoneyInput(cancelFee, market.currency_decimals);
+      if (fee === null) throw new Error('Cancellation fee: enter an amount (0 = no fee).');
+      if (!/^\d{1,2}$/.test(freeCancelMin) || +freeCancelMin > 60) throw new Error('Free cancelling: minutes from 0 to 60.');
+      if (!/^\d{1,2}$/.test(noShowMin) || +noShowMin < 1 || +noShowMin > 60) throw new Error('No-show wait: minutes from 1 to 60.');
       const numbers = emergency.split(',').map((s) => s.trim()).filter(Boolean);
       if (numbers.some((x) => !/^[0-9+]{2,15}$/.test(x))) throw new Error('Emergency numbers: digits only, separated by commas.');
       const { error } = await supabase.from('markets').update({
@@ -165,6 +172,9 @@ function MarketSettingsCard({ market }: { market: Market }) {
         prices_are_placeholder: placeholder,
         new_driver_free_days: +freeDays,
         new_driver_free_trips: +freeTrips,
+        cancellation_fee: fee,
+        cancellation_free_seconds: +freeCancelMin * 60,
+        no_show_wait_seconds: +noShowMin * 60,
       }).eq('code', market.code);
       if (error) throw error;
     },
@@ -195,6 +205,21 @@ function MarketSettingsCard({ market }: { market: Market }) {
       </View>
       <Text style={[type.small, { marginTop: -space.sm, marginBottom: space.lg }]}>
         Counts from the day a driver is first approved. With both set, the offer ends at whichever comes first.
+      </Text>
+      <Text style={[type.label, { marginBottom: space.sm }]}>Cancellation fee</Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
+        <View style={{ flexGrow: 1, flexBasis: 160 }}>
+          <Input label={`Fee (${market.currency}, 0 = no fee)`} value={cancelFee} onChangeText={setCancelFee} keyboardType={market.currency_decimals ? 'decimal-pad' : 'number-pad'} />
+        </View>
+        <View style={{ flexGrow: 1, flexBasis: 160 }}>
+          <Input label="Free to cancel for (minutes after a driver accepts)" value={freeCancelMin} onChangeText={setFreeCancelMin} keyboardType="number-pad" />
+        </View>
+        <View style={{ flexGrow: 1, flexBasis: 160 }}>
+          <Input label="Driver can report a no-show after (minutes waiting)" value={noShowMin} onChangeText={setNoShowMin} keyboardType="number-pad" />
+        </View>
+      </View>
+      <Text style={[type.small, { marginTop: -space.sm, marginBottom: space.lg }]}>
+        Charged by card or M-Pesa when a passenger cancels late (or after the driver arrived), or doesn’t show up. The driver gets it minus commission.
       </Text>
       <Text style={[type.label, { marginBottom: space.sm }]}>Payment methods passengers can choose</Text>
       <View style={{ flexDirection: 'row', gap: space.sm, marginBottom: space.lg }}>
